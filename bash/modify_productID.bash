@@ -15,7 +15,7 @@
 # VERSION: 1.0
 #===================================================================================
 
-
+# Modify shell behavior and enable "shell globbing"
 shopt -s globstar
 
 declare -r domaindir="/production/apache/data/emodnet-domains/"
