@@ -158,26 +158,26 @@ for ncfile in ${domaindir}**/*.nc; do # Whitespace-safe and recursive
 
     # Copy the old product ID
     echo "Modifying product ID"
-    ncrename -a global@product_id,old_product_id ${ncfile}
+    ncrename -a global@product_id,old_product_id "${ncfile}"
 
     # Update the new product ID
     echo "New product ID: ${productID}"
-    ncatted -a product_id,global,o,c,${productID} ${ncfile}
+    ncatted -a product_id,global,o,c,${productID} "${ncfile}"
 
     # Editing the attributes
     # -a: name of the attribute
     # o = overwrite (editing mode)
     # c = character (attribute type)
     echo "Modifying global attributes"
-    ncatted -a project,global,o,c,"EMODnet Chemistry: http://www.emodnet-chemistry.eu/" ${ncfile}
-    ncatted -a data_access,global,o,c,"OPeNDAP: http://ec.oceanbrowser.net:8081/data/emodnet-domains/" ${ncfile}
-    ncatted -a WEB_visualisation,global,o,c,"http://ec.oceanbrowser.net/emodnet/" ${ncfile}
+    ncatted -a project,global,o,c,"EMODnet Chemistry: http://www.emodnet-chemistry.eu/" "${ncfile}"
+    ncatted -a data_access,global,o,c,"OPeNDAP: http://ec.oceanbrowser.net:8081/data/emodnet-domains/" "${ncfile}"
+    ncatted -a WEB_visualisation,global,o,c,"http://ec.oceanbrowser.net/emodnet/" "${ncfile}"
 
     # Adding new attributes
     # -h: don't write the command in "history" global attribute
     echo "Creating new global attributes"
-    ncatted -a DIVA_source,global,o,c,"https://github.com/gher-ulg/DIVA" ${ncfile}
-    ncatted -a DIVA_code_doi,global,o,c,"10.5281/zenodo.592476" ${ncfile}
+    ncatted -a DIVA_source,global,o,c,"https://github.com/gher-ulg/DIVA" "${ncfile}"
+    ncatted -a DIVA_code_doi,global,o,c,"10.5281/zenodo.592476" "${ncfile}"
     ncatted -h -a DIVA_references,global,o,c,"Troupin, C.; Sirjacobs, D.; Rixen, M.; Brasseur, P.; Brankart, J.-M.;\
     Barth, A.;Alvera-Azcárate, A.; Capet, A.; Ouberdous, M.; Lenartz, F.; Toussaint, M.-E. & Beckers, J.-M. (2012)\
     Generation of analysis and consistent error fields using the Data Interpolating Variational Analysis (Diva).\
@@ -186,6 +186,6 @@ for ncfile in ${domaindir}**/*.nc; do # Whitespace-safe and recursive
     Some approximate and efficient methods to assess error fields in spatial gridding with DIVA\
     (Data Interpolating Variational Analysis) (2014).\
     Journal of Atmospheric and Oceanic Technology, 31: 515-530.\
-    doi:10.1175/JTECH-D-13-00130.1" ${ncfile}
+    doi:10.1175/JTECH-D-13-00130.1" "${ncfile}"
 
 done
