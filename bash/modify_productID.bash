@@ -1,4 +1,21 @@
 #!/bin/bash
+#===============================================================================
+#
+# FILE: modify_productID.bash
+#
+# USAGE: modify_productID.bash
+#
+# DESCRIPTION: processes all the netCDF files
+# listed in the directory "domaindir".
+#
+# REQUIREMENTS: netCDF Operator toolkit (http://nco.sourceforge.net/)
+#
+# AUTHOR: C. Troupin (GHER, Uliege)),
+#
+# VERSION: 1.0
+#===================================================================================
+
+
 shopt -s globstar
 
 declare -r domaindir="/production/apache/data/emodnet-domains/"
@@ -153,7 +170,7 @@ for ncfile in ${domaindir}**/*.nc; do # Whitespace-safe and recursive
     # c = character (attribute type)
     echo "Modifying global attributes"
     ncatted -a project,global,o,c,"EMODnet Chemistry: http://www.emodnet-chemistry.eu/" ${ncfile}
-    ncatted -a data_access,global,o,c,"OPENDAP: http://ec.oceanbrowser.net:8081/data/emodnet-domains/" ${ncfile}
+    ncatted -a data_access,global,o,c,"OPeNDAP: http://ec.oceanbrowser.net:8081/data/emodnet-domains/" ${ncfile}
     ncatted -a WEB_visualisation,global,o,c,"http://ec.oceanbrowser.net/emodnet/" ${ncfile}
 
     # Adding new attributes
