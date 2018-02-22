@@ -22,12 +22,12 @@ declare -r domaindir="/production/apache/data/emodnet-domains/"
 echo "Working in ${domaindir}"
 
 # Loop on the netCDF files
-nfiles=$(ls ${domaindir}/**/*.nc | wc -l)
+nfiles=$(ls "${domaindir}"/**/*.nc | wc -l)
 echo "Processing " ${nfiles} "netCDF files"
 echo " "
 
 i=0
-for ncfile in ${domaindir}**/*.nc; do # Whitespace-safe and recursive
+for ncfile in "${domaindir}"**/*.nc; do # Whitespace-safe and recursive
   ((i++))
   echo " "
   echo "Working on file ${i}/${nfiles}"
