@@ -31,7 +31,7 @@ for ncfile in "${domaindir}"**/*.nc; do # Whitespace-safe and recursive
   ((i++))
   echo " "
   echo "Working on file ${i}/${nfiles}"
-  echo "File: "$(basename "${ncfile}")
+  echo "File: ${ncfile}"
   # Identify domain name and variable using file path
   # (not the most robust but ok for now)
   domain=$(echo ${ncfile} | cut -d "/" -f 6)
@@ -156,6 +156,13 @@ for ncfile in "${domaindir}"**/*.nc; do # Whitespace-safe and recursive
     exit 1
   fi
 
+  # Check if the file has been processed
+  # by inspecting the attributes
+  if ncdump -h "${ncfile}" | grep -q '\:old_product_id\ =\ ' ; then
+    echo "File has already been processed"
+  else
+    echo "File has not been processed"
+
     # Copy the old product ID
     echo "Modifying product ID"
     ncrename -a global@product_id,old_product_id "${ncfile}"
@@ -188,4 +195,6 @@ for ncfile in "${domaindir}"**/*.nc; do # Whitespace-safe and recursive
     Journal of Atmospheric and Oceanic Technology, 31: 515-530.\
     doi:10.1175/JTECH-D-13-00130.1" "${ncfile}"
 
+    echo "Finished processing file ${i}/${nfiles}"
+  fi
 done
