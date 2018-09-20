@@ -18,7 +18,8 @@
 # Modify shell behavior and enable "shell globbing"
 shopt -s globstar
 
-declare -r domaindir="/production/apache/data/emodnet-domains/"
+declare -r domaindir="/home/ctroupin/Data/EMODnet/Chemistry/TestEdit/"
+# declare -r domaindir="/production/apache/data/emodnet-domains/"
 echo "Working in ${domaindir}"
 
 if [ -d "${domaindir}" ]; then
@@ -52,6 +53,9 @@ if [ "${nfiles}" -gt "0" ]; then
     (Data Interpolating Variational Analysis) (2014).\
     Journal of Atmospheric and Oceanic Technology, 31: 515-530.\
     doi:10.1175/JTECH-D-13-00130.1" "${ncfile}"
+
+    echo "Editing attribute related to NCO version"
+    ncatted -h -a NCO,global,o,c,"4.6.1"
 
     echo "Finished processing file ${i}/${nfiles}"
   done

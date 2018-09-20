@@ -1,3 +1,4 @@
+
 #!/bin/bash
 #===============================================================================
 #
@@ -32,12 +33,13 @@ stdnames=( ["Water_body_chlorophyll-a"]="mass_concentration_of_chlorophyll_a_in_
 ["Water_body_dissolved_inorganic_nitrogen_(DIN)"]="mass_concentration_of_inorganic_nitrogen_in_sea_water"
 )
 
-declare -r domaindir="/production/apache/data/emodnet-test-charles/"
+# declare -r domaindir="/production/apache/data/emodnet-test-charles/"
+declare -r domaindir="/home/ctroupin/Data/EMODnet/Chemistry/Products2018/"
 echo "Working in ${domaindir}"
 
 # Function to generate a list of variables based on the main variable
 function getvarlist {
-    echo $1 $1"_err" $1"_L1" ${1}"_L2" $1"_deepest" $1"_deepest_L1" $1"_deepest_L2"
+    echo ${1}","$1"_err",$1"_L1",${1}"_L2",$1"_deepest",$1"_deepest_L1",$1"_deepest_L2"
     }
 
 divacitation="Troupin, C.; Sirjacobs, D.; Rixen, M.; Brasseur, P.; Brankart, J.-M.;\
@@ -57,6 +59,13 @@ echo "Processing " ${nfiles} "netCDF files"
 
 i=0
 for ncfile in "${domaindir}"**/*.nc; do # Whitespace-safe and recursive
+
+  if [ "$i" -eq "2" ]; then
+    echo "****************"
+    echo "Exiting the loop"
+    echo "****************"
+    break
+  fi
   ((i++))
   echo " "
   echo "  Working on file ${i}/${nfiles}"
@@ -77,7 +86,7 @@ for ncfile in "${domaindir}"**/*.nc; do # Whitespace-safe and recursive
     echo "File has already been processed"
   else
     echo "File has not been processed"
-  
+
 
     # Special case for nitrogen (parenthesis in the name)
     # We change the value of the variable name to be the same as in the netCDF (escaping the parenthesis)
@@ -88,13 +97,15 @@ for ncfile in "${domaindir}"**/*.nc; do # Whitespace-safe and recursive
 
     # Loop on the variables of which we have to change the name
     vlist=$(echo $(getvarlist "${variable}"))
-    for varnames in ${vlist}; do
+    IFS=","
+    for varnames in ${vlist[@]}; do
       echo "    Working on variable "${varnames}
-      ncatted -O -h -a standard_name,${varnames},o,c,${stdname} "${ncfile}"
+      # ncatted -O -h -a standard_name,"${varnames}",o,c,${stdname} "${ncfile}"
     done
-
+    unset IFS
 
     # Editing the attributes
+    # -h: override automatically appending the command to the history global attribute
     # -a: name of the attribute
     # o = overwrite (editing mode)
     # c = character (attribute type)
