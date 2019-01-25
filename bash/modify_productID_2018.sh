@@ -41,12 +41,12 @@ else
 fi
 
 # Loop on the netCDF files
-nfiles=$(ls "${domaindir}"/**/*.nc | wc -l)
+nfiles=$(ls "${domaindir}"/*6-years*/*.nc | wc -l)
 echo "Processing " ${nfiles} "netCDF files"
 echo " "
 
 i=0
-for ncfile in "${domaindir}"**/*.nc; do # Whitespace-safe and recursive
+for ncfile in "${domaindir}"*6-years*/*.nc; do # Whitespace-safe and recursive
 ((i++))
 echo " "
 echo "${ncfile}"
@@ -68,7 +68,7 @@ echo "Variable: ${variable}"
 if [ "${domain}" == "Atlantic Sea" ]; then
   if [ "${variable}" == "Water_body_chlorophyll-a" ]; then
     productID="ce474bda-7eba-11e8-84a3-40a8f051e8d0"
-  elif [ "${variable}" == "Water_body_dissolved_inorganic_nitrogen_\(DIN\)" ]; then
+  elif [ "${variable}" == "Water_body_dissolved_inorganic_nitrogen_(DIN)" ]; then
     productID="8c928758-84dd-11e8-9571-40a8f051e8d0"
   elif [ "${variable}" == "Water_body_dissolved_oxygen_concentration" ]; then
     productID="210c2726-7a12-11e8-a42c-40a8f051e8d0"
@@ -183,23 +183,23 @@ else
   # Update the new product ID
   echo "  New product ID: ${productID}"
   echo " "
-  ncatted -a product_id,global,o,c,${productID} "${ncfile}"
+  #ncatted -a product_id,global,o,c,${productID} "${ncfile}"
 
   # Editing the attributes
   # -a: name of the attribute
   # o = overwrite (editing mode)
   # c = character (attribute type)
   echo "Modifying global attributes"
-  ncatted -h -a project,global,o,c,"EMODnet Chemistry: http://www.emodnet-chemistry.eu/" "${ncfile}"
-  ncatted -h -a data_access,global,o,c,"OPeNDAP: http://ec.oceanbrowser.net:8081/data/emodnet-domains/" "${ncfile}"
-  ncatted -h -a WEB_visualisation,global,o,c,"http://ec.oceanbrowser.net/emodnet/" "${ncfile}"
+  #ncatted -h -a project,global,o,c,"EMODnet Chemistry: http://www.emodnet-chemistry.eu/" "${ncfile}"
+  #ncatted -h -a data_access,global,o,c,"OPeNDAP: http://ec.oceanbrowser.net:8081/data/emodnet-domains/" "${ncfile}"
+  #ncatted -h -a WEB_visualisation,global,o,c,"http://ec.oceanbrowser.net/emodnet/" "${ncfile}"
 
   # Adding new attributes
   # -h: don't write the command in "history" global attribute
   echo "  Creating new global attributes"
-  ncatted -h -a DIVA_source,global,o,c,"https://github.com/gher-ulg/DIVA" "${ncfile}"
-  ncatted -h -a DIVA_code_doi,global,o,c,"10.5281/zenodo.592476" "${ncfile}"
-  ncatted -h -a DIVA_references,global,o,c,"${divacitation}" "${ncfile}"
+  #ncatted -h -a DIVA_source,global,o,c,"https://github.com/gher-ulg/DIVA" "${ncfile}"
+  #ncatted -h -a DIVA_code_doi,global,o,c,"10.5281/zenodo.592476" "${ncfile}"
+  #ncatted -h -a DIVA_references,global,o,c,"${divacitation}" "${ncfile}"
 
 
   echo "Finished processing file ${i}/${nfiles}"
