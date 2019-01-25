@@ -1,16 +1,26 @@
 #!/bin/bash
-
+# Tool to combine the different regions into a single product
+#
+# Necessary tools:
+# * nco (netCDF operators)
+# * cdo (Climate Data Operators)
+# * Ferret
+#
 #################################################
 # Sylvain Watelet - 17/11/2016 ##################
 # swatelet@ulg.ac.be ############################
 #################################################
 #################################################
 
+
+
+# Define the combined product directory
 datapath="/data/emodnet-combined-tmp"
 
 #var="Water_body_ammonium"
 #varcapital="WATER_BODY_AMMONIUM"
 
+#
 var_old="Water_body_chlorophyll-a"
 var_old_black="Water\ body\ chlorophyll-a"
 var="Water_body_chlorophyll_a"
@@ -37,13 +47,13 @@ varcapital="WATER_BODY_CHLOROPHYLL_A"
 #season_cineca1='Winter\ \(January-March\)'
 #season_cineca2='Winter\ \(December-February\)'
 #season_cineca1='Winter (January-March)'
-#season_cineca2='Winter (December-February)'                      
+#season_cineca2='Winter (December-February)'
 
 #season="spring"
 #season_cineca1='Spring\ \(April-June\)'
 #season_cineca2='Spring\ \(March-May\)'
 #season_cineca1='Spring (April-June)'
-#season_cineca2='Spring (March-May)' 
+#season_cineca2='Spring (March-May)'
 
 season="summer"
 #season_cineca1='Summer\ \(July-September\)'
@@ -51,202 +61,201 @@ season="summer"
 season_cineca1='Summer (July-September)'
 season_cineca2='Summer (June-August)'
 
-if [ "$season" == "winter" ]
-then
-j=1
-elif [ "$season" == "spring" ]
-then
-j=2
-elif [ "$season" == "summer" ]
-then
-j=3
-elif [ "$season" == "autumn" ]
-then
-j=4
+if [ "$season" == "winter" ]; then
+  j=1
+elif [ "$season" == "spring" ]; then
+  j=2
+elif [ "$season" == "summer" ]; then
+  j=3
+elif [ "$season" == "autumn" ]; then
+  j=4
 fi
 
 mkdir -p 'combined'
 
+# Loop on the regions
 for i in `seq 1 5` #5
 do
 
-if [ $i == "1" ] 
-then
-region="atlantic"
-#rm -f $region/$season/*
-#mkdir -p $region/$season                                                                                                                          
-mkdir -p $datapath/$region/$season
-#scp "uniliege01@ogs01.cineca.it:/production/apache/data/emodnet-domains/Atlantic\ Sea/''$season_cineca1''\ \-\ 10-years\ running\ averages/'$var'.4Danl.nc" $region/$season
-#cp "/data/emodnet-domains/Atlantic Sea/$season_cineca1 - 10-years running averages/$var.4Danl.nc" $datapath/$region/$season 
+  if [ $i == "1" ]
+  then
+    region="atlantic"
+    #rm -f $region/$season/*
+    #mkdir -p $region/$season
+    mkdir -p ${datapath}/${region}/${season}
+    #scp "uniliege01@ogs01.cineca.it:/production/apache/data/emodnet-domains/Atlantic\ Sea/''$season_cineca1''\ \-\ 10-years\ running\ averages/'$var'.4Danl.nc" $region/$season
+    #cp "/data/emodnet-domains/Atlantic Sea/$season_cineca1 - 10-years running averages/$var.4Danl.nc" ${datapath}/${region}/${season}
 
-### for chlorophyll-a ###
-#scp "uniliege01@ogs01.cineca.it:/production/apache/data/emodnet-domains/Atlantic\ Sea/''$season_cineca1''\ \-\ 10-years\ running\ averages/'$var_old'.4Danl.nc" $region/$season
-cp "/data/emodnet-domains/Atlantic Sea/$season_cineca1 - 10-years running averages/$var_old.4Danl.nc" $datapath/$region/$season 
-cp $datapath/$region/$season/$var_old.4Danl.nc $datapath/$region/$season/$var.4Danl.nc
-ncrename -v $var_old,$var $datapath/$region/$season/$var.4Danl.nc
-ncrename -v ${var_old}_L2,${var}_L2 $datapath/$region/$season/$var.4Danl.nc
+    ### for chlorophyll-a ###
+    #scp "uniliege01@ogs01.cineca.it:/production/apache/data/emodnet-domains/Atlantic\ Sea/''$season_cineca1''\ \-\ 10-years\ running\ averages/'${var_old}'.4Danl.nc" $region/$season
+    cp "/data/emodnet-domains/Atlantic Sea/$season_cineca1 - 10-years running averages/${var_old}.4Danl.nc" ${datapath}/${region}/${season}
+    cp ${datapath}/${region}/${season}/${var_old}.4Danl.nc ${datapath}/${region}/${season}/$var.4Danl.nc
+    ncrename -v ${var_old},$var ${datapath}/${region}/${season}/$var.4Danl.nc
+    ncrename -v ${var_old}_L2,${var}_L2 ${datapath}/${region}/${season}/$var.4Danl.nc
 
-fi
+  fi
 
-if [ $i == "2" ]
-then 
-region="north"
-#rm -f $region/$season/*
-#mkdir -p $region/$season
-mkdir -p /data/emodnet-combined-tmp/$region/$season
-#scp "uniliege01@ogs01.cineca.it:/production/apache/data/emodnet-domains/North\ Sea/''$season_cineca2''\ \-\ 10-years\ running\ averages/'$var'.4Danl.nc" $region/$season
-#cp "/data/emodnet-domains/North Sea/$season_cineca2 - 10-years running averages/$var.4Danl.nc" /data/emodnet-combined-tmp/$region/$season
+  if [ $i == "2" ]
+  then
+    region="north"
+    #rm -f $region/$season/*
+    #mkdir -p $region/$season
+    mkdir -p ${datapath}/${region}/${season}
+    #scp "uniliege01@ogs01.cineca.it:/production/apache/data/emodnet-domains/North\ Sea/''$season_cineca2''\ \-\ 10-years\ running\ averages/'$var'.4Danl.nc" $region/$season
+    #cp "/data/emodnet-domains/North Sea/$season_cineca2 - 10-years running averages/$var.4Danl.nc" /data/emodnet-combined-tmp/$region/$season
 
-### for chlorophyll-a ###
-#scp "uniliege01@ogs01.cineca.it:/production/apache/data/emodnet-domains/Atlantic\ Sea/''$season_cineca1''\ \-\ 10-years\ running\ averages/'$var_old'.4Danl.nc" $region/$season
-cp "/data/emodnet-domains/North Sea/$season_cineca2 - 10-years running averages/$var_old.4Danl.nc" /data/emodnet-combined-tmp/$region/$season
-cp $datapath/$region/$season/$var_old.4Danl.nc $datapath/$region/$season/$var.4Danl.nc
-ncrename -v $var_old,$var $datapath/$region/$season/$var.4Danl.nc
-ncrename -v ${var_old}_L2,${var}_L2 $datapath/$region/$season/$var.4Danl.nc
+    ### for chlorophyll-a ###
+    #scp "uniliege01@ogs01.cineca.it:/production/apache/data/emodnet-domains/Atlantic\ Sea/''$season_cineca1''\ \-\ 10-years\ running\ averages/'${var_old}'.4Danl.nc" $region/$season
+    cp "/data/emodnet-domains/North Sea/$season_cineca2 - 10-years running averages/${var_old}.4Danl.nc" /data/emodnet-combined-tmp/$region/$season
+    cp ${datapath}/${region}/${season}/${var_old}.4Danl.nc ${datapath}/${region}/${season}/$var.4Danl.nc
+    ncrename -v ${var_old},$var ${datapath}/${region}/${season}/$var.4Danl.nc
+    ncrename -v ${var_old}_L2,${var}_L2 ${datapath}/${region}/${season}/$var.4Danl.nc
 
-fi
+  fi
 
-if [ $i == "3" ] 
-then 
-region="baltic" 
-rm -f $region/$season/*
-#mkdir -p $region/$season
-mkdir -p $datapath/$region/$season
-#scp "uniliege01@ogs01.cineca.it:/production/apache/data/emodnet-domains/Baltic\ Sea/''$season_cineca2''\ \-\ 10-years\ running\ averages/'$var'.4Danl.nc" $region/$season
-#cp "/data/emodnet-domains/Baltic Sea/$season_cineca2 - 10-years running averages/$var.4Danl.nc" $datapath/$region/$season
+  if [ $i == "3" ]
+  then
+    region="baltic"
+    rm -f $region/$season/*
+    #mkdir -p $region/$season
+    mkdir -p ${datapath}/${region}/${season}
+    #scp "uniliege01@ogs01.cineca.it:/production/apache/data/emodnet-domains/Baltic\ Sea/''$season_cineca2''\ \-\ 10-years\ running\ averages/'$var'.4Danl.nc" $region/$season
+    #cp "/data/emodnet-domains/Baltic Sea/$season_cineca2 - 10-years running averages/$var.4Danl.nc" ${datapath}/${region}/${season}
 
-### for chlorophyll-a ###
-#scp "uniliege01@ogs01.cineca.it:/production/apache/data/emodnet-domains/Atlantic\ Sea/''$season_cineca1''\ \-\ 10-years\ running\ averages/'$var_old'.4Danl.nc" $region/$season
-cp "/data/emodnet-domains/Baltic Sea/$season_cineca2 - 10-years running averages/$var_old.4Danl.nc" $datapath/$region/$season    
-cp $datapath/$region/$season/$var_old.4Danl.nc $datapath/$region/$season/$var.4Danl.nc
-ncrename -v $var_old,$var $datapath/$region/$season/$var.4Danl.nc
-ncrename -v ${var_old}_L2,${var}_L2 $datapath/$region/$season/$var.4Danl.nc
+    ### for chlorophyll-a ###
+    #scp "uniliege01@ogs01.cineca.it:/production/apache/data/emodnet-domains/Atlantic\ Sea/''$season_cineca1''\ \-\ 10-years\ running\ averages/'${var_old}'.4Danl.nc" $region/$season
+    cp "/data/emodnet-domains/Baltic Sea/$season_cineca2 - 10-years running averages/${var_old}.4Danl.nc" ${datapath}/${region}/${season}
+    cp ${datapath}/${region}/${season}/${var_old}.4Danl.nc ${datapath}/${region}/${season}/$var.4Danl.nc
+    ncrename -v ${var_old},$var ${datapath}/${region}/${season}/$var.4Danl.nc
+    ncrename -v ${var_old}_L2,${var}_L2 ${datapath}/${region}/${season}/$var.4Danl.nc
 
-fi
+  fi
 
-if [ $i == "4" ] 
-then 
-region="black"
-rm -f $region/$season/*
-#mkdir -p $region/$season
-mkdir -p $datapath/$region/$season
-#scp "uniliege01@ogs01.cineca.it:/production/apache/data/emodnet-domains/Black\ Sea/''$season_cineca2''\ \-\ 10-years\ running\ averages/'$var'.4Danl.nc" $region/$season
-#cp "/data/emodnet-domains/Black Sea/$season_cineca2 - 10-years running averages/$var.4Danl.nc" $datapath/$region/$season
+  if [ $i == "4" ]
+  then
+    region="black"
+    rm -f $region/$season/*
+    #mkdir -p $region/$season
+    mkdir -p ${datapath}/${region}/${season}
+    #scp "uniliege01@ogs01.cineca.it:/production/apache/data/emodnet-domains/Black\ Sea/''$season_cineca2''\ \-\ 10-years\ running\ averages/'$var'.4Danl.nc" $region/$season
+    #cp "/data/emodnet-domains/Black Sea/$season_cineca2 - 10-years running averages/$var.4Danl.nc" ${datapath}/${region}/${season}
 
-### for chlorophyll-a ###
-#scp "uniliege01@ogs01.cineca.it:/production/apache/data/emodnet-domains/Atlantic\ Sea/''$season_cineca1''\ \-\ 10-years\ running\ averages/'$var_old'.4Danl.nc" $region/$season
-cp "/data/emodnet-domains/Black Sea/$season_cineca2 - 10-years running averages/$var_old.4Danl.nc" $datapath/$region/$season
-cp $datapath/$region/$season/$var_old.4Danl.nc $datapath/$region/$season/$var.4Danl.nc
-ncrename -v "Water body chlorophyll-a",$var $datapath/$region/$season/$var.4Danl.nc
-ncrename -v "Water body chlorophyll-a_L2",${var}_L2 $datapath/$region/$season/$var.4Danl.nc
+    ### for chlorophyll-a ###
+    #scp "uniliege01@ogs01.cineca.it:/production/apache/data/emodnet-domains/Atlantic\ Sea/''$season_cineca1''\ \-\ 10-years\ running\ averages/'${var_old}'.4Danl.nc" $region/$season
+    cp "/data/emodnet-domains/Black Sea/$season_cineca2 - 10-years running averages/${var_old}.4Danl.nc" ${datapath}/${region}/${season}
+    cp ${datapath}/${region}/${season}/${var_old}.4Danl.nc ${datapath}/${region}/${season}/$var.4Danl.nc
+    ncrename -v "Water body chlorophyll-a",$var ${datapath}/${region}/${season}/$var.4Danl.nc
+    ncrename -v "Water body chlorophyll-a_L2",${var}_L2 ${datapath}/${region}/${season}/$var.4Danl.nc
 
-### for dissolved oxygen ###
-#ncrename -v "${var_old}",$var $datapath/$region/$season/$var.4Danl.nc
-#ncrename -v "${var_old}_L2",${var}_L2 $datapath/$region/$season/$var.4Danl.nc
+    ### for dissolved oxygen ###
+    #ncrename -v "${var_old}",$var ${datapath}/${region}/${season}/$var.4Danl.nc
+    #ncrename -v "${var_old}_L2",${var}_L2 ${datapath}/${region}/${season}/$var.4Danl.nc
 
-fi
+  fi
 
-if [ $i == "5" ] 
-then 
-region="mediterranean"
-rm -f $region/$season/*
-#mkdir -p $region/$season
-mkdir -p $datapath/$region/$season
-#scp "uniliege01@ogs01.cineca.it:/production/apache/data/emodnet-domains/Mediterranean\ Sea/''$season_cineca1''\ \-\ 10-years\ running\ averages/'$var'.4Danl.nc" $region/$season
-#cp "/data/emodnet-domains/Mediterranean Sea/$season_cineca1 - 10-years running averages/$var.4Danl.nc" $datapath/$region/$season
+  if [ $i == "5" ]
+  then
+    region="mediterranean"
+    rm -f $region/$season/*
+    #mkdir -p $region/$season
+    mkdir -p ${datapath}/${region}/${season}
+    #scp "uniliege01@ogs01.cineca.it:/production/apache/data/emodnet-domains/Mediterranean\ Sea/''$season_cineca1''\ \-\ 10-years\ running\ averages/'$var'.4Danl.nc" $region/$season
+    #cp "/data/emodnet-domains/Mediterranean Sea/$season_cineca1 - 10-years running averages/$var.4Danl.nc" ${datapath}/${region}/${season}
 
-### for chlorophyll-a ###
-#scp "uniliege01@ogs01.cineca.it:/production/apache/data/emodnet-domains/Atlantic\ Sea/''$season_cineca1''\ \-\ 10-years\ running\ averages/'$var_old'.4Danl.nc" $region/$season
-cp "/data/emodnet-domains/Mediterranean Sea/$season_cineca1 - 10-years running averages/$var_old.4Danl.nc" $datapath/$region/$season
-cp $datapath/$region/$season/$var_old.4Danl.nc $datapath/$region/$season/$var.4Danl.nc
-ncrename -v $var_old,$var $datapath/$region/$season/$var.4Danl.nc
-ncrename -v ${var_old}_L2,${var}_L2 $datapath/$region/$season/$var.4Danl.nc
+    ### for chlorophyll-a ###
+    #scp "uniliege01@ogs01.cineca.it:/production/apache/data/emodnet-domains/Atlantic\ Sea/''$season_cineca1''\ \-\ 10-years\ running\ averages/'${var_old}'.4Danl.nc" $region/$season
+    cp "/data/emodnet-domains/Mediterranean Sea/$season_cineca1 - 10-years running averages/${var_old}.4Danl.nc" ${datapath}/${region}/${season}
+    cp ${datapath}/${region}/${season}/${var_old}.4Danl.nc ${datapath}/${region}/${season}/$var.4Danl.nc
+    ncrename -v ${var_old},$var ${datapath}/${region}/${season}/$var.4Danl.nc
+    ncrename -v ${var_old}_L2,${var}_L2 ${datapath}/${region}/${season}/$var.4Danl.nc
 
-fi
+  fi
 
-kmax=$(ncdump -h $datapath/$region/$season/$var.4Danl.nc | grep -i "depth =" | awk '{print $3}')
-kmaxnew=30
-lmax=184 #1965-2010, 4 seasons
+  kmax=$(ncdump -h ${datapath}/${region}/${season}/$var.4Danl.nc | grep -i "depth =" | awk '{print $3}')
+  kmaxnew=30
+  lmax=184 #1965-2010, 4 seasons
 
-echo '
-cancel data/all
-cancel axis/all
-cancel mode upcase_output
+  # Ferret script to enlarge???
+  # ---------------------------
+  echo '
+  cancel data/all
+  cancel axis/all
+  cancel mode upcase_output
 
-set memory/size=2100
+  set memory/size=2100
 
-use "'$datapath'/'$region'/'$season'/'$var'.4Danl.nc"
+  use "'$datapath'/'$region'/'$season'/'$var'.4Danl.nc"
 
-!define axis/t="1-JAN-1950":"1-JAN-2016":1/calendar=360_DAY/UNIT=month time1
-!define grid/like='$var'/t=time1 gg1
+  !define axis/t="1-JAN-1950":"1-JAN-2016":1/calendar=360_DAY/UNIT=month time1
+  !define grid/like='$var'/t=time1 gg1
 
-let start_year = 1965
-let nyears = 46
-!water_body_ammonium : 1965-2010
-let indices = L[L=1:`nyears*12`]
-let month = mod(indices-1,12)+1
-let year = start_year + int((indices-1)/12)
-define axis/units=days/T0=1-jan-1900/edges/from_data time1 = DAYS1900(year,month,1)
+  let start_year = 1965
+  let nyears = 46
+  !water_body_ammonium : 1965-2010
+  let indices = L[L=1:`nyears*12`]
+  let month = mod(indices-1,12)+1
+  let year = start_year + int((indices-1)/12)
+  define axis/units=days/T0=1-jan-1900/edges/from_data time1 = DAYS1900(year,month,1)
 
-!SHOW AXIS/T=1-jan-1958:1-jan-1959 time1
+  !SHOW AXIS/T=1-jan-1958:1-jan-1959 time1
 
-define grid/like='$var'/t=time1 gg1
+  define grid/like='$var'/t=time1 gg1
 
-let test='$var'_L2[G=gg1@nrst]
+  let test='$var'_L2[G=gg1@nrst]
 
-def att/output test.long_name = '${var}'_L2.long_name
-!set att/like='$var'_L2/output test
-!show attribute/all test
+  def att/output test.long_name = '${var}'_L2.long_name
+  !set att/like='$var'_L2/output test
+  !show attribute/all test
 
-let indices2 = L[L=1:`nyears`]
-if `'$j' EQ 1` then let month2 = indices2*0+2
-if `'$j' EQ 2` then let month2 = indices2*0+5
-if `'$j' EQ 3` then let month2 = indices2*0+8
-if `'$j' EQ 4` then let month2 = indices2*0+11
-let year2 = start_year + int(indices2)
-define axis/units=days/T0=1-jan-1900 time2 = DAYS1900(year2,month2,16)
+  let indices2 = L[L=1:`nyears`]
+  if `'$j' EQ 1` then let month2 = indices2*0+2
+  if `'$j' EQ 2` then let month2 = indices2*0+5
+  if `'$j' EQ 3` then let month2 = indices2*0+8
+  if `'$j' EQ 4` then let month2 = indices2*0+11
+  let year2 = start_year + int(indices2)
+  define axis/units=days/T0=1-jan-1900 time2 = DAYS1900(year2,month2,16)
 
-define grid/like='$var'/t=time2 gg2
+  define grid/like='$var'/t=time2 gg2
 
-let test_tmp=test[G=gg2@nrst]
+  let test_tmp=test[G=gg2@nrst]
 
-!define axis/t="1-OCT-1950":"1-OCT-2016":12/calendar=360_DAY/UNIT=month time2
-!define grid/like='$var'_L2/t=time2 gg2
+  !define axis/t="1-OCT-1950":"1-OCT-2016":12/calendar=360_DAY/UNIT=month time2
+  !define grid/like='$var'_L2/t=time2 gg2
 
-let indices3 = L[L=1:`nyears*4`]
-let month3_tmp = mod(indices3-1,4)+1
-let month3 = month3_tmp*3-1
-let year3 = start_year + int((indices3-1)/4)
-define axis/units=days/T0=1-jan-1900 time3 = DAYS1900(year3,month3,16)
+  let indices3 = L[L=1:`nyears*4`]
+  let month3_tmp = mod(indices3-1,4)+1
+  let month3 = month3_tmp*3-1
+  let year3 = start_year + int((indices3-1)/4)
+  define axis/units=days/T0=1-jan-1900 time3 = DAYS1900(year3,month3,16)
 
-define axis/units=meters/Z depthnew={0, 5, 10, 20, 30, 40, 50, 75, 100, 125, 150, 200, 250, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1750, 2000, 2500, 3000}
+  define axis/units=meters/Z depthnew={0, 5, 10, 20, 30, 40, 50, 75, 100, 125, 150, 200, 250, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1750, 2000, 2500, 3000}
 
-!SHOW AXIS/T=1-jan-1958:1-jan-1959 time3
+  !SHOW AXIS/T=1-jan-1958:1-jan-1959 time3
 
-define grid/like='$var'/z=depthnew/t=time3 gg3
+  define grid/like='$var'/z=depthnew/t=time3 gg3
 
-! 3 regridding (1 small, 1 coarse, 1 medium) to avoid interpolation problems
+  ! 3 regridding (1 small, 1 coarse, 1 medium) to avoid interpolation problems
 
-let '${var}'_enlarged=test_tmp[G=gg3@xact]
+  let '${var}'_enlarged=test_tmp[G=gg3@xact]
 
-def att/output '${var}'_enlarged.long_name  = test.long_name
-!set att/like=test/output '${var}'_enlarged
-!show attribute/all '${var}'_enlarged
+  def att/output '${var}'_enlarged.long_name  = test.long_name
+  !set att/like=test/output '${var}'_enlarged
+  !show attribute/all '${var}'_enlarged
 
-!show attribute .
-!set att/output ..title
-!def att/output ..comment = "test"
+  !show attribute .
+  !set att/output ..title
+  !def att/output ..comment = "test"
 
-!list/x=-3.8/y=43.7/l=275 test !'${var}'_enlarged 
-!list/x=-3.8/y=43.7/l=22 test_tmp
-!list/x=-3.8/y=43.7/l=92/k=2 '${var}'_enlarged
+  !list/x=-3.8/y=43.7/l=275 test !'${var}'_enlarged
+  !list/x=-3.8/y=43.7/l=22 test_tmp
+  !list/x=-3.8/y=43.7/l=92/k=2 '${var}'_enlarged
 
-save/clobber/l=1/file="'$datapath'/'$region'/'$season'/'$var'.4Danl.enlarged.nc" '${var}'_enlarged
-repeat/l=2:`nyears*4` save/append/file="'$datapath'/'$region'/'$season'/'$var'.4Danl.enlarged.nc" '${var}'_enlarged
+  save/clobber/l=1/file="'$datapath'/'$region'/'$season'/'$var'.4Danl.enlarged.nc" '${var}'_enlarged
+  repeat/l=2:`nyears*4` save/append/file="'$datapath'/'$region'/'$season'/'$var'.4Danl.enlarged.nc" '${var}'_enlarged
 
-' > enlargetime.jnl
+  ' > enlargetime.jnl
 
-ferret -script enlargetime.jnl
+  ferret -script enlargetime.jnl
 
 done
 
@@ -273,10 +282,12 @@ mkdir -p $datapath/combined
 
 region="mediterranean"
 
+# Define script to process NaNs ???
+# ----------------------------------
 echo '
 cancel data/all
 cancel axis/all
-cancel mode upcase_output 
+cancel mode upcase_output
 
 !set memory/size=400
 set memory/size=200
@@ -289,7 +300,7 @@ def att/output '$var'.long_name = '${var}'_enlarged.long_name
 
 !save/clobber/file="'$datapath'/nan.nc" '${var}'
 save/l=1/clobber/file="'$datapath'/nan.nc" '${var}'
-repeat/l=2:'$lmax' save/append/file="'$datapath'/nan.nc" '${var}'  
+repeat/l=2:'$lmax' save/append/file="'$datapath'/nan.nc" '${var}'
 ' > nan.jnl
 
 ferret -script nan.jnl
@@ -312,10 +323,13 @@ region="mediterranean"
 cdo remapbil,grid.txt $datapath/$region'/'$season'/'$var'.4Danl.enlarged.nc' $datapath/$region'/'$season'/'$var'.4Danl.enlarged.regridded.nc'
 cdo mergegrid $datapath'/combined/'$var'.'$season'.combined.4.nc' $datapath/$region'/'$season'/'$var'.4Danl.enlarged.regridded.nc' $datapath'/combined/'$var'.'$season'.combined.5.nc'
 
+
+# Define script to smooth the results
+# -----------------------------------
 echo '
 cancel data/all
 cancel axis/all
-cancel mode upcase_output 
+cancel mode upcase_output
 
 set memory/size=600
 
@@ -346,118 +360,108 @@ let '$var'_L2 = if (xx ge -7 and xx le -3 and yy ge 46 and yy le 50) or (xx ge -
 def att/output '$var'_L2.long_name = '$var'.long_name
 
 save/l=1/clobber/bounds/title="DIVA 4D analysis of '$var'"/file="'$datapath'/combined/'$var'.'$season'.combined.nc" '$var'_L2
-repeat/l=2:'$lmax' save/append/bounds/title="DIVA 4D analysis of '$var'"/file="'$datapath'/combined/'$var'.'$season'.combined.nc" '$var'_L2  
+repeat/l=2:'$lmax' save/append/bounds/title="DIVA 4D analysis of '$var'"/file="'$datapath'/combined/'$var'.'$season'.combined.nc" '$var'_L2
 
 ' > smooth.jnl
 
 ferret -script smooth.jnl
 
-if [[ -f $datapath/combined/$var.winter.combined.nc && -f $datapath/combined/$var.spring.combined.nc ]] 
+if [[ -f $datapath/combined/$var.winter.combined.nc && -f $datapath/combined/$var.spring.combined.nc ]]
 then
-if [[ -f $datapath/combined/$var.summer.combined.nc && -f $datapath/combined/$var.autumn.combined.nc ]]
-then
-cdo mergegrid $datapath'/combined/'$var'.winter.combined.nc' $datapath'/combined/'$var'.spring.combined.nc' $datapath'/combined/'$var'.winterspring.combined.nc'
-cdo mergegrid $datapath'/combined/'$var'.winterspring.combined.nc' $datapath'/combined/'$var'.summer.combined.nc' $datapath'/combined/'$var'.winterspringsummer.combined.nc'
-cdo mergegrid $datapath'/combined/'$var'.winterspringsummer.combined.nc' $datapath'/combined/'$var'.autumn.combined.nc' $datapath'/combined/'$var'.combined.nc' 
+  if [[ -f $datapath/combined/$var.summer.combined.nc && -f $datapath/combined/$var.autumn.combined.nc ]]
+  then
+    cdo mergegrid $datapath'/combined/'$var'.winter.combined.nc' $datapath'/combined/'$var'.spring.combined.nc' $datapath'/combined/'$var'.winterspring.combined.nc'
+    cdo mergegrid $datapath'/combined/'$var'.winterspring.combined.nc' $datapath'/combined/'$var'.summer.combined.nc' $datapath'/combined/'$var'.winterspringsummer.combined.nc'
+    cdo mergegrid $datapath'/combined/'$var'.winterspringsummer.combined.nc' $datapath'/combined/'$var'.autumn.combined.nc' $datapath'/combined/'$var'.combined.nc'
 
-ncrename -d time3,time $datapath/combined/$var.combined.nc 
-ncrename -v time3,time $datapath/combined/$var.combined.nc 
-ncrename -v time3_bnds,climatology_bounds $datapath/combined/$var.combined.nc
-#ncrename -d bnds,nv $datapath/combined/$var.combined.nc 
-ncrename -d nb2,nv $datapath/combined/$var.combined.nc
-#ncrename -d DEPTH1_1,depth $datapath/combined/$var.combined.nc
-#ncrename -v DEPTH1_1,depth $datapath/combined/$var.combined.nc 
-ncrename -d depthnew,depth $datapath/combined/$var.combined.nc
-ncrename -v depthnew,depth $datapath/combined/$var.combined.nc 
-#ncrename -v ${varcapital}_L2,${var}_L2 $datapath/combined/$var.combined.nc
-ncatted -O -a units,time,o,c,"days since 1900-01-01 00:00:00" $datapath/combined/$var.combined.nc
-ncatted -O -a units,depth,o,c,"meters" $datapath/combined/$var.combined.nc
-ncatted -O -a long_name_mod,${var}_L2,d,c, $datapath/combined/$var.combined.nc
-ncatted -O -a history,${var}_L2,d,c, $datapath/combined/$var.combined.nc
+    ncrename -d time3,time $datapath/combined/$var.combined.nc
+    ncrename -v time3,time $datapath/combined/$var.combined.nc
+    ncrename -v time3_bnds,climatology_bounds $datapath/combined/$var.combined.nc
+    #ncrename -d bnds,nv $datapath/combined/$var.combined.nc
+    ncrename -d nb2,nv $datapath/combined/$var.combined.nc
+    #ncrename -d DEPTH1_1,depth $datapath/combined/$var.combined.nc
+    #ncrename -v DEPTH1_1,depth $datapath/combined/$var.combined.nc
+    ncrename -d depthnew,depth $datapath/combined/$var.combined.nc
+    ncrename -v depthnew,depth $datapath/combined/$var.combined.nc
+    #ncrename -v ${varcapital}_L2,${var}_L2 $datapath/combined/$var.combined.nc
+    ncatted -O -a units,time,o,c,"days since 1900-01-01 00:00:00" $datapath/combined/$var.combined.nc
+    ncatted -O -a units,depth,o,c,"meters" $datapath/combined/$var.combined.nc
+    ncatted -O -a long_name_mod,${var}_L2,d,c, $datapath/combined/$var.combined.nc
+    ncatted -O -a history,${var}_L2,d,c, $datapath/combined/$var.combined.nc
 
-ncatted -a _FillValue,,o,f,NaN $datapath/combined/$var.combined.nc 
-ncatted -a _FillValue,,m,f,-1.e+34 $datapath/combined/$var.combined.nc
+    ncatted -a _FillValue,,o,f,NaN $datapath/combined/$var.combined.nc
+    ncatted -a _FillValue,,m,f,-1.e+34 $datapath/combined/$var.combined.nc
 
-ncatted -a climatology,time,a,c,'climatology_bounds' $datapath/combined/$var.combined.nc
+    ncatted -a climatology,time,a,c,'climatology_bounds' $datapath/combined/$var.combined.nc
 
-#ncks -x -v depthnew_bnds $datapath/combined/$var.combined.nc tmp.nc
-#mv tmp.nc $datapath/combined/$var.combined.nc
+    #ncks -x -v depthnew_bnds $datapath/combined/$var.combined.nc tmp.nc
+    #mv tmp.nc $datapath/combined/$var.combined.nc
 
-ncatted -O -a _FillValue,time,d,c, $datapath/combined/$var.combined.nc 
-ncatted -O -a _FillValue,climatology_bounds,d,c, $datapath/combined/$var.combined.nc 
-ncatted -O -a _FillValue,depth,d,c, $datapath/combined/$var.combined.nc
-ncatted -O -a _FillValue,lon,d,c, $datapath/combined/$var.combined.nc
-ncatted -O -a _FillValue,lat,d,c, $datapath/combined/$var.combined.nc
-ncatted -O -a _FillValue,lon_bnds,d,c, $datapath/combined/$var.combined.nc
-ncatted -O -a _FillValue,lat_bnds,d,c, $datapath/combined/$var.combined.nc
-ncatted -O -a _FillValue,depthnew_bnds,d,c, $datapath/combined/$var.combined.nc
+    ncatted -O -a _FillValue,time,d,c, $datapath/combined/$var.combined.nc
+    ncatted -O -a _FillValue,climatology_bounds,d,c, $datapath/combined/$var.combined.nc
+    ncatted -O -a _FillValue,depth,d,c, $datapath/combined/$var.combined.nc
+    ncatted -O -a _FillValue,lon,d,c, $datapath/combined/$var.combined.nc
+    ncatted -O -a _FillValue,lat,d,c, $datapath/combined/$var.combined.nc
+    ncatted -O -a _FillValue,lon_bnds,d,c, $datapath/combined/$var.combined.nc
+    ncatted -O -a _FillValue,lat_bnds,d,c, $datapath/combined/$var.combined.nc
+    ncatted -O -a _FillValue,depthnew_bnds,d,c, $datapath/combined/$var.combined.nc
 
-### actual range
+    ### actual range
 
-rm $datapath/combined/range.txt
-touch $datapath/combined/range.txt
+    rm $datapath/combined/range.txt
+    touch $datapath/combined/range.txt
 
-echo '
+    echo '
 
-use "'$datapath'/combined/'$var'.combined.nc"
+    use "'$datapath'/combined/'$var'.combined.nc"
 
-list/nohead/append/file="'$datapath'/combined/range.txt" '$var'_L2[i=@max,j=@max,k=1:15@max,l=@max]
-list/nohead/append/file="'$datapath'/combined/range.txt" '$var'_L2[i=@max,j=@max,k=16:30@max,l=@max]
-list/nohead/append/file="'$datapath'/combined/range.txt" '$var'_L2[i=@min,j=@min,k=1:15@min,l=@min]
-list/nohead/append/file="'$datapath'/combined/range.txt" '$var'_L2[i=@min,j=@min,k=16:30@min,l=@min]
+    list/nohead/append/file="'$datapath'/combined/range.txt" '$var'_L2[i=@max,j=@max,k=1:15@max,l=@max]
+    list/nohead/append/file="'$datapath'/combined/range.txt" '$var'_L2[i=@max,j=@max,k=16:30@max,l=@max]
+    list/nohead/append/file="'$datapath'/combined/range.txt" '$var'_L2[i=@min,j=@min,k=1:15@min,l=@min]
+    list/nohead/append/file="'$datapath'/combined/range.txt" '$var'_L2[i=@min,j=@min,k=16:30@min,l=@min]
 
-' > actualrange.jnl
+    ' > actualrange.jnl
 
-ferret -script actualrange.jnl
+    ferret -script actualrange.jnl
 
-{
-read a
-read b
-read c
-read d
-} < $datapath/combined/range.txt
+    {
+      read a
+      read b
+      read c
+      read d
+    } < $datapath/combined/range.txt
 
-if [ $(echo "$a>$b" | bc -l)=="1" ] 
-then
-maximum=$a
-else
-maximum=$b
+    if [ $(echo "$a>$b" | bc -l)=="1" ]
+    then
+      maximum=$a
+    else
+      maximum=$b
+    fi
+
+    if [ $(echo "$c<$d" | bc -l)=="1" ]
+    then
+      minimum=$c
+    else
+      minimum=$d
+    fi
+
+    #echo $minimum,$maximum
+    ncatted -O -a actual_range,${var}_L2,o,c,"$minimum,$maximum" $datapath/combined/$var.combined.nc
+
+    ###
+
+    ncatted -h -a history,global,d,c, $datapath/combined/$var.combined.nc
+
+    nccopy -d 4  -c time/1,depth/1 $datapath'/combined/'$var'.combined.nc' $datapath'/combined/'$var'.combined.compressed.nc'
+
+    #scp 'combined/'$var'.combined.nc' 'uniliege01@ogs01.cineca.it:/production/apache/data/emodnet-combined'
+
+    ### for chlorophyll-a ###
+    #cp ./combined/$var.combined.nc ./combined/${var_old}.combined.nc
+    #ncrename -v ${var}_L2,${var_old}_L2 ./combined/${var_old}.combined.nc
+    #scp 'combined/'${var_old}'.combined.nc' 'uniliege01@ogs01.cineca.it:/production/apache/data/emodnet-combined'
+
+    #rm -rf 'combined'
+
+  fi
 fi
-
-if [ $(echo "$c<$d" | bc -l)=="1" ] 
-then
-minimum=$c
-else
-minimum=$d
-fi
-
-#echo $minimum,$maximum
-ncatted -O -a actual_range,${var}_L2,o,c,"$minimum,$maximum" $datapath/combined/$var.combined.nc
-
-###
-
-ncatted -h -a history,global,d,c, $datapath/combined/$var.combined.nc
-
-nccopy -d 4  -c time/1,depth/1 $datapath'/combined/'$var'.combined.nc' $datapath'/combined/'$var'.combined.compressed.nc'
-
-#scp 'combined/'$var'.combined.nc' 'uniliege01@ogs01.cineca.it:/production/apache/data/emodnet-combined'
-
-### for chlorophyll-a ###
-#cp ./combined/$var.combined.nc ./combined/$var_old.combined.nc
-#ncrename -v ${var}_L2,${var_old}_L2 ./combined/$var_old.combined.nc
-#scp 'combined/'$var_old'.combined.nc' 'uniliege01@ogs01.cineca.it:/production/apache/data/emodnet-combined'
-
-#rm -rf 'combined'
-
-fi
-fi
-
-
-
-
-
-
-
-
-
-
