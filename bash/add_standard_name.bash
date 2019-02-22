@@ -32,15 +32,22 @@ stdnames=( ["Water_body_ammonium"]="mole_concentration_of_ammonium_in_sea_water"
 ["Water_body_silicate"]="mass_concentration_of_silicate_in_sea_water"
 ["Water_body_dissolved_inorganic_nitrogen_(DIN)"]="mass_concentration_of_inorganic_nitrogen_in_sea_water"
 ["Water_body_dissolved_oxygen_saturation"]="fractional_saturation_of_oxygen_in_sea_water"
+["Water body ammonium"]="mole_concentration_of_ammonium_in_sea_water"
+["Water body chlorophyll-a"]="mass_concentration_of_chlorophyll_a_in_sea_water"
+["Water body phosphate"]="mass_concentration_of_phosphate_in_sea_water"
+["Water body dissolved oxygen concentration"]="mass_concentration_of_oxygen_in_sea_water"
+["Water body silicate"]="mass_concentration_of_silicate_in_sea_water"
+["Water body dissolved inorganic nitrogen (DIN)"]="mass_concentration_of_inorganic_nitrogen_in_sea_water"
+["Water body dissolved oxygen saturation"]="fractional_saturation_of_oxygen_in_sea_water"
 )
 
 #declare -r domaindir="/production/apache/data/emodnet-test-charles/North Sea/"
-declare -r domaindir="/data/EMODnet/Chemistry/prod/"
+declare -r domaindir="/data/EMODnet/Chemistry/prod/Arctic region/"
 echo "Working in ${domaindir}"
 
 # Function to generate a list of variables based on the main variable
 function getvarlist {
-    echo $1 $1"_err" $1"_L1" ${1}"_L2" $1"_deepest" $1"_deepest_L1" $1"_deepest_L2"
+    echo "$1","$1_err","$1_L1",${1}"_L2",$1"_deepest",$1"_deepest_L1",$1"_deepest_L2"
     }
 
 i=0
@@ -48,8 +55,9 @@ nfiles=$(find "${domaindir}" -type f -name "*.nc" | wc -l )
 echo "Found ${nfiles} netCDF files in the specified directory"
 echo " "
 
+
 # Loop on the files
-find "${domaindir}" -type f -name "*.nc" -print0 | while IFS= read -r -d '' ncfile; do 
+find "${domaindir}" -type f -name "*.nc" -print0 | while IFS= read -r -d '' ncfile; do
   ((i++))
   echo " "
   echo "  Working on file ${i}/${nfiles}"
@@ -59,7 +67,7 @@ find "${domaindir}" -type f -name "*.nc" -print0 | while IFS= read -r -d '' ncfi
   domain=$(echo ${ncfile} | cut -d "/" -f 6)
   echo "  Domain: "${domain}
   variable=$(echo $(basename "${ncfile}") | cut -d "." -f 1)
-  echo "  Variable to process:" ${variable}
+  echo "  Variable to process: ${variable}"
   # Get standard name from dictionary
   stdname=${stdnames[$variable]}
   echo "  CF Standard name: ${stdname}"
@@ -74,9 +82,12 @@ find "${domaindir}" -type f -name "*.nc" -print0 | while IFS= read -r -d '' ncfi
 
   # Loop on the variables of which we have to change the name
   vlist=$(echo $(getvarlist "${variable}"))
+  OLDIFS=${IFS}
+  IFS=",";
   for varnames in ${vlist}; do
     echo "    Working on variable "${varnames}
     #ncatted -O -h -a standard_name,${varnames},o,c,${stdname} "${ncfile}"
   done
+  IFS=${OLDIFS}
 
 done
