@@ -80,14 +80,22 @@ find "${domaindir}" -type f -name "*.nc" -print0 | while IFS= read -r -d '' ncfi
     echo "Changed variable name to $variable"
   fi
 
-  # Loop on the variables of which we have to change the name
-  vlist=$(echo $(getvarlist "${variable}"))
-  OLDIFS=${IFS}
-  IFS=",";
-  for varnames in ${vlist}; do
-    echo "    Working on variable "${varnames}
-    #ncatted -O -h -a standard_name,${varnames},o,c,${stdname} "${ncfile}"
-  done
-  IFS=${OLDIFS}
+  # Additional check to run on my machine:
+  # check if file is empty
+
+  if [ -s "${ncfile}" ]; then
+    echo "  -- File is not empty"
+    # Loop on the variables of which we have to change the name
+    vlist=$(echo $(getvarlist "${variable}"))
+    OLDIFS=${IFS}
+    IFS=",";
+    for varnames in ${vlist}; do
+      echo "    Working on variable "${varnames}
+      ncatted -O -h -a standard_name,${varnames},o,c,${stdname} "${ncfile}"
+    done
+    IFS=${OLDIFS}
+  else
+    echo "  -- File is empty (test file)"
+  fi
 
 done
