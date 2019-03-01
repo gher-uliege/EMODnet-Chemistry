@@ -42,7 +42,7 @@ stdnames=( ["Water_body_ammonium"]="mole_concentration_of_ammonium_in_sea_water"
 )
 
 #declare -r domaindir="/production/apache/data/emodnet-test-charles/North Sea/"
-declare -r domaindir="/data/EMODnet/Chemistry/prod/Arctic region/"
+declare -r domaindir="/data/EMODnet/Chemistry/prod/"
 echo "Working in ${domaindir}"
 
 # Function to generate a list of variables based on the main variable
