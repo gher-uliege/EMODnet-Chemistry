@@ -41,14 +41,22 @@ stdnames=( ["Water_body_ammonium"]="mole_concentration_of_ammonium_in_sea_water"
 ["Water body dissolved oxygen saturation"]="fractional_saturation_of_oxygen_in_sea_water"
 )
 
-#declare -r domaindir="/production/apache/data/emodnet-test-charles/North Sea/"
-declare -r domaindir="/data/EMODnet/Chemistry/prod/"
+#declare -r domaindir="/production/apache/data/emodnet-test-charles/Black Sea/"
+#declare -r domaindir="/data/EMODnet/Chemistry/prod/"
+declare -r domaindir="/production/apache/data/emodnet-test-charles/Arctic region/"
+
 echo "Working in ${domaindir}"
 
 # Function to generate a list of variables based on the main variable
 function getvarlist {
-    echo "$1","$1_err","$1_L1",${1}"_L2",$1"_deepest",$1"_deepest_L1",$1"_deepest_L2"
+    echo "$1","$1_L1" # ,${1}"_L2",$1"_deepest",$1"_deepest_L1",$1"_deepest_L2"
     }
+
+function getvarlisterr {
+    echo "$1_err","$1_relerr" # ,${1}"_L2",$1"_deepest",$1"_deepest_L1",$1"_deepest_L2"
+    }
+
+
 
 i=0
 nfiles=$(find "${domaindir}" -type f -name "*.nc" | wc -l )
@@ -85,13 +93,29 @@ find "${domaindir}" -type f -name "*.nc" -print0 | while IFS= read -r -d '' ncfi
 
   if [ -s "${ncfile}" ]; then
     echo "  -- File is not empty"
+
+
+    ncatted -O -h -a standard_name,lon,o,c,longitude "${ncfile}"
+    ncatted -O -h -a standard_name,lat,o,c,latitude "${ncfile}"
+    ncatted -O -h -a standard_name,depth,o,c,depth "${ncfile}"
+    ncatted -O -h -a standard_name,time,o,c,time "${ncfile}"
+
     # Loop on the variables of which we have to change the name
     vlist=$(echo $(getvarlist "${variable}"))
+    vlisterr=$(echo $(getvarlisterr "${variable}"))
+
     OLDIFS=${IFS}
     IFS=",";
-    for varnames in ${vlist}; do
-      echo "    Working on variable "${varnames}
-      ncatted -O -h -a standard_name,${varnames},o,c,${stdname} "${ncfile}"
+    variable_esc="$(printf '%q' ${variable})"
+    echo ${variable_esc}
+    ncatted -O -h -a standard_name,"${variable_esc}",o,c,${stdname} "${ncfile}"
+    
+    
+    echo "Variable list:" ${vlisterr}
+    for varnames in ${vlisterr}; do
+      varname_esc=$(printf '%q\n' ${varnames})
+      # echo "    Working on variable ${varname_esc}"
+      ncatted -O -h -a standard_name,"${varname_esc}",d,, "${ncfile}"
     done
     IFS=${OLDIFS}
   else
@@ -99,3 +123,4 @@ find "${domaindir}" -type f -name "*.nc" -print0 | while IFS= read -r -d '' ncfi
   fi
 
 done
+
