@@ -1,0 +1,28 @@
+#!/bin/bash
+
+if [ "$#" == 0 ]; then
+  echo "Usage"
+  echo ${0} filename
+  exit 1
+fi
+
+ncfile=${1}
+echo "Working on file ${ncfile}"
+
+ncatted -O -h -a long_name,Water_body_phosphate,o,c,Water_body_phosphate "${ncfile}"
+ncatted -O -h -a long_name,Water_body_phosphate_err,o,c,"Error standard deviation of Water_body_phosphate" "${ncfile}"
+ncatted -O -h -a long_name,Water_body_phosphate_L1,o,c,"Water_body_phosphate masked using relative error threshold 0.3" "${ncfile}"
+ncatted -O -h -a long_name,Water_body_phosphate_L2,o,c,"Water_body_phosphate masked using relative error threshold 0.5" "${ncfile}"
+ncatted -O -h -a long_name,Water_body_phosphate_relerr,o,c,"Relative error of Water_body_phosphate" "${ncfile}"
+ncatted -O -h -a long_name,Water_body_phosphate_deepest,o,c,"Deepest values of Water_body_phosphate" "${ncfile}"
+ncatted -O -h -a long_name,Water_body_phosphate_deepest_L1,o,c,"Deepest values of Water_body_phosphate masked using relative error threshold 0.3" "${ncfile}"
+ncatted -O -h -a long_name,Water_body_phosphate_deepest_L2,o,c,"Deepest values of Water_body_phosphate masked using relative error threshold 0.5" "${ncfile}"
+
+ncatted -O -h -a units,Water_body_phosphate,o,c,"umol/l" "${ncfile}"
+ncatted -O -h -a units,Water_body_phosphate_err,o,c,"umol/l" "${ncfile}"
+ncatted -O -h -a units,Water_body_phosphate_L1,o,c,"umol/l" "${ncfile}"
+ncatted -O -h -a units,Water_body_phosphate_L2,o,c,"umol/l" "${ncfile}"
+ncatted -O -h -a units,Water_body_phosphate_relerr,o,c,"umol/l" "${ncfile}"
+ncatted -O -h -a units,Water_body_phosphate_deepest,o,c,"umol/l" "${ncfile}"
+ncatted -O -h -a units,Water_body_phosphate_deepest_L1,o,c,"umol/l" "${ncfile}"
+ncatted -O -h -a units,Water_body_phosphate_deepest_L2,o,c,"umol/l" "${ncfile}"
