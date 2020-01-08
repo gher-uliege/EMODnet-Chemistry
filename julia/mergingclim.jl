@@ -1,3 +1,4 @@
+module MergingClim
 using NCDatasets
 using Dates
 using Glob
@@ -262,7 +263,7 @@ get_depth_indices(depth, depthvector)
 Return the indices of the depth levels from `depthvector` above and below
 the depth level `depth`
 """
-function get_depth_indices(depth::Float64, depthvector::Array{Float32})
+function get_depth_indices(depth::Float64, depthvector::Array{Float64})
     dmin, dmax = get_closer_depth(depthvector, depth)
     if dmin == nothing || dmax == nothing
         indmin = nothing
@@ -377,4 +378,6 @@ Could be done from the netCDF itself
 """
 function get_region_name(datafile::String)::String
     return split(datafile,"/")[6]
+end
+
 end
