@@ -36,7 +36,10 @@ function create_date_list(years::Array, months::Array, dateref::Date=Date(1900,1
 end
 
 """
-create_nc_merged(filename, longrid, latgrid, depthgrid, timegrid)
+```julia
+create_nc_merged(filename, longrid, latgrid, depthgrid, timegrid,
+                 varname, standardname, longname, title, units, valex)
+```
 
 Create a netCDF file named `filename` with the coordinates taken from vectors
 longrid, latgrid, depthgrid, timegrid.
@@ -131,11 +134,15 @@ end
 
 
 """
+```julia
 get_file_list(datadir, varname, season)
-
+```
 Return a list of files located in `datadir`, containing the
 variable `varname` for the season `season`.
 
+`season` can take the values: Summer, Autumn, Winter, Spring
+
+## Example
 ```julia
 get_file("./data/EMODnet/", "chlorophyll-a", "Winter")
 ```
@@ -158,8 +165,9 @@ end
 
 
 """
+```julia
 get_years(filename)
-
+```
 Extract the years (from the time variable) out of a netCDF file `filename`
 """
 function get_years(filename::String)::Array
@@ -172,8 +180,9 @@ function get_years(filename::String)::Array
 end
 
 """
+```julia
 get_coords(filename)
-
+```
 Extract the years, longitudes, latitudes and depths
 out of a netCDF file `filename`
 """
