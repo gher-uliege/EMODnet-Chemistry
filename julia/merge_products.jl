@@ -2,7 +2,7 @@ using NCDatasets
 using Dates
 using Glob
 using DIVAnd
-include("mergingclim.jl")
+include("MergingClim.jl")
 
 plotcheck = false
 
@@ -20,11 +20,10 @@ var_stdname = "mass_concentration_of_chlorophyll_a_in_sea_water"
 longname = "chlorophyll-a"
 units = "mg/m^3"
 
-
 #varname = "silicate"
 #longname = "Water body silicate"
 #var_stdname = "mass_concentration_of_silicate_in_sea_water"
-units = "umol/l"
+#units = "umol/l"
 
 #varname = "oxygen_concentration"
 #longname = "Water body dissolved oxygen concentration"
@@ -72,7 +71,7 @@ yearmax = 2016;
 yearrange = collect(yearmin:yearmax)
 monthlist = [2,5,8,11]
 dateref = Date(1900,1,1)
-timegrid = create_date_list(yearrange, monthlist)
+timegrid = MergingClim.create_date_list(yearrange, monthlist)
 
 if !(isdir(outputdir))
 	@info("Create new output directory")
@@ -93,11 +92,11 @@ end
 valex = -999.
 
 title = "Water body $(varname)"
-create_nc_merged(outputfile, longrid, latgrid, depthgrid, timegrid,
+MergingClim.create_nc_merged(outputfile, longrid, latgrid, depthgrid, timegrid,
 				 varname, var_stdname, longname, title, units, valex);
 
 @info "Getting the years from the output file"
-yeargrid = get_years(joinpath(outputdir, outputfile));
+yeargrid = MergingClim.get_years(joinpath(outputdir, outputfile));
 @debug "Year grid: $(yeargrid)";
 
 # Loop on the seasons
@@ -106,7 +105,7 @@ for (iseason, season) in enumerate(["Winter", "Spring", "Summer", "Autumn"])
 	@info("Working on season $(season)")
 
 	# Generate list of files for that season and that variable
-	filelist = get_file_list(databasedir, varname, season);
+	filelist = MergingClim.get_file_list(databasedir, varname, season);
 	nfiles = length(filelist);
 	@info("Found $(nfiles) files")
 	if nfiles !== 6
@@ -117,7 +116,7 @@ for (iseason, season) in enumerate(["Winter", "Spring", "Summer", "Autumn"])
 
 	for datafile in filelist
 		@info "Reading data from file $(datafile)"
-		regionname = get_region_name(datafile);
+		regionname = MergingClim.get_region_name(datafile);
 		yeargridregion, lonregion, latregion, depthregion = get_coords(datafile)
 		@info("minimum year for the region: $(minimum(yeargridregion)), maximum year: $(maximum(yeargridregion))");
 		@debug "Year grid for the region: $(yeargridregion)";
@@ -142,7 +141,7 @@ for (iseason, season) in enumerate(["Winter", "Spring", "Summer", "Autumn"])
 			@debug("After subsetting: $(size(field_subset))")
 		end
 		@info(typeof(field_subset))
-		clim = RegionClimato(regionname, yeargridregion[goodyears],
+		clim = MergingClim.RegionClimato(regionname, yeargridregion[goodyears],
 		depthregion[gooddepths], lonregion, latregion,
 		coalesce.(field_subset), coalesce.(field_masked05_subset))
 		push!(climlist, clim)
@@ -202,12 +201,12 @@ for (iseason, season) in enumerate(["Winter", "Spring", "Summer", "Autumn"])
 
 						if length(findall(clim.depths .== depthtarget)) == 0
 							@warn("Depth not found, will perform vertical interpolation")
-							dmin, dmax = get_closer_depth(clim.depths, depthtarget)
-							w1, w2 = get_depth_weights(depthtarget, dmin, dmax)
+							dmin, dmax = MergingClim.get_closer_depth(clim.depths, depthtarget)
+							w1, w2 = MergingClim.get_depth_weights(depthtarget, dmin, dmax)
 							@show (w1, w2);
 							@show depthtarget;
 							@show typeof(clim.depths)
-							indmin, indmax = get_depth_indices(depthtarget, clim.depths)
+							indmin, indmax = MergingClim.get_depth_indices(depthtarget, clim.depths)
 
 							field_depth = clim.field[:,:,[indmin, indmax],yearindex]
 							fieldmasked_depth = clim.fieldmasked[:,:,[indmin, indmax],yearindex]
@@ -230,10 +229,10 @@ for (iseason, season) in enumerate(["Winter", "Spring", "Summer", "Autumn"])
 						@info("Size of the interpolated field: $(size(field_depth_interpolated))");
 
 						@debug("Performing 2D horizontal interpolation")
-						loninterp, latinterp, finterp, indlon, indlat = interp_horiz(clim.lons, clim.lats,
+						loninterp, latinterp, finterp, indlon, indlat = MergingClim.interp_horiz(clim.lons, clim.lats,
 						field_depth_interpolated, longrid, latgrid);
 
-						_, _, finterp_masked, _, _ = interp_horiz(clim.lons, clim.lats,
+						_, _, finterp_masked, _, _ = MergingClim.interp_horiz(clim.lons, clim.lats,
 						fieldmasked_depth_interpolated, longrid, latgrid);
 
 						@debug("Filling the 3D array for merging")
@@ -266,7 +265,7 @@ for (iseason, season) in enumerate(["Winter", "Spring", "Summer", "Autumn"])
 
 			@debug("Time index in the netCDF: $((iyear-1)*4+iseason)")
 			# Write inside the global netCDF file
-			dsout = Dataset(outputfile, "a") do dsout
+			Dataset(outputfile, "a") do dsout
 				dsout
 				dsout[varname][1:length(longrid),1:length(latgrid),idepth,(iyear-1)*4+iseason] = field_merged;
 				dsout[varname*"_L2"][1:length(longrid),1:length(latgrid),idepth,(iyear-1)*4+iseason] = field_masked_merged;
