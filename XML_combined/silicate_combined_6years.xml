@@ -9633,7 +9633,7 @@ Anglesey,
           <gmd:onLine>
             <gmd:CI_OnlineResource>
               <gmd:linkage>
-                <gmd:URL>https://ec.oceanbrowser.net/emodnet-projects/Python/web/wms?SERVICE=WMS&amp;REQUEST=GetCapabilitiesGetCapabilities&amp;VERSION=1.3.0</gmd:URL>
+                <gmd:URL>https://ec.oceanbrowser.net/emodnet-projects/Python/web/wms?SERVICE=WMS&amp;REQUEST=GetCapabilities&amp;VERSION=1.3.0</gmd:URL>
               </gmd:linkage>
               <gmd:protocol>
                 <gco:CharacterString>OGC:WMS</gco:CharacterString>
