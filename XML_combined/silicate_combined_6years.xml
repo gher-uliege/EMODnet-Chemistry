@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gmd:MD_Metadata xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:gml="http://www.opengis.net/gml" xmlns:xslt="http://xml.apache.org/xslt" xmlns:date="http://exslt.org/dates-and-times" xmlns:gss="http://www.isotc211.org/2005/gss" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:gsr="http://www.isotc211.org/2005/gsr" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.isotc211.org/2005/gmd https://www.isotc211.org/2005/gmd/gmd.xsd http://www.isotc211.org/2005/gmx https://www.isotc211.org/2005/gmx/gmx.xsd http://www.isotc211.org/2005/srv http://schemas.opengis.net/iso/19139/20060504/srv/srv.xsd">
   <gmd:fileIdentifier>
-    <gco:CharacterString>9a1924bd-1f76-46c3-bf23-22a595a48939</gco:CharacterString>
+    <gco:CharacterString>bbd08254-474b-11ea-9ac9-93eaa7977f8e</gco:CharacterString>
   </gmd:fileIdentifier>
   <gmd:language>
     <gmd:LanguageCode codeList="http://www.loc.gov/standards/iso639-2/" codeListValue="eng"/>
@@ -15,7 +15,7 @@
   <gmd:contact>
     <gmd:CI_ResponsibleParty>
       <gmd:organisationName>
-        <gco:CharacterString>EMODNET CHEMISTRY</gco:CharacterString>
+        <gco:CharacterString>EMODnet CHEMISTRY</gco:CharacterString>
       </gmd:organisationName>
       <gmd:contactInfo>
         <gmd:CI_Contact>
@@ -102,7 +102,7 @@
       <gmd:citation>
         <gmd:CI_Citation>
           <gmd:title>
-            <gco:CharacterString>Combined DIVA 4D 10-year analysis of Water body silicate</gco:CharacterString>
+            <gco:CharacterString>Combined DIVA 4D 6-year analysis of Water body silicate</gco:CharacterString>
           </gmd:title>
           <gmd:alternateTitle gco:nilReason="missing">
             <gco:CharacterString/>
@@ -123,7 +123,7 @@
           <gmd:identifier>
             <gmd:MD_Identifier>
               <gmd:code>
-                <gco:CharacterString>9a1924bd-1f76-46c3-bf23-22a595a48939</gco:CharacterString>
+                <gco:CharacterString>bbd08254-474b-11ea-9ac9-93eaa7977f8e</gco:CharacterString>
               </gmd:code>
             </gmd:MD_Identifier>
           </gmd:identifier>
@@ -134,7 +134,7 @@
 Units: umol/l</gco:CharacterString>
       </gmd:abstract>
       <gmd:credit>
-        <gco:CharacterString>Emodnet chemistry</gco:CharacterString>
+        <gco:CharacterString>EMODnet chemistry</gco:CharacterString>
       </gmd:credit>
       <gmd:pointOfContact>
         <gmd:CI_ResponsibleParty uuid="http://seadatanet.maris2.nl/v_edmo/print.asp?n_code=1001">
@@ -215,7 +215,7 @@ Units: umol/l</gco:CharacterString>
               <gmd:address>
                 <gmd:CI_Address>
                   <gmd:deliveryPoint>
-                    <gco:CharacterString>O.A.S.U. 
+                    <gco:CharacterString>O.A.S.U.
 Bâtiment B18N
 Allée Geoffroy Saint Hilaire
 CS 50023</gco:CharacterString>
@@ -2423,8 +2423,8 @@ BP 330 - Zone Portuaire de Brégaillon</gco:CharacterString>
                 <gmd:CI_Address>
                   <gmd:deliveryPoint>
                     <gco:CharacterString>School of Ocean Sciences,
-University of Wales Bangor, 
-Menai Bridge, 
+University of Wales Bangor,
+Menai Bridge,
 Anglesey,</gco:CharacterString>
                   </gmd:deliveryPoint>
                   <gmd:city>
@@ -3199,7 +3199,7 @@ CS 10070</gco:CharacterString>
               <gmd:address>
                 <gmd:CI_Address>
                   <gmd:deliveryPoint>
-                    <gco:CharacterString>UPMC/UMR 7093 
+                    <gco:CharacterString>UPMC/UMR 7093
 181, chemin du Lazaret</gco:CharacterString>
                   </gmd:deliveryPoint>
                   <gmd:city>
@@ -4574,7 +4574,7 @@ P.O.BOX 500</gco:CharacterString>
               <gmd:address>
                 <gmd:CI_Address>
                   <gmd:deliveryPoint>
-                    <gco:CharacterString>University of Cyprus 
+                    <gco:CharacterString>University of Cyprus
 P.O. BOX 20537</gco:CharacterString>
                   </gmd:deliveryPoint>
                   <gmd:city>
@@ -5049,7 +5049,7 @@ Inciralti</gco:CharacterString>
               <gmd:address>
                 <gmd:CI_Address>
                   <gmd:deliveryPoint>
-                    <gco:CharacterString>351, Cours de la Liberation 
+                    <gco:CharacterString>351, Cours de la Liberation
 Avenue des Facultes</gco:CharacterString>
                   </gmd:deliveryPoint>
                   <gmd:city>
@@ -6100,7 +6100,7 @@ CS 10070</gco:CharacterString>
       <gmd:graphicOverview>
         <gmd:MD_BrowseGraphic>
           <gmd:fileName>
-            <gco:CharacterString>https://sextant.ifremer.fr/geonetwork/srv/fre//resources.get?uuid=9a1924bd-1f76-46c3-bf23-22a595a48939&amp;fname=water_body_silicate_thumbnail.gif</gco:CharacterString>
+            <gco:CharacterString>https://sextant.ifremer.fr/geonetwork/srv/fre//resources.get?uuid=bbd08254-474b-11ea-9ac9-93eaa7977f8e&amp;fname=water_body_silicate_thumbnail.gif</gco:CharacterString>
           </gmd:fileName>
         </gmd:MD_BrowseGraphic>
       </gmd:graphicOverview>
@@ -6170,7 +6170,7 @@ CS 10070</gco:CharacterString>
           <gmd:thesaurusName>
             <gmd:CI_Citation>
               <gmd:title>
-                <gco:CharacterString>EMODNET chemistry lot aggregated parameter names</gco:CharacterString>
+                <gco:CharacterString>EMODnet Chemistry lot aggregated parameter names</gco:CharacterString>
               </gmd:title>
               <gmd:date>
                 <gmd:CI_Date>
@@ -6410,7 +6410,7 @@ CS 10070</gco:CharacterString>
           <gmd:onLine>
             <gmd:CI_OnlineResource>
               <gmd:linkage>
-                <gmd:URL>https://ec.oceanbrowser.net/emodnet-projects/Python/web/wms?SERVICE=WMS&amp;;REQUEST=GetCapabilitiesGetCapabilities&amp;VERSION=1.3.0</gmd:URL>
+                <gmd:URL>https://ec.oceanbrowser.net/emodnet-projects/Python/web/wms?SERVICE=WMS&amp;REQUEST=GetCapabilitiesGetCapabilities&amp;VERSION=1.3.0</gmd:URL>
               </gmd:linkage>
               <gmd:protocol>
                 <gco:CharacterString>OGC:WMS</gco:CharacterString>
@@ -6471,7 +6471,7 @@ CS 10070</gco:CharacterString>
       <gmd:lineage>
         <gmd:LI_Lineage>
           <gmd:statement>
-            <gco:CharacterString>The data used as input for this product have been extracted from the Emodnet Download Service: http://www.seadatanet.org/Data-Access/Common-Data-Index-CDI</gco:CharacterString>
+            <gco:CharacterString>The data used as input for this product have been extracted from the EMODnet Download Service: http://www.seadatanet.org/Data-Access/Common-Data-Index-CDI</gco:CharacterString>
           </gmd:statement>
         </gmd:LI_Lineage>
       </gmd:lineage>

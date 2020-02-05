@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gmd:MD_Metadata xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:date="http://exslt.org/dates-and-times" xmlns:gml="http://www.opengis.net/gml" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:gsr="http://www.isotc211.org/2005/gsr" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xslt="http://xml.apache.org/xslt" xmlns:gss="http://www.isotc211.org/2005/gss" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:gmx="http://www.isotc211.org/2005/gmx" xsi:schemaLocation="http://www.isotc211.org/2005/gmd https://www.isotc211.org/2005/gmd/gmd.xsd http://www.isotc211.org/2005/gmx https://www.isotc211.org/2005/gmx/gmx.xsd http://www.isotc211.org/2005/srv http://schemas.opengis.net/iso/19139/20060504/srv/srv.xsd">
   <gmd:fileIdentifier>
-    <gco:CharacterString>7bec3694-f33f-413a-8e23-50fcdc5a0816</gco:CharacterString>
+    <gco:CharacterString>936c0afe-474b-11ea-b114-6bfe3bb2d42c</gco:CharacterString>
   </gmd:fileIdentifier>
   <gmd:language>
     <gmd:LanguageCode codeList="http://www.loc.gov/standards/iso639-2/" codeListValue="eng"/>
@@ -123,7 +123,7 @@
           <gmd:identifier>
             <gmd:MD_Identifier>
               <gmd:code>
-                <gco:CharacterString>7bec3694-f33f-413a-8e23-50fcdc5a0816</gco:CharacterString>
+                <gco:CharacterString>936c0afe-474b-11ea-b114-6bfe3bb2d42c</gco:CharacterString>
               </gmd:code>
             </gmd:MD_Identifier>
           </gmd:identifier>
@@ -11018,7 +11018,7 @@ CS 10070</gco:CharacterString>
       <gmd:graphicOverview>
         <gmd:MD_BrowseGraphic>
           <gmd:fileName>
-            <gco:CharacterString>https://sextant.ifremer.fr/geonetwork/srv/fre//resources.get?uuid=7bec3694-f33f-413a-8e23-50fcdc5a0816&amp;fname=water_body_dissolved_oxygen_concentration_thumbnail.gif</gco:CharacterString>
+            <gco:CharacterString>https://sextant.ifremer.fr/geonetwork/srv/fre//resources.get?uuid=936c0afe-474b-11ea-b114-6bfe3bb2d42c&amp;fname=water_body_dissolved_oxygen_concentration_thumbnail.gif</gco:CharacterString>
           </gmd:fileName>
         </gmd:MD_BrowseGraphic>
       </gmd:graphicOverview>
@@ -11398,7 +11398,7 @@ CS 10070</gco:CharacterString>
       <gmd:lineage>
         <gmd:LI_Lineage>
           <gmd:statement>
-            <gco:CharacterString>The data used as input for this product have been extracted from the Emodnet Download Service: http://www.seadatanet.org/Data-Access/Common-Data-Index-CDI</gco:CharacterString>
+            <gco:CharacterString>The data used as input for this product have been extracted from the EMODnet Download Service: http://www.seadatanet.org/Data-Access/Common-Data-Index-CDI</gco:CharacterString>
           </gmd:statement>
         </gmd:LI_Lineage>
       </gmd:lineage>
