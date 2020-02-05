@@ -1499,7 +1499,7 @@ Viale Vespucci 2</gco:CharacterString>
       <gmd:pointOfContact>
         <gmd:CI_ResponsibleParty uuid="http://seadatanet.maris2.nl/v_edmo/print.asp?n_code=1232">
           <gmd:organisationName>
-            <gco:CharacterString>Institut National des Sciences et Technologies de la Mer – INSTM</gco:CharacterString>
+            <gco:CharacterString>Institut National des Sciences et Technologies de la Mer - INSTM</gco:CharacterString>
           </gmd:organisationName>
           <gmd:contactInfo>
             <gmd:CI_Contact>
@@ -2406,7 +2406,7 @@ Apdo.130</gco:CharacterString>
               <gmd:address>
                 <gmd:CI_Address>
                   <gmd:deliveryPoint>
-                    <gco:CharacterString>Cabo Estay – Canido</gco:CharacterString>
+                    <gco:CharacterString>Cabo Estay - Canido</gco:CharacterString>
                   </gmd:deliveryPoint>
                   <gmd:city>
                     <gco:CharacterString>Vigo</gco:CharacterString>
@@ -4480,7 +4480,7 @@ Bidston Hill</gco:CharacterString>
       <gmd:pointOfContact>
         <gmd:CI_ResponsibleParty uuid="http://seadatanet.maris2.nl/v_edmo/print.asp?n_code=2195">
           <gmd:organisationName>
-            <gco:CharacterString>DTU Aqua – National Institute of Aquatic Resources, Technical University of Denmark</gco:CharacterString>
+            <gco:CharacterString>DTU Aqua - National Institute of Aquatic Resources, Technical University of Denmark</gco:CharacterString>
           </gmd:organisationName>
           <gmd:contactInfo>
             <gmd:CI_Contact>

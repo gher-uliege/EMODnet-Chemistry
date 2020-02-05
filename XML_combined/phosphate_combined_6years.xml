@@ -198,7 +198,7 @@ Units: umol/l</gco:CharacterString>
       <gmd:pointOfContact>
         <gmd:CI_ResponsibleParty uuid="http://seadatanet.maris2.nl/v_edmo/print.asp?n_code=1002">
           <gmd:organisationName>
-            <gco:CharacterString>Aquitaine Observatory of Sciences of the Universe – University of Bordeaux (OASU)</gco:CharacterString>
+            <gco:CharacterString>Aquitaine Observatory of Sciences of the Universe - University of Bordeaux (OASU)</gco:CharacterString>
           </gmd:organisationName>
           <gmd:contactInfo>
             <gmd:CI_Contact>
@@ -1761,7 +1761,7 @@ Apdo.130</gco:CharacterString>
               <gmd:address>
                 <gmd:CI_Address>
                   <gmd:deliveryPoint>
-                    <gco:CharacterString>Cabo Estay – Canido</gco:CharacterString>
+                    <gco:CharacterString>Cabo Estay - Canido</gco:CharacterString>
                   </gmd:deliveryPoint>
                   <gmd:city>
                     <gco:CharacterString>Vigo</gco:CharacterString>
