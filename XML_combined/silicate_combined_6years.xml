@@ -130,7 +130,7 @@
         </gmd:CI_Citation>
       </gmd:citation>
       <gmd:abstract>
-        <gco:CharacterString>Combined product of Water body silicate based on DIVA 4D 6-year analysis on five regions: Atlantic Sea, North Sea, Baltic Sea, Black Sea, Mediterranean Sea. The boundaries and overlapping zones between these five regions were filtered to avoid any unrealistic spatial discontinuities. This combined water body silicate product is masked using the relative error threshold 0.5.
+        <gco:CharacterString>Combined product of Water body silicate based on DIVA 4D 6-year analysis on six regions: Arctic region, Atlantic Sea, North Sea, Baltic Sea, Black Sea, Mediterranean Sea. The boundaries and overlapping zones between these regions were filtered to avoid any unrealistic spatial discontinuities. This combined water body silicate product is masked using the relative error threshold 0.5.
 Units: umol/l</gco:CharacterString>
       </gmd:abstract>
       <gmd:credit>
@@ -9639,7 +9639,7 @@ Anglesey,
                 <gco:CharacterString>OGC:WMS</gco:CharacterString>
               </gmd:protocol>
               <gmd:name>
-                <gco:CharacterString>Phase-3/Combined/Water_body_silicate_combined_V1.nc*silicate_L2&amp;basedir=Phase-3/Combined</gco:CharacterString>
+                <gco:CharacterString>Phase-3/Combined/Water_body_silicate_combined_V1.nc*silicate_L2</gco:CharacterString>
               </gmd:name>
               <gmd:description>
                 <gco:CharacterString>Water body silicate masked using relative error threshold 0.5</gco:CharacterString>

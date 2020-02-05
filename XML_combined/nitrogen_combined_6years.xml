@@ -130,7 +130,7 @@
         </gmd:CI_Citation>
       </gmd:citation>
       <gmd:abstract>
-        <gco:CharacterString>Combined product of Water body dissolved organic nitrogen based on DIVA 4D 6-year analysis on five regions: Atlantic Sea, North Sea, Baltic Sea, Black Sea, Mediterranean Sea. The boundaries and overlapping zones between these five regions were filtered to avoid any unrealistic spatial discontinuities. This combined Water body dissolved organic nitrogen product is masked using the relative error threshold 0.5.
+        <gco:CharacterString>Combined product of Water body dissolved organic nitrogen based on DIVA 4D 6-year analysis on five regions: Atlantic Sea, North Sea, Baltic Sea, Black Sea, Mediterranean Sea. The boundaries and overlapping zones between these regions were filtered to avoid any unrealistic spatial discontinuities. This combined Water body dissolved organic nitrogen product is masked using the relative error threshold 0.5.
 Units: umol/l</gco:CharacterString>
       </gmd:abstract>
       <gmd:credit>
@@ -7480,7 +7480,7 @@ BP 80</gco:CharacterString>
                 <gco:CharacterString>OGC:WMS</gco:CharacterString>
               </gmd:protocol>
               <gmd:name>
-                <gco:CharacterString>Phase-3/Combined/Water_body_nitrogen_combined_V1.nc*nitrogen_L2&amp;basedir=Phase-3/Combined</gco:CharacterString>
+                <gco:CharacterString>Phase-3/Combined/Water_body_nitrogen_combined_V1.nc*nitrogen_L2</gco:CharacterString>
               </gmd:name>
               <gmd:description>
                 <gco:CharacterString>Water body dissolved inorganic nitrogen masked using relative error threshold 0.5</gco:CharacterString>

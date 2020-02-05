@@ -130,7 +130,7 @@
         </gmd:CI_Citation>
       </gmd:citation>
       <gmd:abstract>
-        <gco:CharacterString>Combined product of Water body chlorophyll a based on DIVA 4D 6-year analysis on five regions: Atlantic Sea, North Sea, Baltic Sea, Black Sea, Mediterranean Sea. The boundaries and overlapping zones between these five regions were filtered to avoid any unrealistic spatial discontinuities. This combined Water body chlorophyll a product is masked using the relative error threshold 0.5.
+        <gco:CharacterString>Combined product of Water body chlorophyll a based on DIVA 4D 6-year analysis on six regions: Arctic Region, Atlantic Sea, Arctic Sea, North Sea, Baltic Sea, Black Sea, Mediterranean Sea. The boundaries and overlapping zones between these regions were filtered to avoid any unrealistic spatial discontinuities. This combined Water body chlorophyll a product is masked using the relative error threshold 0.5.
 Units: mg/m^3.
 Created by 'University of Liege, GeoHydrodynamics and Environment Research (ULiege-GHER)'.</gco:CharacterString>
       </gmd:abstract>
@@ -8527,7 +8527,7 @@ Anglesey,
                 <gco:CharacterString>OGC:WMS</gco:CharacterString>
               </gmd:protocol>
               <gmd:name>
-                <gco:CharacterString>Phase-3/Combined/Water_body_chlorophyll-a_combined_V1.nc*chlorophyll-a_L2&amp;basedir=Phase-3/Combined</gco:CharacterString>
+                <gco:CharacterString>Phase-3/Combined/Water_body_chlorophyll-a_combined_V1.nc*chlorophyll-a_L2</gco:CharacterString>
               </gmd:name>
               <gmd:description>
                 <gco:CharacterString>Water body chlorophyll-a masked using relative error threshold 0.5</gco:CharacterString>
