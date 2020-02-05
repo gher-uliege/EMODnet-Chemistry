@@ -134,7 +134,7 @@
 Units: umol/l</gco:CharacterString>
       </gmd:abstract>
       <gmd:credit>
-        <gco:CharacterString>Emodnet chemistry</gco:CharacterString>
+        <gco:CharacterString>EMODnet chemistry</gco:CharacterString>
       </gmd:credit>
       <gmd:pointOfContact>
         <gmd:CI_ResponsibleParty uuid="http://seadatanet.maris2.nl/v_edmo/print.asp?n_code=100">
@@ -11286,7 +11286,7 @@ CS 10070</gco:CharacterString>
                 <gco:CharacterString>OGC:WMS</gco:CharacterString>
               </gmd:protocol>
               <gmd:name>
-                <gco:CharacterString>Phase-2/Combined/Water_body_dissolved_oxygen_concentration.combined.nc*Water_body_dissolved_oxygen_concentration_L2&amp;basedir=Phase-2/Combined</gco:CharacterString>
+                <gco:CharacterString>Phase-3/Combined/Water_body_oxygen_concentration_combined_V1.nc*oxygen_concentration_L2&amp;basedir=Phase-3/Combined</gco:CharacterString>
               </gmd:name>
               <gmd:description>
                 <gco:CharacterString>Water body dissolved oxygen concentration masked using relative error threshold 0.5</gco:CharacterString>
@@ -11318,7 +11318,7 @@ CS 10070</gco:CharacterString>
           <gmd:onLine>
             <gmd:CI_OnlineResource>
               <gmd:linkage>
-                <gmd:URL>http://ec.oceanbrowser.net:8081/data/emodnet-projects/Phase-2/Combined/Water_body_dissolved_oxygen_concentration.combined.nc.html</gmd:URL>
+                <gmd:URL>http://ec.oceanbrowser.net:8081/data/emodnet-projects/Phase-3/Combined/Water_body_oxygen_concentration_combined_V1.nc.html</gmd:URL>
               </gmd:linkage>
               <gmd:protocol>
                 <gco:CharacterString>WWW:DOWNLOAD-1.0-link--download</gco:CharacterString>
@@ -11337,7 +11337,7 @@ CS 10070</gco:CharacterString>
           <gmd:onLine>
             <gmd:CI_OnlineResource>
               <gmd:linkage>
-                <gmd:URL>http://ec.oceanbrowser.net:8081/data/emodnet-projects/Phase-2/Combined/Water_body_dissolved_oxygen_concentration.combined.nc</gmd:URL>
+                <gmd:URL>http://ec.oceanbrowser.net:8081/data/emodnet-projects/Phase-3/Combined/Water_body_oxygen_concentration_combined_V1.nc</gmd:URL>
               </gmd:linkage>
               <gmd:protocol>
                 <gco:CharacterString>WWW:DOWNLOAD-1.0-link--download</gco:CharacterString>

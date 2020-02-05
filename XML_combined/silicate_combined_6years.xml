@@ -130,7 +130,7 @@
         </gmd:CI_Citation>
       </gmd:citation>
       <gmd:abstract>
-        <gco:CharacterString>Combined product of Water body silicate based on DIVA 4D 6-year analysis on five regions : Atlantic Sea, North Sea, Baltic Sea, Black Sea, Mediterranean Sea. The boundaries and overlapping zones between these five regions were filtered to avoid any unrealistic spatial discontinuities. This combined water body silicate product is masked using the relative error threshold 0.5.
+        <gco:CharacterString>Combined product of Water body silicate based on DIVA 4D 6-year analysis on five regions: Atlantic Sea, North Sea, Baltic Sea, Black Sea, Mediterranean Sea. The boundaries and overlapping zones between these five regions were filtered to avoid any unrealistic spatial discontinuities. This combined water body silicate product is masked using the relative error threshold 0.5.
 Units: umol/l</gco:CharacterString>
       </gmd:abstract>
       <gmd:credit>
@@ -6372,7 +6372,7 @@ CS 10070</gco:CharacterString>
           <gmd:onLine>
             <gmd:CI_OnlineResource>
               <gmd:linkage>
-                <gmd:URL>http://ec.oceanbrowser.net:8081/data/emodnet-projects/Phase-2/Combined/Water_body_silicate.combined.nc.html</gmd:URL>
+                <gmd:URL>http://ec.oceanbrowser.net:8081/data/emodnet-projects/Phase-3/Combined/Water_body_silicate_combined_V1.nc.html</gmd:URL>
               </gmd:linkage>
               <gmd:protocol>
                 <gco:CharacterString>WWW:DOWNLOAD-1.0-link--download</gco:CharacterString>
@@ -6391,7 +6391,7 @@ CS 10070</gco:CharacterString>
           <gmd:onLine>
             <gmd:CI_OnlineResource>
               <gmd:linkage>
-                <gmd:URL>http://ec.oceanbrowser.net:8081/data/emodnet-projects/Phase-2/Combined/Water_body_silicate.combined.nc</gmd:URL>
+                <gmd:URL>http://ec.oceanbrowser.net:8081/data/emodnet-projects/Phase-3/Combined/Water_body_silicate_combined_V1.nc</gmd:URL>
               </gmd:linkage>
               <gmd:protocol>
                 <gco:CharacterString>WWW:DOWNLOAD-1.0-link--download</gco:CharacterString>
@@ -6416,7 +6416,7 @@ CS 10070</gco:CharacterString>
                 <gco:CharacterString>OGC:WMS</gco:CharacterString>
               </gmd:protocol>
               <gmd:name>
-                <gco:CharacterString>Phase-2/Combined/Water_body_silicate.combined.nc*Water_body_silicate_L2&amp;basedir=Phase-2/Combined</gco:CharacterString>
+                <gco:CharacterString>Phase-3/Combined/Water_body_silicate_combined_V1.nc*silicate_L2&amp;basedir=Phase-3/Combined</gco:CharacterString>
               </gmd:name>
               <gmd:description>
                 <gco:CharacterString>Water body silicate masked using relative error threshold 0.5</gco:CharacterString>
