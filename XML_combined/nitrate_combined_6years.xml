@@ -198,7 +198,7 @@ Units: umol/l</gco:CharacterString>
       <gmd:pointOfContact>
         <gmd:CI_ResponsibleParty uuid="http://seadatanet.maris2.nl/v_edmo/print.asp?n_code=1002">
           <gmd:organisationName>
-            <gco:CharacterString>Aquitaine Observatory of Sciences of the Universe – University of Bordeaux (OASU)</gco:CharacterString>
+            <gco:CharacterString>Aquitaine Observatory of Sciences of the Universe - University of Bordeaux (OASU)</gco:CharacterString>
           </gmd:organisationName>
           <gmd:contactInfo>
             <gmd:CI_Contact>
@@ -6633,7 +6633,7 @@ CS 10070</gco:CharacterString>
       <gmd:graphicOverview>
         <gmd:MD_BrowseGraphic>
           <gmd:fileName>
-            <gco:CharacterString>https://sextant.ifremer.fr/geonetwork/srv/fre//resources.get?uuid=9319472e-474b-11ea-98a7-fbb0a718c1ae&amp;fname=water_body_phosphate_thumbnail.gif</gco:CharacterString>
+            <gco:CharacterString>https://sextant.ifremer.fr/geonetwork/srv/fre//resources.get?uuid=9319472e-474b-11ea-98a7-fbb0a718c1ae&amp;fname=water_body_nitrogen_thumbnail.gif</gco:CharacterString>
           </gmd:fileName>
         </gmd:MD_BrowseGraphic>
       </gmd:graphicOverview>
@@ -6695,7 +6695,7 @@ CS 10070</gco:CharacterString>
       <gmd:descriptiveKeywords>
         <gmd:MD_Keywords>
           <gmd:keyword>
-            <gmx:Anchor xlink:href="https://sextant.ifremer.fr/geonetwork/srv/api/registries/vocabularies/keyword?thesaurus=external.parameter.NVS.P35&amp;id=http://vocab.nerc.ac.uk/collection/P35/current/EPC00007/">Water body phosphate</gmx:Anchor>
+            <gmx:Anchor xlink:href="https://sextant.ifremer.fr/geonetwork/srv/api/registries/vocabularies/keyword?thesaurus=external.parameter.NVS.P35&amp;id=http://vocab.nerc.ac.uk/collection/P35/current/EPC00007/">Water body dissolved inorganic nitrogen (DIN)</gmx:Anchor>
           </gmd:keyword>
           <gmd:type>
             <gmd:MD_KeywordTypeCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#MD_KeywordTypeCode" codeListValue="parameter"/>
@@ -6842,8 +6842,8 @@ CS 10070</gco:CharacterString>
             <gmd:EX_TemporalExtent>
               <gmd:extent>
                 <gml:TimePeriod gml:id="d25503062e7168a1051934">
-                  <gml:beginPosition>1965-01-01</gml:beginPosition>
-                  <gml:endPosition>2010-12-31</gml:endPosition>
+                  <gml:beginPosition>1983-01-01</gml:beginPosition>
+                  <gml:endPosition>2016-12-31</gml:endPosition>
                 </gml:TimePeriod>
               </gmd:extent>
             </gmd:EX_TemporalExtent>
