@@ -2,7 +2,7 @@
 using HTTP, EzXML, NCDatasets
 
 # Usage:
-# check_sextant_entry.jl  /production/apache/data/emodnet-domains/
+# julia --color=yes check_sextant_entry.jl  "/production/apache/data/emodnet-domains/"
 
 function check_uuid(uuid)
     r = HTTP.get("https://sextant.ifremer.fr/geonetwork/srv/eng/qi", query = Dict("_uuid" => uuid));
@@ -47,9 +47,10 @@ for ncfile = allfiles
     print("checking $ncfile: ")
     
     if check_uuid(product_id)
-        printstyled(": present in Sextant",color = :green)
+        printstyled("present in Sextant",color = :green)
     else
-        printstyled(": not present in Sextant",color = :red)
+        printstyled("not present in Sextant",color = :red)
+        println("check: https://www.emodnet-chemistry.eu/products/catalogue#/metadata/$(product_id)")
     end
     println()
     sleep(3)
