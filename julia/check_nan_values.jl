@@ -55,6 +55,7 @@ Return the number of NaNs in the filename.
 """
 function count_nans(filename::String)
 	Dataset(filename) do ds
+		var0 = varbyattrib(ds, standard_name=var_stdname);
 		d = ds["Water_body_ammonium_L1"].var[:];
 		nnans = sum(isnan.(d));
 		@info("Found $(nnans) NaNs for the variable")

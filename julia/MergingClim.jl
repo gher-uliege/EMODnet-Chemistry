@@ -165,21 +165,17 @@ end
 
 """
 ```julia
-get_file_list_combined(datadir)
+get_file_list_combined(datadir, varname)
 ```
-Return a list of files corresponding to the combined products.
+Return a list of files corresponding to the combined products for the variable `varname`.
 
 
-## Example
-```julia
-get_file_list_combined(datadir)
-```
 """
-function get_file_list_combined(datadir::String)::Array
+function get_file_list_combined(datadir::String, varname::String)::Array
     filelist = []
     for (root, dirs, files) in walkdir(datadir)
         for file in files
-            if endswith(file, ".nc")
+            if endswith(file, ".nc") & (occursin(varname, file) | occursin(varname2, file))
                 push!(filelist, joinpath(root, file))
             end
         end
