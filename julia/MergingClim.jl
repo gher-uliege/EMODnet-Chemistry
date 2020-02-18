@@ -163,6 +163,30 @@ function get_file_list(datadir::String, varname::String="", season::String="")::
     return filelist
 end
 
+"""
+```julia
+get_file_list_combined(datadir)
+```
+Return a list of files corresponding to the combined products.
+
+
+## Example
+```julia
+get_file_list_combined(datadir)
+```
+"""
+function get_file_list_combined(datadir::String)::Array
+    filelist = []
+    for (root, dirs, files) in walkdir(datadir)
+        for file in files
+            if endswith(file, ".nc")
+                push!(filelist, joinpath(root, file))
+            end
+        end
+    end
+    return filelist
+end
+
 
 """
 ```julia
