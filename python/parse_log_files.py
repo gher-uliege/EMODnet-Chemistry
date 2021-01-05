@@ -42,8 +42,9 @@ for month in range(1, 13):
                     filepath = m.group(3).split(" ")[0]
 
                     # Check if download by bot
-                    if "semrush.com" in m.group(6):
-                        logger.debug("Semrush Bot")
+                    if "semrush.com" in m.group(6) or "www.google.com/bot.html" in m.group(6) or\
+                       "https://aspiegel.com/petalbot" in m.group(6):
+                        logger.debug("Robot ")
                     else:
                         # Check if not EMODnet or SeaDataNet IP address
                         if (IP not in IP_discard_list) & (filepath.endswith(".nc")):
