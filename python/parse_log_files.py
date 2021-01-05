@@ -31,7 +31,7 @@ for month in range(1, 13):
     # Allocate lists
     IPlist = []
     datelist = []
-    urllist = []
+    filepathlist = []
     sizelist = []
     for logfile in filelist:
         with open(logfile, "r") as f:
@@ -39,17 +39,22 @@ for month in range(1, 13):
                 m = re.match(regex, line)
                 if m:
                     IP = m.group(1)
+                    filepath = m.group(3).split(" ")[0]
+
                     # Check if download by bot
                     if "semrush.com" in m.group(6):
                         logger.debug("Semrush Bot")
                     else:
                         # Check if not EMODnet or SeaDataNet IP address
-                        if IP not in IP_discard_list:
+                        if (IP not in IP_discard_list) & (filepath.endswith(".nc")):
                             IPlist.append(IP)
                             datelist.append(m.group(2))
-                            urllist.append(m.group(3))
+                            filepathlist.append(filepath)
                             sizelist.append(int(m.group(5)))
 
     nIP = np.unique(IPlist)
+    filespath_u = np.unique(filepathlist)
     sizearray = np.array(sizelist)
     logger.info("Total size for month {}: {}".format(mmonth, size(sizearray.sum())))
+    logger.info("Number of different files: {}".format(len(filespath_u)))
+    logger.info(" ")
