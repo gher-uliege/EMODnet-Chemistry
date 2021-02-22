@@ -32,5 +32,24 @@ datadir = "/data"
 woddir = joinpath(datadir,"WOD")
 
 
-# Name of the variables
+# Name of the variables (WOD)
 varnames = ["Oxygen","Phosphate","Silicate","Nitrate and Nitrate+Nitrite","pH","Chlorophyll"]
+
+# Name of the variables (EMODnet Chemistry)
+varlist = ["Water body phosphate",
+           "Water body dissolved oxygen concentration",
+           "Water body chlorophyll-a",
+           "Water body dissolved inorganic nitrogen (DIN)",
+           ]
+
+
+varinfo = Dict(
+   "Water body dissolved oxygen concentration" => Dict(
+      "files" => ["/data/EMODnet/BlackSea_Water_body_dissolved_oxygen_concentration.nc"]))
+
+
+
+bathname = joinpath(datadir, "gebco_30sec_4.nc")
+if !isfile(bathname)
+    download("https://dox.ulg.ac.be/index.php/s/RSwm4HPHImdZoQP/download",bathname)
+end
