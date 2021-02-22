@@ -11,6 +11,7 @@ using PhysOcean
 using StatsBase
 using FileIO
 using PyPlot
+using Glob
 
 ENV["JULIA_DEBUG"] = "DIVAnd"
 
@@ -41,6 +42,8 @@ moddim = [0,0,0]
 memtofit = 300
 
 
+
+
 #TS = DIVAnd.TimeSelectorRunningAverage(
 #    [mean(timerange - timerange[1]) + timerange[1]],
 #    90)
@@ -57,18 +60,20 @@ TS = DIVAnd.TimeSelectorYearListMonthList(
     [1900:2017],
     [1:12])
 
-filename = replace(@__FILE__,r".jl$" => "_all_$(randstring()).nc")
-figdir = joinpath(replace(filename,".nc" => ""),"Fig")
-mkpath(figdir)
+varname = varlist[2]
+@show varname
+filename = joinpath(resdir,"$(varname)_background_test.nc")
 
 #rm(filename)
 
+bx,by,b = DIVAnd.extract_bath(bathname,bathisglobal,lonr,latr);
 
 
 function plotres(timeindex,sel,fit,erri)
     tmp = copy(fit)
     #tmp[erri .> .5] .= NaN;
     figure(figsize = (12,8))
+    aspect_ratio = 1/cosd(mean(latr))
 
     for k = 1:size(fit,3)
         clf()
@@ -89,21 +94,21 @@ function plotres(timeindex,sel,fit,erri)
 
         # plot the data
         scatter(obslon[sel_depth],obslat[sel_depth],10,obsvalue[sel_depth];
-                vmin = vmin, vmax = vmax, cmap="jet")
+                vmin = vmin, vmax = vmax)
         xlim(minimum(lonr),maximum(lonr))
         ylim(minimum(latr),maximum(latr))
-        colorbar()
-        #contourf(bx,by,permutedims(b,[2,1]), levels = [-1e5,0],colors = [[.5,.5,.5]])
-        #gca().set_aspect(aspect_ratio)
+        colorbar(orientation="horizontal")
+        contourf(bx,by,b', levels = [-1e5,0],colors = [[.5,.5,.5]])
+        gca().set_aspect(aspect_ratio)
 
         # plot the analysis
         subplot(1,2,2)
         pcolor(lonr,latr,permutedims(tmp[:,:,k],[2,1]);
-               vmin = vmin, vmax = vmax, cmap="jet")
-        colorbar()
-        #contourf(bx,by,permutedims(b,[2,1]), levels = [-1e5,0],colors = [[.5,.5,.5]])
-        #gca().set_aspect(aspect_ratio)
-        savefig(joinpath(figdir,"analysis-$(timeindex)-$(depthr[k]).png"))
+               vmin = vmin, vmax = vmax)
+        colorbar(orientation="horizontal")
+        contourf(bx,by,b', levels = [-1e5,0],colors = [[.5,.5,.5]])
+        gca().set_aspect(aspect_ratio)
+        savefig(joinpath(figdir,"analysis-$(varname)-$(timeindex)-$(depthr[k]).png"))
     end
 end
 
@@ -114,13 +119,10 @@ function plotres_timeindex(timeindex,sel,fit,erri)
 end
 
 
-varname = varlist[2]
+filenames_obs = glob("*" * replace(varname," " => "_") * "*.nc",obsdir)
 
-filenames_obs = varinfo[varname]
-
-@assert length(filenames_obs) == 1
-
-obsvalue,obslon,obslat,obsdepth,obstime,obsids = DIVAnd.loadobs(Float64,filenames_obs[1],varname)
+obsvalue,obslon,obslat,obsdepth,obstime,obsids = DIVAnd.loadobs(
+    Float64,filenames_obs,varname)
 
 
 #bad = (-11 .<= obslon .<= 0.7) .& (34 .<= obslat .<= 47) .& (obsvalue .<= 100);
@@ -144,47 +146,17 @@ if isfile(filename)
     rm(filename)
 end
 
-#Profile.init(n=1000000000, delay = 1.)
+#=
+ioff()
+clf()
+hist(obsvalue)
+savefig(joinpath(figdir,"$varname.png"))
 
-
-maxqcvalue = percentile(qcvalues[isfinite.(qcvalues)],maxpercentile)
-
-
-dbinfo = @time DIVAnd.diva3d(
-    (lonr,latr,depthr,TS),
-    (obslon,obslat,obsdepth,obstime),
-    obsvalue,
-    #              (ones(sz),ones(sz),ones(sz)),
-    (lenx,leny,lenz),
-    epsilon2,
-    filename,varname,
-    bathname = bathname,
-    #plotres = plotres_timeindex,
-    plotres = plotres,
-    timeorigin = timeorigin,
-    #fitcorrlen = true,
-    transform = DIVAnd.Anam.loglin(100.),
-    memtofit = memtofit,
-    QCMETHOD = 3,
-    minfield = minimum(obsvalue),
-    solver = :direct,
-    #surfextend = true,
-    coeff_derivative2 = [0.,0.,1e-8],
-)
-
-#= 
-open("prof_all_flat_count_$VERSION.out","w") do f
-    Profile.print(f; format = :flat, sortedby = :count)
-end
-
-open("prof_all_flat_$VERSION.out","w") do f
-    Profile.print(f; format = :flat)
-end
-
-open("prof_all_$VERSION.out","w") do f
-    Profile.print(f)
-end
-
+anam_maxval = percentile(obsvalue,90)
+transform = DIVAnd.Anam.loglin(anam_maxval)
+clf()
+hist(transform[1].(obsvalue))
+savefig(joinpath(figdir,"$(varname)_anam.png"))
 =#
 
 #=
@@ -205,33 +177,36 @@ obsvaluemin,obsvaluemax = percentile(obsvalue[isfinite.(obsvalue)],[0.01, 99.9])
 sel = (qcvalues .<= maxqcvalue) .& (obsvaluemin .<= obsvalue) .& (obsvalue .<= obsvaluemax)
 
 @show sum(sel)
+=#
 
 #filename = replace(@__FILE__,r".jl$" => "_$(randstring()).nc")
-filename = backgroundname
+
+sel = trues(size(obsvalue))
 
 
-dbinfo = @time @profile DIVAnd.diva3d((lonr,latr,depthr,TS),
-              (obslon[sel],obslat[sel],obsdepth[sel],obstime[sel]),
-              obsvalue[sel],
+dbinfo = @time @profile DIVAnd.diva3d(
+    (lonr,latr,depthr,TS),
+    (obslon[sel],obslat[sel],obsdepth[sel],obstime[sel]),
+    obsvalue[sel],
 #              (ones(sz),ones(sz),ones(sz)),
-              (lenx,leny,lenz),
-              epsilon2,
-              filename,varname,
-              bathname = bathname,
+    (lenx,leny,lenz),
+    epsilon2,
+    filename,varname,
+    bathname = bathname,
 #              plotres = plotres_timeindex,
-              plotres = plotres,
-              timeorigin = timeorigin,
+    plotres = plotres,
+    timeorigin = timeorigin,
 #              fitcorrlen = true,
-              transform = DIVAnd.Anam.loglin(100.),
-              memtofit = memtofit,
-                             QCMETHOD = 3,
-                             minfield = minimum(obsvalue),
-                             solver = :direct,
-                             surfextend = true,
-                             coeff_derivative2 = [0.,0.,1e-8],
+#    transform = transform,
+    memtofit = memtofit,
+    QCMETHOD = 3,
+    minfield = minimum(obsvalue),
+    solver = :direct,
+    #surfextend = true,
+    coeff_derivative2 = [0.,0.,1e-8],
 )
 
-
+#=
 
 used = dbinfo[:used]
 sel_used = copy(sel)
