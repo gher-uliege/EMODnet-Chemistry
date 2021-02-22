@@ -11,6 +11,10 @@ deltalat = 0.5
 lonr = -40.:deltalon:55.
 latr = 24.:deltalat:67.
 
+# include the Artic
+lonr = -45.:deltalon:70.
+latr = 24.:deltalat:83.
+
 timeorigin = DateTime(1900,1,1,0,0,0)
 
 # List of depths: selected as the union of the different products
