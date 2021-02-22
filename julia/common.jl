@@ -11,6 +11,7 @@ deltalat = 0.5
 lonr = -40.:deltalon:55.
 latr = 24.:deltalat:67.
 
+timeorigin = DateTime(1900,1,1,0,0,0)
 
 # List of depths: selected as the union of the different products
 
@@ -31,6 +32,16 @@ email = ENV["EMAIL"]
 datadir = "/data"
 woddir = joinpath(datadir,"WOD")
 
+# Figures
+figdir = joinpath(datadir,"Figures")
+mkpath(figdir)
+
+# Results
+resdir = joinpath(datadir,"Results")
+mkpath(resdir)
+
+
+obsdir = joinpath(datadir,"EMODnet")
 
 # Name of the variables (WOD)
 varnames = ["Oxygen","Phosphate","Silicate","Nitrate and Nitrate+Nitrite","pH","Chlorophyll"]
@@ -43,9 +54,9 @@ varlist = ["Water body phosphate",
            ]
 
 
-varinfo = Dict(
-   "Water body dissolved oxygen concentration" => Dict(
-      "files" => ["/data/EMODnet/BlackSea_Water_body_dissolved_oxygen_concentration.nc"]))
+#varinfo = Dict(
+#   "Water body dissolved oxygen concentration" => Dict(
+#      "files" => ["/data/EMODnet/BlackSea_Water_body_dissolved_oxygen_concentration.nc"]))
 
 
 
@@ -53,3 +64,4 @@ bathname = joinpath(datadir, "gebco_30sec_4.nc")
 if !isfile(bathname)
     download("https://dox.ulg.ac.be/index.php/s/RSwm4HPHImdZoQP/download",bathname)
 end
+bathisglobal = true
