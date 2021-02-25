@@ -1,5 +1,6 @@
 #!/usr/bin/env julia
 
+ENV["DISPLAY"] = ""
 using Distributed
 using Dates
 using Printf
@@ -23,7 +24,7 @@ mkpath(datadir)
 
 epsilon2 = 0.1
 #epsilon2 = 0.01
-epsilon2 = 1.
+epsilon2 = 10.
 
 sz = (length(lonr),length(latr),length(depthr))
 
@@ -33,9 +34,10 @@ sz = (length(lonr),length(latr),length(depthr))
 
 #lenx = fill(500_000.,sz)
 #leny = fill(500_000.,sz)
+
 lenx = fill(800_000.,sz)
 leny = fill(800_000.,sz)
-lenz = [min(max(25.,1 + depthr[k]/150),300.) for i = 1:sz[1], j = 1:sz[2], k = 1:sz[3]]
+lenz = [min(max(25.,1 + depthr[k]/150),500.) for i = 1:sz[1], j = 1:sz[2], k = 1:sz[3]]
 
 
 moddim = [0,0,0]
@@ -61,6 +63,7 @@ TS = DIVAnd.TimeSelectorYearListMonthList(
     [1:12])
 
 varname = varlist[2]
+#varname = ENV["VARNAME"]
 @show varname
 filename = joinpath(resdir,"$(varname)_background_test.nc")
 
@@ -125,6 +128,8 @@ obsvalue,obslon,obslat,obsdepth,obstime,obsids = DIVAnd.loadobs(
     Float64,filenames_obs,varname)
 
 
+obslon = mod.(obslon .+ 180,360) .- 180
+
 #bad = (-11 .<= obslon .<= 0.7) .& (34 .<= obslat .<= 47) .& (obsvalue .<= 100);
 #minvalue = 0.01
 #sel = (obsvalue .> minvalue)
@@ -183,7 +188,39 @@ sel = (qcvalues .<= maxqcvalue) .& (obsvaluemin .<= obsvalue) .& (obsvalue .<= o
 
 sel = trues(size(obsvalue))
 
+mask,(pm,pn,po),(xi,yi,zi) = DIVAnd.domain(bathname,bathisglobal,lonr,latr,depthr)
 
+mask = label = DIVAnd.floodfill(mask);
+
+# the 2 largest water bodies (include Black Sea)
+mask = 0 .< label .<= 2
+
+mv = mean(obsvalue[sel])
+
+size(mask)
+
+#pmn = (pm, pn, po)
+#len = (lenx,leny,lenz)
+#SS = @time DIVAnd.sparse_derivative2n(1, mask, pmn, len);
+
+
+fi2, s2 =
+    @time DIVAnd.DIVAndrun(
+        mask, (pm, pn, po), (xi, yi, zi),
+        (obslon[sel],obslat[sel],obsdepth[sel]),
+        obsvalue[sel] .- mv,
+        (lenx,leny,lenz),
+        epsilon2; alphabc = 0,
+        inversion = :amg_sa,
+        maxit = 2000,
+        coeff_derivative2 = [0.,0.,1e-8],
+    );
+
+fi2 = fi2 .+ mv;
+@show filename
+
+DIVAnd.save(filename,(lonr,latr,depthr),fi2,varname)
+#=
 dbinfo = @time @profile DIVAnd.diva3d(
     (lonr,latr,depthr,TS),
     (obslon[sel],obslat[sel],obsdepth[sel],obstime[sel]),
@@ -199,12 +236,13 @@ dbinfo = @time @profile DIVAnd.diva3d(
 #              fitcorrlen = true,
 #    transform = transform,
     memtofit = memtofit,
-    QCMETHOD = 3,
+#    QCMETHOD = 3,
     minfield = minimum(obsvalue),
     solver = :direct,
     #surfextend = true,
     coeff_derivative2 = [0.,0.,1e-8],
 )
+=#
 
 #=
 

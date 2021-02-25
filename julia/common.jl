@@ -1,3 +1,5 @@
+using Dates
+
 # common parameters to various scripts
 
 # Grid and resolutions
@@ -5,11 +7,14 @@
 deltalon = 0.1
 deltalat = 0.1
 
+#deltalon = 0.25
+#deltalat = 0.25
+
 deltalon = 0.5
 deltalat = 0.5
 
-lonr = -40.:deltalon:55.
-latr = 24.:deltalat:67.
+#lonr = -40.:deltalon:55.
+#latr = 24.:deltalat:67.
 
 # include the Artic
 lonr = -45.:deltalon:70.
@@ -36,14 +41,6 @@ email = ENV["EMAIL"]
 datadir = "/data"
 woddir = joinpath(datadir,"WOD")
 
-# Figures
-figdir = joinpath(datadir,"Figures")
-mkpath(figdir)
-
-# Results
-resdir = joinpath(datadir,"Results")
-mkpath(resdir)
-
 
 obsdir = joinpath(datadir,"EMODnet")
 
@@ -55,6 +52,8 @@ varlist = ["Water body phosphate",
            "Water body dissolved oxygen concentration",
            "Water body chlorophyll-a",
            "Water body dissolved inorganic nitrogen (DIN)",
+           "Water body ammonium",
+           "Water body silicate",
            ]
 
 
