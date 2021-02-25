@@ -175,7 +175,7 @@ function get_file_list_combined(datadir::String, varname::String)::Array
     filelist = []
     for (root, dirs, files) in walkdir(datadir)
         for file in files
-            if endswith(file, ".nc") & (occursin(varname, file) | occursin(varname2, file))
+            if endswith(file, ".nc") & (occursin(varname, file))
                 push!(filelist, joinpath(root, file))
             end
         end
