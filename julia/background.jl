@@ -1,6 +1,6 @@
 #!/usr/bin/env julia
 
-ENV["DISPLAY"] = ""
+#ENV["DISPLAY"] = ""
 using Distributed
 using Dates
 using Printf
@@ -37,6 +37,10 @@ sz = (length(lonr),length(latr),length(depthr))
 
 lenx = fill(800_000.,sz)
 leny = fill(800_000.,sz)
+
+lenx = fill(1000_000.,sz)
+leny = fill(1000_000.,sz)
+
 lenz = [min(max(25.,1 + depthr[k]/150),500.) for i = 1:sz[1], j = 1:sz[2], k = 1:sz[3]]
 
 
@@ -59,13 +63,26 @@ memtofit = 300
 
 
 TS = DIVAnd.TimeSelectorYearListMonthList(
-    [1900:2017],
+    [1970:2020],
     [1:12])
 
 varname = varlist[2]
 #varname = ENV["VARNAME"]
 @show varname
-filename = joinpath(resdir,"$(varname)_background_test.nc")
+maxit = 100
+
+casedir = joinpath(datadir,"$varname-res$(deltalon)-epsilon2$(epsilon2)-lenx$(mean(lenx))-maxit$(maxit)")
+mkpath(casedir)
+
+# Figures
+figdir = joinpath(casedir,"Figures")
+mkpath(figdir)
+
+# Results
+resdir = joinpath(casedir,"Results")
+mkpath(resdir)
+
+filename = joinpath(resdir,"$(varname)_background.nc")
 
 #rm(filename)
 
@@ -203,25 +220,54 @@ size(mask)
 #len = (lenx,leny,lenz)
 #SS = @time DIVAnd.sparse_derivative2n(1, mask, pmn, len);
 
+#=
+pmn = (pm, pn, po)
+xyi = (xi, yi, zi)
+xsel = (obslon[sel],obslat[sel],obsdepth[sel])
+vaa = obsvalue[sel] .- mv
+len_scaled = (lenx,leny,lenz)
+kwargs =
+    (
+        inversion = :amg_sa,
+        maxit = 100,
+        coeff_derivative2 = [0.,0.,1e-8],
+        QCMETHOD = 5,
+    )
+
+kwargs_without_qcm = [(p, v) for (p, v) in Dict(pairs(kwargs)) if p !== :QCMETHOD]
 
 fi2, s2 =
     @time DIVAnd.DIVAndrun(
-        mask, (pm, pn, po), (xi, yi, zi),
-        (obslon[sel],obslat[sel],obsdepth[sel]),
-        obsvalue[sel] .- mv,
-        (lenx,leny,lenz),
+        mask, pmn, xyi,
+        xsel,
+        vaa,
+        len_scaled,
         epsilon2; alphabc = 0,
-        inversion = :amg_sa,
-        maxit = 2000,
-        coeff_derivative2 = [0.,0.,1e-8],
-    );
+        kwargs_without_qcm...)
 
-fi2 = fi2 .+ mv;
+qcdata = ()
+if haskey(Dict(pairs(kwargs)),:QCMETHOD)
+    qc_method = kwargs.QCMETHOD
+    qcdata = DIVAnd.DIVAnd_qc(fi2, s2, qc_method)
+end
+
+cpme = ()
+if errortype == :cpme
+    cpme = DIVAnd.DIVAnd_cpme(mask,pmn,xyi,xsel,vaa,len_scaled,epsilon2; kwargs...)
+end
+
+residual = DIVAnd.DIVAnd_residualobs(s2, fi2);
+scalefactore = DIVAnd.DIVAnd_adaptedeps2(vaa, residual, epsilon2, isnan.(residual))
+
+
+fit = fi2 .+ mv;
 @show filename
 
-DIVAnd.save(filename,(lonr,latr,depthr),fi2,varname)
-#=
-dbinfo = @time @profile DIVAnd.diva3d(
+#DIVAnd.save(filename,(lonr,latr,depthr),fi2,varname)
+=#
+
+
+dbinfo = @time DIVAnd.diva3d(
     (lonr,latr,depthr,TS),
     (obslon[sel],obslat[sel],obsdepth[sel],obstime[sel]),
     obsvalue[sel],
@@ -229,6 +275,7 @@ dbinfo = @time @profile DIVAnd.diva3d(
     (lenx,leny,lenz),
     epsilon2,
     filename,varname,
+    mask = mask,
     bathname = bathname,
 #              plotres = plotres_timeindex,
     plotres = plotres,
@@ -241,8 +288,10 @@ dbinfo = @time @profile DIVAnd.diva3d(
     solver = :direct,
     #surfextend = true,
     coeff_derivative2 = [0.,0.,1e-8],
+    inversion = :amg_sa,
+    maxit = maxit,
 )
-=#
+
 
 #=
 
