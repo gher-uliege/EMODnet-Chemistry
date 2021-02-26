@@ -10,6 +10,9 @@ deltalat = 0.1
 #deltalon = 0.25
 #deltalat = 0.25
 
+#deltalon = 0.5
+#deltalat = 0.5
+
 deltalon = 0.5
 deltalat = 0.5
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env julia
 
-#ENV["DISPLAY"] = ""
+ENV["DISPLAY"] = ""
 using Distributed
 using Dates
 using Printf
@@ -25,6 +25,7 @@ mkpath(datadir)
 epsilon2 = 0.1
 #epsilon2 = 0.01
 epsilon2 = 10.
+epsilon2 = 1.
 
 sz = (length(lonr),length(latr),length(depthr))
 
@@ -38,28 +39,12 @@ sz = (length(lonr),length(latr),length(depthr))
 lenx = fill(800_000.,sz)
 leny = fill(800_000.,sz)
 
-lenx = fill(1000_000.,sz)
-leny = fill(1000_000.,sz)
+#lenx = fill(1000_000.,sz)
+#leny = fill(1000_000.,sz)
 
 lenz = [min(max(25.,1 + depthr[k]/150),500.) for i = 1:sz[1], j = 1:sz[2], k = 1:sz[3]]
 
-
 moddim = [0,0,0]
-memtofit = 300
-
-
-
-
-#TS = DIVAnd.TimeSelectorRunningAverage(
-#    [mean(timerange - timerange[1]) + timerange[1]],
-#    90)
-
-
-#TS = DIVAnd.TimeSelectorYearListMonthList([1900:2017],[[12,1,2],[3,4,5],[6,7,8],[9,10,11]])
-
-# TS = DIVAnd.TimeSelectorYearListMonthList(
-#                                           [1900:2017],
-#                                           [[m] for m in 1:12])
 
 
 TS = DIVAnd.TimeSelectorYearListMonthList(
@@ -69,10 +54,23 @@ TS = DIVAnd.TimeSelectorYearListMonthList(
 varname = varlist[2]
 #varname = ENV["VARNAME"]
 @show varname
-maxit = 100
+maxit = 2000
 
-casedir = joinpath(datadir,"$varname-res$(deltalon)-epsilon2$(epsilon2)-lenx$(mean(lenx))-maxit$(maxit)")
+casedir = joinpath(datadir,"Case/$varname-res-$(deltalon)-epsilon2-$(epsilon2)-lenx-$(mean(lenx))-maxit-$(maxit)")
 mkpath(casedir)
+
+@info "casedir: $casedir"
+
+cd(joinpath(dirname(pathof(DIVAnd)),"..")) do
+    write(joinpath(casedir,"DIVAnd.commit"), read(`git rev-parse HEAD`))
+    write(joinpath(casedir,"DIVAnd.diff"), read(`git diff`))
+end;
+
+cd(expanduser("~/src/EMODnet-Chemistry")) do
+    write(joinpath(casedir,"EMODnet-Chemistry.commit"), read(`git rev-parse HEAD`))
+    write(joinpath(casedir,"EMODnet-Chemistry.diff"), read(`git diff`))
+end;
+
 
 # Figures
 figdir = joinpath(casedir,"Figures")
@@ -282,9 +280,10 @@ dbinfo = @time DIVAnd.diva3d(
     timeorigin = timeorigin,
 #              fitcorrlen = true,
 #    transform = transform,
-    memtofit = memtofit,
+#    memtofit = memtofit,
 #    QCMETHOD = 3,
     minfield = minimum(obsvalue),
+    maxfield = maximum(obsvalue),
     solver = :direct,
     #surfextend = true,
     coeff_derivative2 = [0.,0.,1e-8],
