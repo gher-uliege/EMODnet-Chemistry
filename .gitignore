@@ -5,3 +5,5 @@
 deps/deps.jl
 .ipynb_checkpoints
 src/emodnet-chemistry-surface-phosphate-*
+python/__pycache__
+python/logs
