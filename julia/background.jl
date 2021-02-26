@@ -13,79 +13,11 @@ using StatsBase
 using FileIO
 using PyPlot
 using Glob
-
-ENV["JULIA_DEBUG"] = "DIVAnd"
-
-include("common.jl")
-
-timerange = [DateTime(1900,1,1),DateTime(2017,12,31)]
-
-mkpath(datadir)
-
-epsilon2 = 0.1
-#epsilon2 = 0.01
-epsilon2 = 10.
-epsilon2 = 1.
-
-sz = (length(lonr),length(latr),length(depthr))
-
-# correlation length in meters (in x, y, and z directions)
-#lenx = fill(200_000.,sz)
-#leny = fill(200_000.,sz)
-
-#lenx = fill(500_000.,sz)
-#leny = fill(500_000.,sz)
-
-lenx = fill(800_000.,sz)
-leny = fill(800_000.,sz)
-
-#lenx = fill(1000_000.,sz)
-#leny = fill(1000_000.,sz)
-
-lenz = [min(max(25.,1 + depthr[k]/150),500.) for i = 1:sz[1], j = 1:sz[2], k = 1:sz[3]]
-
-moddim = [0,0,0]
+using JLD2
 
 
-TS = DIVAnd.TimeSelectorYearListMonthList(
-    [1970:2020],
-    [1:12])
-
-varname = varlist[2]
-#varname = ENV["VARNAME"]
-@show varname
-maxit = 2000
-
-casedir = joinpath(datadir,"Case/$varname-res-$(deltalon)-epsilon2-$(epsilon2)-lenx-$(mean(lenx))-maxit-$(maxit)")
-mkpath(casedir)
-
-@info "casedir: $casedir"
-
-cd(joinpath(dirname(pathof(DIVAnd)),"..")) do
-    write(joinpath(casedir,"DIVAnd.commit"), read(`git rev-parse HEAD`))
-    write(joinpath(casedir,"DIVAnd.diff"), read(`git diff`))
-end;
-
-cd(expanduser("~/src/EMODnet-Chemistry")) do
-    write(joinpath(casedir,"EMODnet-Chemistry.commit"), read(`git rev-parse HEAD`))
-    write(joinpath(casedir,"EMODnet-Chemistry.diff"), read(`git diff`))
-end;
-
-
-# Figures
-figdir = joinpath(casedir,"Figures")
-mkpath(figdir)
-
-# Results
-resdir = joinpath(casedir,"Results")
-mkpath(resdir)
-
-filename = joinpath(resdir,"$(varname)_background.nc")
-
-#rm(filename)
-
-bx,by,b = DIVAnd.extract_bath(bathname,bathisglobal,lonr,latr);
-
+# uses lonr,latr,varname,figdir,bx,by,b,obslon,obslat...
+# from global scope
 
 function plotres(timeindex,sel,fit,erri)
     tmp = copy(fit)
@@ -96,7 +28,7 @@ function plotres(timeindex,sel,fit,erri)
     for k = 1:size(fit,3)
         clf()
         subplot(1,2,1)
-        title("$(timeindex)")
+        title("Time index $(timeindex); depth = $(depthr[k])")
 
         Δz = depthr[min(k+1,length(depthr))] - depthr[max(k-1,1)]
         @show Δz
@@ -128,6 +60,7 @@ function plotres(timeindex,sel,fit,erri)
         gca().set_aspect(aspect_ratio)
         savefig(joinpath(figdir,"analysis-$(varname)-$(timeindex)-$(depthr[k]).png"))
     end
+    PyPlot.close()
 end
 
 
@@ -136,6 +69,80 @@ function plotres_timeindex(timeindex,sel,fit,erri)
     @show timeindex
 end
 
+ENV["JULIA_DEBUG"] = "DIVAnd"
+
+include("common.jl")
+sz = (length(lonr),length(latr),length(depthr))
+
+mkpath(datadir)
+
+#analysistype = "background"
+#analysistype = "monthly"
+analysistype = get(ENV,"ANALYSIS_TYPE","background")
+
+TSbackground = DIVAnd.TimeSelectorYearListMonthList(
+    [1970:2020],
+    [1:12])
+lenz = [min(max(25.,1 + depthr[k]/150),500.) for i = 1:sz[1], j = 1:sz[2], k = 1:sz[3]]
+
+varname_index = parse(Int,get(ENV,"VARNAME_INDEX","2"))
+varname = varlist[varname_index]
+
+#varname = 
+
+if analysistype == "background"
+    epsilon2 = 0.1
+    epsilon2 = 1.
+
+    # correlation length in meters (in x, y, and z directions)
+    lenx = fill(800_000.,sz)
+    leny = fill(800_000.,sz)
+
+    lenx = fill(1000_000.,sz)
+    leny = fill(1000_000.,sz)
+
+    maxit = 100
+    background = nothing
+    TS = TSbackground
+else
+    # monthly
+    TS = DIVAnd.TimeSelectorYearListMonthList(
+        [1970:2020],
+        [m:m for m in 1:12])
+
+    lenx = fill(250_000.,sz)
+    leny = fill(250_000.,sz)
+    epsilon2 = 1.
+    maxit = 10
+    filenamebackground = joinpath(datadir,"Case/$(varname)-res-$(deltalon)-epsilon2-1.0-lenx-1.0e6-maxit-100-background/Results/$(varname)_background.nc")
+    background = DIVAnd.backgroundfile(filenamebackground,varname,TSbackground)
+end
+
+
+#--
+
+@show varname
+
+casedir = joinpath(datadir,"Case/$varname-res-$(deltalon)-epsilon2-$(epsilon2)-lenx-$(mean(lenx))-maxit-$(maxit)-$(analysistype)")
+mkpath(casedir)
+
+@info "casedir: $casedir"
+
+gitdiff(casedir)
+
+# Figures
+figdir = joinpath(casedir,"Figures")
+mkpath(figdir)
+
+# Results
+resdir = joinpath(casedir,"Results")
+mkpath(resdir)
+
+filename = joinpath(resdir,"$(varname)_$(analysistype).nc")
+
+#rm(filename)
+
+bx,by,b = DIVAnd.extract_bath(bathname,bathisglobal,lonr,latr);
 
 filenames_obs = glob("*" * replace(varname," " => "_") * "*.nc",obsdir)
 
@@ -161,10 +168,17 @@ obsids = obsids[sel]
 DIVAnd.checkobs((obslon,obslat,obsdepth,obstime),obsvalue,obsids)
 
 
+filename_residual = replace(filename,".nc" => "_residuals.nc")
+
 #----------------
-if isfile(filename)
-    rm(filename)
-end
+if isfile(filename_residual)
+    #rm(filename)
+    @info "filename $filename_residual already exists; skipping"
+else
+
+    if isfile(filename)
+        rm(filename)
+    end
 
 #=
 ioff()
@@ -205,65 +219,15 @@ sel = trues(size(obsvalue))
 
 mask,(pm,pn,po),(xi,yi,zi) = DIVAnd.domain(bathname,bathisglobal,lonr,latr,depthr)
 
-mask = label = DIVAnd.floodfill(mask);
+# the 2 largest water bodies (include Black Sea) at 0.1 degree
+if deltalon == 0.1
+    label = DIVAnd.floodfill(mask);
+    mask = 0 .< label .<= 2
+end
 
-# the 2 largest water bodies (include Black Sea)
-mask = 0 .< label .<= 2
-
-mv = mean(obsvalue[sel])
-
+mean_value = mean(obsvalue[sel])
+@show mean_value
 size(mask)
-
-#pmn = (pm, pn, po)
-#len = (lenx,leny,lenz)
-#SS = @time DIVAnd.sparse_derivative2n(1, mask, pmn, len);
-
-#=
-pmn = (pm, pn, po)
-xyi = (xi, yi, zi)
-xsel = (obslon[sel],obslat[sel],obsdepth[sel])
-vaa = obsvalue[sel] .- mv
-len_scaled = (lenx,leny,lenz)
-kwargs =
-    (
-        inversion = :amg_sa,
-        maxit = 100,
-        coeff_derivative2 = [0.,0.,1e-8],
-        QCMETHOD = 5,
-    )
-
-kwargs_without_qcm = [(p, v) for (p, v) in Dict(pairs(kwargs)) if p !== :QCMETHOD]
-
-fi2, s2 =
-    @time DIVAnd.DIVAndrun(
-        mask, pmn, xyi,
-        xsel,
-        vaa,
-        len_scaled,
-        epsilon2; alphabc = 0,
-        kwargs_without_qcm...)
-
-qcdata = ()
-if haskey(Dict(pairs(kwargs)),:QCMETHOD)
-    qc_method = kwargs.QCMETHOD
-    qcdata = DIVAnd.DIVAnd_qc(fi2, s2, qc_method)
-end
-
-cpme = ()
-if errortype == :cpme
-    cpme = DIVAnd.DIVAnd_cpme(mask,pmn,xyi,xsel,vaa,len_scaled,epsilon2; kwargs...)
-end
-
-residual = DIVAnd.DIVAnd_residualobs(s2, fi2);
-scalefactore = DIVAnd.DIVAnd_adaptedeps2(vaa, residual, epsilon2, isnan.(residual))
-
-
-fit = fi2 .+ mv;
-@show filename
-
-#DIVAnd.save(filename,(lonr,latr,depthr),fi2,varname)
-=#
-
 
 dbinfo = @time DIVAnd.diva3d(
     (lonr,latr,depthr,TS),
@@ -284,31 +248,36 @@ dbinfo = @time DIVAnd.diva3d(
 #    QCMETHOD = 3,
     minfield = minimum(obsvalue),
     maxfield = maximum(obsvalue),
-    solver = :direct,
+    #solver = :direct,
     #surfextend = true,
     coeff_derivative2 = [0.,0.,1e-8],
-    inversion = :amg_sa,
+    inversion = :cg_amg_sa,
     maxit = maxit,
+    background = background,
 )
 
-
-#=
-
 used = dbinfo[:used]
-sel_used = copy(sel)
-sel_used[.!used] = false;
-=#
+residuals = dbinfo[:residuals]
 
-#=
-open("prof_all_flat_count2_$VERSION.out","w") do f
-    Profile.print(f; format = :flat, sortedby = :count)
+@show sum(used)
+@show mean(used)
+DIVAnd.saveobs(
+    filename,
+    (obslon,obslat,obsdepth,obstime),obsids,
+    used=used);
+
+
+if isfile(filename_residual)
+    rm(filename_residual)
 end
 
-open("prof_all_flat2_$VERSION.out","w") do f
-    Profile.print(f; format = :flat)
-end
+DIVAnd.saveobs(
+    filename_residual,
+    varname,
+    residuals,
+    (obslon,obslat,obsdepth,obstime),obsids,
+    used=used);
 
-open("prof_all2_$VERSION.out","w") do f
-    Profile.print(f)
+
+JLD2.@save replace(filename,".nc" => "_dbinfo.jld2") dbinfo
 end
-=#

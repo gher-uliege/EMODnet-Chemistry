@@ -71,3 +71,20 @@ if !isfile(bathname)
     download("https://dox.ulg.ac.be/index.php/s/RSwm4HPHImdZoQP/download",bathname)
 end
 bathisglobal = true
+
+
+
+function gitdiff(casedir)
+    cd(joinpath(dirname(pathof(DIVAnd)),"..")) do
+        write(joinpath(casedir,"DIVAnd.commit"), read(`git rev-parse HEAD`))
+        write(joinpath(casedir,"DIVAnd.diff"), read(`git diff`))
+    end;
+
+    cd(expanduser("~/src/EMODnet-Chemistry")) do
+        write(joinpath(casedir,"EMODnet-Chemistry.commit"), read(`git rev-parse HEAD`))
+        write(joinpath(casedir,"EMODnet-Chemistry.diff"), read(`git diff`))
+    end;
+end
+
+
+
