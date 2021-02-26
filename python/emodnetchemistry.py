@@ -8,6 +8,59 @@ import matplotlib.cbook
 warnings.filterwarnings("ignore",category=matplotlib.cbook.mplDeprecation)
 
 
+def make_histo_values(obsval, varname):
+    """Create a histogram from the values stored in array `obsval`
+    """
+
+    # Set limits from the percentile
+    vmax = np.percentile(obsval, 97.5)
+    vmin = np.percentile(obsval, 2.5)
+
+    if varname == "chlorophyll-a":
+        units = r"mg/m^{3}"
+    else:
+        units = r"$\mu$moles/l"
+
+    fig = plt.figure(figsize=(12, 12))
+    ax = plt.subplot(111)
+
+    plt.hist(obsval, bins=np.linspace(vmin, vmax, 20), rwidth=.8, color=".2")
+    plt.ylabel("Number of\nobservations", rotation=0, ha="right")
+    plt.xlabel(units)
+    plt.title(varname.replace("_", " ").capitalize(), fontsize=20)
+    plt.savefig(os.path.join(figdir, f"values_histogram_{varname}"), dpi=300, bbox_inches="tight")
+    #plt.show()
+    plt.close()
+
+def make_histo_year(years, varname):
+    """Create an histogram from the years
+    """
+    fig = plt.figure(figsize=(12, 12))
+    ax = plt.subplot(111)
+    plt.hist(years, bins=np.arange(1928, 2021), rwidth=.8, color=".2")
+    plt.xticks(np.arange(1930, 2030, 10))
+    fig.autofmt_xdate()
+    plt.ylabel("Number of\nobservations", rotation=0, ha="right")
+    plt.xlim(1925, 2021)
+    plt.title(varname.replace("_", " ").capitalize(), fontsize=20)
+    plt.savefig(os.path.join(figdir, f"year_histogram_{varname}"), dpi=300, bbox_inches="tight")
+    plt.close()
+
+def make_histo_month(months, varname):
+    """Create an histogram for the month
+    """
+    monthlist = [calendar.month_name[i] for i in range(1, 13)]
+    fig = plt.figure(figsize=(12, 12))
+    ax = plt.subplot(111)
+    plt.hist(months, bins=12, rwidth=.8, color=".2")
+    plt.xticks(np.arange(1.5, 13.5), monthlist)
+    plt.ylabel("Number of\nobservations", rotation=0, ha="right")
+    fig.autofmt_xdate()
+    plt.title(varname.replace("_", " ").capitalize(), fontsize=20)
+    plt.savefig(os.path.join(figdir, f"month_histogram_{varname}"), dpi=300, bbox_inches="tight")
+    plt.close()
+
+
 class Region(object):
     def __init__(self, lonmin, lonmax, latmin, latmax, dlon, dlat, name=None):
         self.lonmin = lonmin
