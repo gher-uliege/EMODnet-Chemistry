@@ -21,21 +21,42 @@ colorlist = {"ArcticSea": "#1f77b4", "Atlantic": "#ff7f0e",
 
 datadir = "/data/EMODnet/Eutrophication/Split/"
 
-def read_all_positions(datafilelist):
+def all_positions(m, datafilelist):
     """Read all the longitudes and latitudes from a list of file
     """
     lonall = np.array([])
     latall = np.array([])
+    datesall = np.array([])
     for datafile in datafilelist:
         with netCDF4.Dataset(datafile, "r") as nc:
             lon = nc.get_variables_by_attributes(standard_name="longitude")[0][:]
             lat = nc.get_variables_by_attributes(standard_name="latitude")[0][:]
+            times = nc.get_variables_by_attributes(standard_name="time")[0]
+            dates = netCDF4.num2date(times[:], times.units)
+
+        # Ensure longitudes between -180° and 180°
+        # (bug in previous version of ODV for the export)
+        lon[lon > 180] -= 360.
+
         llon, llat = m(lon, lat)
         lonall = np.append(lonall, llon)
         latall = np.append(latall, llat)
+        datesall = np.append(datesall, dates)
+    return lonall, latall, datesall
 
-def read_oxy_woa(datafile, domain, filetype="woa"):
+def read_variable_woa(datafile, domain=[-180., 180., -90., 90.]):
     """Read the variable from the WOA or DIVAnd netCDF file `datafile`
+
+    Args:
+        datafile (str): path of the netCDF file
+        domain (list): 4-element list (lonmin, lonmax, latmin, latmax)
+
+    Returns:
+        lon
+        lat
+        depth
+        date
+        field
     """
 
     with netCDF4.Dataset(datafile, "r") as nc:
@@ -46,13 +67,65 @@ def read_oxy_woa(datafile, domain, filetype="woa"):
         lon = lon[goodlon]
         lat = lat[goodlat]
         depth = nc.variables["depth"][:]
+        time = nc.variables["time"][:]
 
-        if filetype == "woa":
-            oxy = nc.variables["o_an"][0,:,goodlat,goodlon]
-        elif filetype == "diva":
-            oxy = nc.variables["Water body dissolved oxygen concentration"][0,:,goodlat,goodlon]
 
-    return lon, lat, depth, oxy
+        # generate list of variables
+        varlist = list(nc.variables.keys())
+
+        # Find variable corresponding to interpolated field
+        varindex = 0
+        varname = varlist[varindex]
+        while not varname.endswith("_an"):
+            varindex += 1
+            varname = varlist[varindex]
+        logger.info(f"Variable name: {varname}")
+        logger.info(f"Standard name: {nc.variables[varname].standard_name}")
+
+        field = nc.variables[varname][0,:,goodlat,goodlon]
+
+    return lon, lat, depth, time, field
+
+
+def read_variable_diva(datafile, domain=[-180., 180., -90., 90.], timeindex=0):
+    """Read the variable from the DIVAnd netCDF file `datafile`
+
+    Args:
+        datafile (str): path of the netCDF file
+        domain (list): 4-element list (lonmin, lonmax, latmin, latmax)
+        timeindex (int): index for the time; for the DIVA monthly files, values
+        between 1 (January) and 12 (December).
+
+    Returns:
+        lon
+        lat
+        depth
+        date
+        field
+    """
+
+    with netCDF4.Dataset(datafile, "r") as nc:
+        lon = nc.variables["lon"][:]
+        lat = nc.variables["lat"][:]
+        goodlon = np.where( (lon >= domain[0]) & (lon <= domain[1]) )[0]
+        goodlat = np.where( (lat >= domain[2]) & (lat <= domain[3]) )[0]
+        lon = lon[goodlon]
+        lat = lat[goodlat]
+        depth = nc.variables["depth"][:]
+        time = nc.variables["time"]
+        date = netCDF4.num2date(time[timeindex], time.units)
+
+        # Generate list of variables
+        varlist = list(nc.variables.keys())
+        varname = varlist[5]
+
+        logger.info(f"Variable name: {varname}")
+        logger.info(f"Long name: {nc.variables[varname].long_name}")
+
+
+        field = nc.variables[varname][timeindex,:,goodlat,goodlon]
+
+    return lon, lat, depth, date, field
 
 def plot_oxy_map(llon, llat, field, depth, figname=None):
     """Create map with the interpolated values of oxygen concentration
@@ -71,13 +144,14 @@ def plot_oxy_map(llon, llat, field, depth, figname=None):
     m.drawcoastlines(linewidth=0.1, zorder=4)
     plt.title("Oxygen concentration at {} m".format(depth))
     if figname is not None:
-        plt.savefig(figname, dpi=300, bbox_inches="tight")
+        plt.savefig(figname, dpi=300, bbox_inches="tight", facecolor="w",
+        transparent=False)
     # plt.show()
     plt.close()
 
 def plot_WOA_DIVAnd_comparison(m, lon1, lat1, field1, lon2, lat2, field2, depth, figname=None,
                               vmin=200., vmax=375., deltavar=25.,
-                              units=r"$\mu$moles/kg"):
+                              units=r"$\mu$moles/kg", monthname=None):
 
     """Create a plot with WOA and DIVAnd maps together
     """
@@ -91,7 +165,10 @@ def plot_WOA_DIVAnd_comparison(m, lon1, lat1, field1, lon2, lat2, field2, depth,
                     linewidth=.25)
     m.fillcontinents(color=".85", zorder=3)
     m.drawcoastlines(linewidth=0.1, zorder=4)
-    plt.title("World Ocean Atlas 2018 at {} m".format(int(depth)))
+    if monthname is not None:
+        plt.title("WOA 2018 at {} m, {}".format(int(depth), monthname))
+    else:
+        plt.title("WOA 2018 at {} m".format(int(depth)))
 
     ax2 = plt.subplot(122)
     pcm = m.pcolormesh(lon2, lat2, field2, latlon=True, vmin=vmin, vmax=vmax)
@@ -105,8 +182,12 @@ def plot_WOA_DIVAnd_comparison(m, lon1, lat1, field1, lon2, lat2, field2, depth,
 
 
     cbar_ax = fig.add_axes([0.15, 0.15, 0.7, 0.05])
-    cb = plt.colorbar(pcm,  cax=cbar_ax, extend="both", orientation="horizontal")
-    cb.set_label(units, rotation=0, ha="left")
+
+    if vmin==0:
+        cb = plt.colorbar(pcm, cax=cbar_ax, extend="max", orientation="horizontal")
+    else:
+        cb = plt.colorbar(pcm, cax=cbar_ax, extend="both", orientation="horizontal")
+    cb.set_label(units, rotation=0, ha="center")
     cb.set_ticks(np.arange(vmin, vmax + 0.0001, deltavar))
     if figname is not None:
         plt.savefig(figname, dpi=300, bbox_inches="tight")
@@ -191,7 +272,7 @@ def plot_hexbin_datalocations(m, varname, figname=None):
     nfiles = len(datafilelist)
     logger.info("Working on {} files".format(nfiles))
 
-    lonall, latall = read_all_positions(datafilelist)
+    lonall, latall = all_positions(datafilelist)
     fig = plt.figure(figsize=(10, 10))
 
     m.hexbin(lonall, latall, bins="log", vmin=1, vmax=100000,
