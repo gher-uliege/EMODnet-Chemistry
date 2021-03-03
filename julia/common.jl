@@ -92,6 +92,7 @@ area_keywords_urn = [
     "SDN:C19::1_2",
     "SDN:C19::3_1",
 ]
+
 varinfo = Dict(
     "Water body dissolved oxygen concentration" => Dict(
          # http://vocab.nerc.ac.uk/collection/P02/current/
@@ -100,6 +101,41 @@ varinfo = Dict(
         # http://cfconventions.org/Data/cf-standard-names/current/build/cf-standard-name-table.html
         "netcdf_standard_name" => "mole_concentration_of_dissolved_molecular_oxygen_in_sea_water",
     ),
+    "Water body phosphate" => Dict(
+         # http://vocab.nerc.ac.uk/collection/P02/current/
+        "search_keywords_urn" => ["SDN:P02::PHOS"],
+        "netcdf_units" => "umol/l",
+        # http://cfconventions.org/Data/cf-standard-names/current/build/cf-standard-name-table.html
+        "netcdf_standard_name" => "moles_of_phosphate_per_unit_mass_in_sea_water",
+    ),
+    "Water body chlorophyll-a" => Dict(
+         # http://vocab.nerc.ac.uk/collection/P02/current/
+        "search_keywords_urn" => ["SDN:P02::CPWC"],
+        "netcdf_units" => "mg/m3",
+        # http://cfconventions.org/Data/cf-standard-names/current/build/cf-standard-name-table.html
+        "netcdf_standard_name" => "mass_concentration_of_chlorophyll_in_sea_water",
+    ),
+    "Water body ammonium" => Dict(
+         # http://vocab.nerc.ac.uk/collection/P02/current/
+        "search_keywords_urn" => ["SDN:P02::AMON"],
+        "netcdf_units" => "umol/l",
+        # http://cfconventions.org/Data/cf-standard-names/current/build/cf-standard-name-table.html
+        "netcdf_standard_name" => "mole_concentration_of_ammonium_in_sea_water",
+    ),
+    "Water body silicate" => Dict(
+         # http://vocab.nerc.ac.uk/collection/P02/current/
+        "search_keywords_urn" => ["SDN:P02::SLCA"],
+        "netcdf_units" => "umol/l",
+        # http://cfconventions.org/Data/cf-standard-names/current/build/cf-standard-name-table.html
+        "netcdf_standard_name" => "mole_concentration_of_silicate_in_sea_water",
+    ),
+    "Water body dissolved inorganic nitrogen (DIN)" => Dict(
+         # http://vocab.nerc.ac.uk/collection/P02/current/
+        "search_keywords_urn" => ["SDN:P02::TDIN"],
+        "netcdf_units" => "umol/l",
+        # http://cfconventions.org/Data/cf-standard-names/current/build/cf-standard-name-table.html
+        "netcdf_standard_name" => "mole_concentration_of_dissolved_inorganic_nitrogen_in_sea_water",
+    )
 )
 
 
