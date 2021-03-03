@@ -1,11 +1,11 @@
 # Small script to convert the ODV netCDF to different DIVAnd netCDF, one per variable.
-# Note: some files have different names for the variables, namely "DIN" instead of the full name, 
+# Note: some files have different names for the variables, namely "DIN" instead of the full name,
 # in this case the script issues an error and the conversion for that variable is done "by hand".
 #
 # File naming:
 # the file names are build from the region (variable `regionname`) and the name of the variable (without the white spaces).
 # Region name could be deduced from the input file name but that is maybe not trivial (and I did not try).
-#  
+#
 
 using NCDatasets
 using DIVAnd
