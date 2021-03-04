@@ -8,13 +8,13 @@ using Random
 using Profile
 using NCDatasets
 using PhysOcean
-@everywhere import DIVAnd
+@everywhere using DIVAnd
 using StatsBase
 using FileIO
 using PyPlot
 using Glob
 using JLD2
-
+using DataStructures
 
 # uses lonr,latr,varname,figdir,bx,by,b,obslon,obslat...
 # from global scope
@@ -73,7 +73,7 @@ ENV["JULIA_DEBUG"] = "DIVAnd"
 
 include("common.jl")
 sz = (length(lonr),length(latr),length(depthr))
-
+@show sz
 mkpath(datadir)
 
 #analysistype = "background"
@@ -85,23 +85,37 @@ TSbackground = DIVAnd.TimeSelectorYearListMonthList(
     [1:12])
 lenz = [min(max(25.,1 + depthr[k]/150),500.) for i = 1:sz[1], j = 1:sz[2], k = 1:sz[3]]
 
-varname_index = parse(Int,get(ENV,"VARNAME_INDEX","2"))
-varname = varlist[varname_index]
+#varname_index = parse(Int,get(ENV,"VARNAME_INDEX","2"))
+varname_index = parse(Int,get(ENV,"VARNAME_INDEX","5"))
 
-#varname = 
+varname = varlist[varname_index]
+maxit = 100
+#maxit = 1000
+#len_background = 1000_000
+epsilon2_background = 1.
+
+
+filename_corrlen = joinpath(datadir,"correlation_len_$(deltalon).nc")
+
+lenx_2D = NCDataset(filename_corrlen,"r") do ds
+    ds["correlation_length"][:,:] * 111e3
+end
+lenx = repeat(lenx_2D,inner=(1,1,sz[3]))
+lenx_background = lenx*3
 
 if analysistype == "background"
-    epsilon2 = 0.1
-    epsilon2 = 1.
+    epsilon2 = epsilon2_background
 
     # correlation length in meters (in x, y, and z directions)
-    lenx = fill(800_000.,sz)
-    leny = fill(800_000.,sz)
+    # lenx = fill(800_000.,sz)
+    # leny = fill(800_000.,sz)
 
-    lenx = fill(1000_000.,sz)
-    leny = fill(1000_000.,sz)
+    # lenx = fill(len_background,sz)
+    # leny = fill(len_background,sz)
 
-    maxit = 100
+    lenx = lenx_background
+    leny = lenx_background
+
     background = nothing
     TS = TSbackground
 else
@@ -110,11 +124,10 @@ else
         [1970:2020],
         [m:m for m in 1:12])
 
-    lenx = fill(250_000.,sz)
-    leny = fill(250_000.,sz)
+    leny = copy(lenx)
     epsilon2 = 1.
-    maxit = 10
-    filenamebackground = joinpath(datadir,"Case/$(varname)-res-$(deltalon)-epsilon2-1.0-lenx-1.0e6-maxit-100-background/Results/$(varname)_background.nc")
+
+    filenamebackground = joinpath(datadir,"Case/$(varname)-res-$(deltalon)-epsilon2-$(epsilon2_background)-varlen0-maxit-$(maxit)-background/Results/$(varname)_background.nc")
     background = DIVAnd.backgroundfile(filenamebackground,varname,TSbackground)
 end
 
@@ -123,7 +136,7 @@ end
 
 @show varname
 
-casedir = joinpath(datadir,"Case/$varname-res-$(deltalon)-epsilon2-$(epsilon2)-lenx-$(mean(lenx))-maxit-$(maxit)-$(analysistype)")
+casedir = joinpath(datadir,"Case/$(varname)-res-$(deltalon)-epsilon2-$(epsilon2)-varlen0-maxit-$(maxit)-$(analysistype)")
 mkpath(casedir)
 
 @info "casedir: $casedir"
@@ -150,7 +163,36 @@ obsvalue,obslon,obslat,obsdepth,obstime,obsids = DIVAnd.loadobs(
     Float64,filenames_obs,varname)
 
 
+
 obslon = mod.(obslon .+ 180,360) .- 180
+
+#=
+sel = 1:10
+obslon = obslon[sel]
+obslat = obslat[sel]
+obsdepth = obsdepth[sel]
+obstime = obstime[sel]
+=#
+
+
+filename_rdiag = joinpath(obsdir,"weights","$(varname)_rdiag.nc")
+
+if isfile(filename_rdiag)
+    rdiag = NCDataset(filename_rdiag,"r") do ds
+        ds[varname * "_rdiag"][:]
+    end
+else
+    @info "creating '$filename_rdiag'"
+    #rdiag = 1.0 ./ DIVAnd.weight_RtimesOne((obslon,obslat,obsdepth,Dates.datetime2julian.(obstime)),(0.1,0.1,10.,60.))
+    rdiag = 1.0 ./ DIVAnd.weight_RtimesOne((obslon,obslat,obsdepth),(0.1,0.1,10.))
+
+    NCDataset(filename_rdiag,"c") do ds
+        defVar(ds,varname * "_rdiag", rdiag, ("observations",))
+    end
+end
+
+
+
 
 #bad = (-11 .<= obslon .<= 0.7) .& (34 .<= obslat .<= 47) .& (obsvalue .<= 100);
 #minvalue = 0.01
@@ -227,7 +269,66 @@ end
 
 mean_value = mean(obsvalue[sel])
 @show mean_value
-size(mask)
+    size(mask)
+
+    P35 = Vocab.SDNCollection("P35")
+    c = Vocab.findbylabel(P35,[varname])[1]
+    parameter_keyword_urn = Vocab.notation(c)
+
+metadata = OrderedDict(
+    # Name of the project (SeaDataCloud, SeaDataNet, EMODNET-chemistry, ...)
+    "project" => "EMODNET-chemistry",
+
+    # URN code for the institution EDMO registry,
+    # e.g. SDN:EDMO::1579
+    "institution_urn" => "SDN:EDMO::1579", # GHER
+    # Name and emails from authors
+    #"Author_e-mail" => ["Your Name1 <name1@example.com>", "Other Name <name2@example.com>"],
+
+    # Source of the observation
+    "source" => "Observations from EMODnet-Chemistry",
+
+    # SeaDataNet Vocabulary P35 URN
+    # http://seadatanet.maris2.nl/v_bodc_vocab_v2/search.asp?lib=p35
+    # example: SDN:P35::WATERTEMP
+    "parameter_keyword_urn" => parameter_keyword_urn,
+
+    # List of SeaDataNet Parameter Discovery Vocabulary P02 URNs
+    # http://seadatanet.maris2.nl/v_bodc_vocab_v2/search.asp?lib=p02
+    # example: ["SDN:P02::TEMP"]
+    "search_keywords_urn" => varinfo[varname]["search_keywords_urn"],
+
+    # List of SeaDataNet Vocabulary C19 area URNs
+    # SeaVoX salt and fresh water body gazetteer (C19)
+    # http://seadatanet.maris2.nl/v_bodc_vocab_v2/search.asp?lib=C19
+    # example: ["SDN:C19::3_1"]
+    "area_keywords_urn" => area_keywords_urn,
+    "bathymetry_source" => "The GEBCO Digital Atlas published by the British Oceanographic Data Centre on behalf of IOC and IHO, 2003",
+    # # NetCDF CF standard name
+    # # http://cfconventions.org/Data/cf-standard-names/current/build/cf-standard-name-table.html
+    # # example "standard_name" = "sea_water_temperature",
+    "netcdf_standard_name" => varinfo[varname]["netcdf_standard_name"],
+    "netcdf_long_name" => varname,
+    "netcdf_units" => varinfo[varname]["netcdf_units"],
+    "product_version" => "1.0",
+    # # Abstract for the product
+    # "abstract" => "...",
+
+    # # This option provides a place to acknowledge various types of support for the
+    # # project that produced the data
+    # "acknowledgement" => "...",
+
+    # "documentation" => "https://doi.org/doi_of_doc",
+
+    # # Digital Object Identifier of the data product
+    # "doi" => "...",
+);
+
+
+
+
+ncglobalattrib, ncvarattrib = SDNMetadata(metadata, filename, varname, lonr, latr)
+
 
 dbinfo = @time DIVAnd.diva3d(
     (lonr,latr,depthr,TS),
@@ -235,7 +336,7 @@ dbinfo = @time DIVAnd.diva3d(
     obsvalue[sel],
 #              (ones(sz),ones(sz),ones(sz)),
     (lenx,leny,lenz),
-    epsilon2,
+    epsilon2 .* rdiag,
     filename,varname,
     mask = mask,
     bathname = bathname,
@@ -253,11 +354,14 @@ dbinfo = @time DIVAnd.diva3d(
     coeff_derivative2 = [0.,0.,1e-8],
     inversion = :cg_amg_sa,
     maxit = maxit,
+    divamethod = DIVAndrun,
     background = background,
+    ncvarattrib = ncvarattrib,
+    ncglobalattrib = ncglobalattrib,
 )
 
 used = dbinfo[:used]
-residuals = dbinfo[:residuals]
+obsresiduals = dbinfo[:residuals]
 
 @show sum(used)
 @show mean(used)
@@ -266,7 +370,6 @@ DIVAnd.saveobs(
     (obslon,obslat,obsdepth,obstime),obsids,
     used=used);
 
-
 if isfile(filename_residual)
     rm(filename_residual)
 end
@@ -274,10 +377,13 @@ end
 DIVAnd.saveobs(
     filename_residual,
     varname,
-    residuals,
+    obsvalue,
     (obslon,obslat,obsdepth,obstime),obsids,
     used=used);
 
+NCDataset(filename_residual,"a") do ds
+    defVar(ds,varname * "_residual", obsresiduals[used], ("observations",))
+end
 
 JLD2.@save replace(filename,".nc" => "_dbinfo.jld2") dbinfo
 end
