@@ -21,68 +21,39 @@ In this example:
 
 ![Metadata](../figures/ODV-residuals/odv_res03.png "Metadata")
 
-Use decimal date (or dummy variable) as _Primary variable_
+#### Use decimal date (or dummy variable) as _Primary variable_
 ![Primary variable](../figures/ODV-residuals/odv_res04.png "Primary variable")
 
-Finish the netCDF setup
+#### Finish the netCDF setup
 ![netCDF setup](../figures/ODV-residuals/odv_res05.png "netCDF setup")
 
 ### 3. Select a _SURFACE Window_ in _Views/Layout Templates_
 
 ![Surface window](../figures/ODV-residuals/odv_res06.png "Surface window")
 
+Result of the _Surface Window_. Here you can change the dot size (in _Properties_) and other details according to your preferences.
 
+![Surface window result](../figures/ODV-residuals/odv_res07.png "Surface window result")
 
+### 4. Set the z-variable as the residuals
 
-
-Result of the Surface window. Here you can change the dot size (Properties) and other details
-
-
-
-
-
-Set the z-variable as the residuals
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+![z-variable](../figures/ODV-residuals/odv_res08.png "z-variable")
 
 Set the ranges for the residuals, for instance between -5. and 5.
 
+![Set range](../figures/ODV-residuals/odv_res10.png "Set range")
+![Set range](../figures/ODV-residuals/odv_res11.png "Set range")
+
+### 5. Use the sample filter to display only the points with a high value for the residual
+
+#### For example we show residuals above 5
+![Filter display](../figures/ODV-residuals/odv_res12.png "Filter display")
+
+#### Example of what is obtained with the filter
+![Display residuals](../figures/ODV-residuals/odv_res13.png "Display residuals")
 
 
 
-
-
-
-
-
-Use the sample filter to display only the points with a high value for the residual.
-For example we show residuals above 5.
-
-
-
-
-12. Example of what is obtained with the filter
 
 
 
