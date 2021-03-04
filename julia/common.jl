@@ -41,9 +41,9 @@ timerange = [Date(1000,1,1),Date(3000,12,31)]
 
 email = ENV["EMAIL"]
 
-datadir = "/data"
-woddir = joinpath(datadir,"WOD")
+datadir = first(filter(isdir,["/data",expanduser("~/ceci/home/Data/EMODnet-Chemistry-data")]))
 
+woddir = joinpath(datadir,"WOD")
 
 obsdir = joinpath(datadir,"EMODnet")
 
