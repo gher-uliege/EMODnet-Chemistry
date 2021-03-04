@@ -15,26 +15,22 @@ In this example:
 
 ![Open file](../figures/ODV-residuals/odv_res01.png "Open file")
 
-### Follow the Wizard steps
+### 2. Follow the _Wizard_ steps
 
+![Dimensions](../figures/ODV-residuals/odv_res02.png "Dimensions")
 
-### Leave variables and metadata
+![Metadata](../figures/ODV-residuals/odv_res03.png "Metadata")
 
-
-
-
-Use decimal date (or dummy variable) as Primary variable
-
-
-
+Use decimal date (or dummy variable) as _Primary variable_
+![Primary variable](../figures/ODV-residuals/odv_res04.png "Primary variable")
 
 Finish the netCDF setup
+![netCDF setup](../figures/ODV-residuals/odv_res05.png "netCDF setup")
 
+### 3. Select a _SURFACE Window_ in _Views/Layout Templates_
 
+![Surface window](../figures/ODV-residuals/odv_res06.png "Surface window")
 
-
-
-Select a Surface window in Views
 
 
 
