@@ -1,22 +1,24 @@
 # Processing
 
-Processing residuals with ODV
-A short tutorial on how to work with the residuals provided along with the analysis.
-File: Water body phosphate_monthly_residuals.nc
-ODV version: 5.4.0
+The goal of this tutorial is to explain how to processing the residuals
+obtained with `DIVAnd` using `Ocean Data View` (ODV).
+
+In this example:
+* __File:__ `Water body phosphate_monthly_residuals.nc` (monthly residuals of
+	phosphate concentration).
+* __ODV version:__ 5.4.0 (downloaded March 2021)
 
 
-Open the netCDF file containing the residuals
+## Procedure
+
+### 1. Open the netCDF file containing the residuals
+
+![Open file](../figures/ODV-residuals/odv_res01.png "Open file")
+
+### Follow the Wizard steps
 
 
-
-
-Follow the Wizard steps
-
-
-
-
-Leave variables and metadata
+### Leave variables and metadata
 
 
 
