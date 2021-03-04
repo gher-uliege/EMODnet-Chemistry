@@ -52,11 +52,8 @@ Set the ranges for the residuals, for instance between -5. and 5.
 #### Example of what is obtained with the filter
 ![Display residuals](../figures/ODV-residuals/odv_res13.png "Display residuals")
 
+### 6. Select your region of interest using the _Set ranges_ tool
 
+In this case we can see the measurements in the _Black Sea_ for which the residuals exceed a concentration of 5 µmol/l.
 
-
-
-
-
-13. Select your region of interest using the Set ranges.
-In this case we can see the measurements in the Black Sea for which the residuals exceed a 5 µmol/l.
+![Black Sea residuals](../figures/ODV-residuals/odv_res14.png "Black Sea")
