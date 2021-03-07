@@ -11,7 +11,7 @@ using PhysOcean
 @everywhere using DIVAnd
 using StatsBase
 using FileIO
-using PyPlot
+#using PyPlot
 using Glob
 using JLD2
 using DataStructures
@@ -19,6 +19,7 @@ using DataStructures
 # uses lonr,latr,varname,figdir,bx,by,b,obslon,obslat...
 # from global scope
 
+#=
 function plotres(timeindex,sel,fit,erri)
     tmp = copy(fit)
     #tmp[erri .> .5] .= NaN;
@@ -62,7 +63,7 @@ function plotres(timeindex,sel,fit,erri)
     end
     PyPlot.close()
 end
-
+=#
 
 
 function plotres_timeindex(timeindex,sel,fit,erri)
@@ -80,6 +81,8 @@ mkpath(datadir)
 #analysistype = "monthly"
 analysistype = get(ENV,"ANALYSIS_TYPE","background")
 
+@show analysistype
+
 TSbackground = DIVAnd.TimeSelectorYearListMonthList(
     [1970:2020],
     [1:12])
@@ -88,6 +91,7 @@ lenz = [min(max(25.,1 + depthr[k]/150),500.) for i = 1:sz[1], j = 1:sz[2], k = 1
 #varname_index = parse(Int,get(ENV,"VARNAME_INDEX","2"))
 varname_index = parse(Int,get(ENV,"VARNAME_INDEX","5"))
 
+@show varname_index
 varname = varlist[varname_index]
 maxit = 100
 #maxit = 1000
@@ -341,7 +345,7 @@ dbinfo = @time DIVAnd.diva3d(
     mask = mask,
     bathname = bathname,
 #              plotres = plotres_timeindex,
-    plotres = plotres,
+#    plotres = plotres,
     timeorigin = timeorigin,
 #              fitcorrlen = true,
 #    transform = transform,
