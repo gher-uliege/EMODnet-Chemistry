@@ -7,11 +7,11 @@ using Dates
 deltalon = 0.1
 deltalat = 0.1
 
-deltalon = 0.25
-deltalat = 0.25
+#deltalon = 0.25
+#deltalat = 0.25
 
-deltalon = 0.5
-deltalat = 0.5
+#deltalon = 0.5
+#deltalat = 0.5
 
 #lonr = -40.:deltalon:55.
 #latr = 24.:deltalat:67.
@@ -41,7 +41,7 @@ timerange = [Date(1000,1,1),Date(3000,12,31)]
 
 email = ENV["EMAIL"]
 
-datadir = first(filter(isdir,["/data",expanduser("~/ceci/home/Data/EMODnet-Chemistry-data")]))
+datadir = first(filter(isdir,["/data",expanduser("~/tmp/EMODnet-Chemistry-data/")]))
 
 woddir = joinpath(datadir,"WOD")
 
