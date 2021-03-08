@@ -83,9 +83,6 @@ analysistype = get(ENV,"ANALYSIS_TYPE","background")
 
 @show analysistype
 
-TSbackground = DIVAnd.TimeSelectorYearListMonthList(
-    [1970:2020],
-    [1:12])
 lenz = [min(max(25.,1 + depthr[k]/150),500.) for i = 1:sz[1], j = 1:sz[2], k = 1:sz[3]]
 
 #varname_index = parse(Int,get(ENV,"VARNAME_INDEX","2"))
@@ -124,10 +121,7 @@ if analysistype == "background"
     TS = TSbackground
 else
     # monthly
-    TS = DIVAnd.TimeSelectorYearListMonthList(
-        [1970:2020],
-        [m:m for m in 1:12])
-
+    TS = TSmonthly
     leny = copy(lenx)
     epsilon2 = 1.
 
