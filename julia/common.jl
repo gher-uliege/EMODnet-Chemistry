@@ -7,8 +7,8 @@ using Dates
 deltalon = 0.1
 deltalat = 0.1
 
-#deltalon = 0.25
-#deltalat = 0.25
+deltalon = 0.25
+deltalat = 0.25
 
 #deltalon = 0.5
 #deltalat = 0.5
@@ -65,15 +65,6 @@ varlist = ["Water body phosphate",
            "Water body ammonium",
            "Water body silicate",
            ]
-
-varlist_units = [
-    "umol/l",
-    "umol/l",
-    "mg/m3",
-    "umol/l",
-    "umol/l",
-    "umol/l",
-]
 
 #=
 using DIVAnd
