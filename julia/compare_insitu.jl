@@ -1,9 +1,14 @@
+ENV["DISPLAY"] = ""
+
 using Distributed
 @everywhere using PyPlot
 using DIVAnd
 using NCDatasets
 using Glob
 @everywhere using Statistics
+@everywhere using PyCall
+
+
 
 @everywhere ioff()
 include("common.jl")
@@ -37,12 +42,24 @@ varname_index = parse(Int,get(ENV,"VARNAME_INDEX","2"))
 
 fname = "/data/Case/Water body dissolved oxygen concentration-res-0.25-epsilon2-1.0-varlen0-maxit-100-monthly/Results/Water body dissolved oxygen concentration_monthly.nc"
 
-fnames = glob("*-res-0.25-epsilon2-1.0-varlen0-maxit-100-monthly/Results/*_monthly.nc",joinpath(datadir,"Case"))
+analysistype = get(ENV,"ANALYSIS_TYPE","background")
+analysistype = "monthly"
+#analysistype = "background"
 
-TS = TSmonthly
+fnames = sort(glob("*-res-0.25-epsilon2-1.0-varlen0-maxit-100-$(analysistype)/Results/*_$(analysistype).nc",joinpath(datadir,"Case")))
+
+if analysistype == "background"
+    TS = TSbackground
+else
+    TS = TSmonthly
+end
+
 ioff()
 
-for fname in fnames
+#figdir = "/tmp/test"
+#mkpath(figdir)
+
+@time for fname in fnames[2:2]
     figdir = joinpath(dirname(fname),"..","Figures")
 
     ds = NCDataset(fname)
@@ -50,7 +67,6 @@ for fname in fnames
     close(ds)
 
     filenames_obs = glob("*" * replace(varname," " => "_") * "*.nc",obsdir)
-#    plot_profile(domains,domainnames,fname,filenames_obs,TS)
 
     plot_section(
         fname,
@@ -58,6 +74,8 @@ for fname in fnames
         bathname;
         #suffix = "_L2",
         figdir = figdir)
+
+    plot_profile(domains,domainnames,fname,filenames_obs,TS; figdir = figdir)
 end
 
 
