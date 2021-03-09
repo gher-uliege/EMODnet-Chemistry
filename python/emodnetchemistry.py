@@ -11,6 +11,10 @@ import matplotlib.cbook
 import logging
 warnings.filterwarnings("ignore",category=matplotlib.cbook.mplDeprecation)
 
+import matplotlib as mpl
+mpl.rcParams['figure.dpi'] = 300
+
+
 logger = logging.getLogger("EMODnet-Chemistry-Data-positions")
 logger.setLevel(logging.DEBUG)
 logging.info("Starting")
@@ -69,7 +73,6 @@ def read_variable_woa(datafile, domain=[-180., 180., -90., 90.]):
         depth = nc.variables["depth"][:]
         time = nc.variables["time"][:]
 
-
         # generate list of variables
         varlist = list(nc.variables.keys())
 
@@ -122,12 +125,11 @@ def read_variable_diva(datafile, domain=[-180., 180., -90., 90.], timeindex=0):
         logger.info(f"Variable name: {varname}")
         logger.info(f"Long name: {nc.variables[varname].long_name}")
 
-
         field = nc.variables[varname][timeindex,:,goodlat,goodlon]
 
     return lon, lat, depth, date, field
 
-def plot_oxy_map(llon, llat, field, depth, figname=None):
+def plot_oxy_map(llon, llat, field, depth, figname=""):
     """Create map with the interpolated values of oxygen concentration
     """
     fig = plt.figure(figsize=(10, 10))
@@ -143,13 +145,13 @@ def plot_oxy_map(llon, llat, field, depth, figname=None):
     m.fillcontinents(color=".85", zorder=3)
     m.drawcoastlines(linewidth=0.1, zorder=4)
     plt.title("Oxygen concentration at {} m".format(depth))
-    if figname is not None:
+    if len(figname) > 0:
         plt.savefig(figname, dpi=300, bbox_inches="tight", facecolor="w",
         transparent=False)
     # plt.show()
     plt.close()
 
-def plot_WOA_DIVAnd_comparison(m, lon1, lat1, field1, lon2, lat2, field2, depth, figname=None,
+def plot_WOA_DIVAnd_comparison(m, lon1, lat1, field1, lon2, lat2, field2, depth, figname="",
                               vmin=200., vmax=375., deltavar=25.,
                               units=r"$\mu$moles/kg", monthname=None):
 
@@ -189,7 +191,7 @@ def plot_WOA_DIVAnd_comparison(m, lon1, lat1, field1, lon2, lat2, field2, depth,
         cb = plt.colorbar(pcm, cax=cbar_ax, extend="both", orientation="horizontal")
     cb.set_label(units, rotation=0, ha="center")
     cb.set_ticks(np.arange(vmin, vmax + 0.0001, deltavar))
-    if figname is not None:
+    if len(figname) > 0:
         plt.savefig(figname, dpi=300, bbox_inches="tight")
     plt.close()
 
@@ -337,6 +339,59 @@ def make_histo_month(months, varname, figdir="./"):
     fig.autofmt_xdate()
     plt.title(varname.replace("_", " ").capitalize(), fontsize=20)
     plt.savefig(os.path.join(figdir, f"month_histogram_{varname}"), dpi=300, bbox_inches="tight")
+    plt.close()
+
+def plot_month_depth_ndata(obsdepth, months, figname="", depthlist = [5., 100., 500., 1000., 2000.]):
+    """Create a polar plot where the angle is the month and the radius is
+    the number of available measurements
+
+    Parameters
+    ----------
+    obsdepth : list or tuple
+        Depths of the observations.
+    months : array
+        Month for each measurement.
+    figname : str, default=""
+        Path of the figure
+    depthlist : list or tuple, default=[5., 100., 500., 1000., 2000.]
+        Depth levels at which the number of observations will be counted
+
+    """
+    angles = np.arange(0, 2. * np.pi + .1, np.pi / 6.)
+
+    fig = plt.figure(figsize=(10, 10))
+    ax = plt.subplot(111, projection='polar')
+    ax.set_theta_zero_location("N")
+    ax.set_theta_direction(-1)
+    ax.grid(color='.85', linestyle = '--', linewidth=1)
+    ax.set_thetagrids(np.arange(0, 360, 30),
+                      labels=[calendar.month_name[ii] for ii in range(1, 13)],
+                      fontsize=20)
+    ax.set_rlabel_position(2)
+    ax.set_rgrids(np.arange(250000, 1500000, 250000))
+
+    # Loop on the depths of interest
+    for dd in depthlist:
+
+        # Find data above (i.e., shallower than) the considered depth
+        depthselector = np.where(obsdepth <= dd)[0]
+        monthsdepth = months[depthselector]
+
+        # Loop on the month
+        ndatamonth = np.zeros(13)
+        for mm in range(0, 12):
+            # logger.info(mm)
+            monthselector = np.where(monthsdepth == mm+1)[0]
+            ndatamonth[mm] = len(monthselector)
+        ndatamonth[-1] = ndatamonth[0]
+
+        ax.plot(angles, ndatamonth, "o-", ms=5, label="< {} m".format(int(dd)))
+
+    ax.yaxis.set_major_formatter(FormatStrFormatter('%d'))
+    ax.legend(bbox_to_anchor=(1.2, 1.1))
+    plt.title("Number of measurements of {}".format(varname), fontsize=24)
+    if len(figname) > 0:
+        plt.savefig(figname, dpi=300, bbox_inches="tight", facecolor="w", transparent=False)
     plt.close()
 
 
