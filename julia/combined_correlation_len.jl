@@ -16,6 +16,9 @@ using DataStructures
 
 include("common.jl")
 
+
+clversion = "varlen1"
+
 sz = (length(lonr),length(latr),length(depthr))
 sz = (length(lonr),length(latr))
 @show sz
@@ -24,6 +27,7 @@ domains = [
     # Arctic 1
     #(len = 1, lonr = (-44.25,70), latr = (56.5,83)),
     (len = 1, lonr = (-Inf,70), latr = (56.5,83)),
+    (len = 2, lonr = (-Inf,70), latr = (56.5,83)),
     # Baltic 0.7
     (len = 0.7, lonr = (9.4,30.9), latr = (53,60)),
     (len = 0.7, lonr = (14,30.9), latr = (60,65.9)),
@@ -99,9 +103,9 @@ gca().set_aspect(aspect_ratio)
 colorbar()
 figdir = joinpath(datadir,"Figures")
 mkpath(figdir)
-savefig(joinpath(figdir,"correlation_len_$(deltalon).png"))
+savefig(joinpath(figdir,"correlation_len_$(clversion)_$(deltalon).png"))
 
-filename_corrlen = joinpath(datadir,"correlation_len_$(deltalon).nc")
+filename_corrlen = joinpath(datadir,"correlation_len_$(clversion)_$(deltalon).nc")
 NCDataset(filename_corrlen,"c") do ds
     defVar(ds,"correlation_length",lenfilled,("lon","lat"))
 end
