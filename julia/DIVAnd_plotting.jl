@@ -75,7 +75,7 @@ function plot_section(
     bathname;
     suffix = "",
     figdir = joinpath(dirname(fname),"..","Figures"),
-    quantile_colorbar = [0.1,0.9],
+    quantile_colorbar = [0.01,0.99],
     bathisglobal = true)
 
     ds = NCDataset(fname)
@@ -95,7 +95,6 @@ function plot_section(
 
     aspect_ratio = 1/cosd(mean(latr))
     #fig = figure(figsize = (12,8))
-    fig = figure(figsize = (15,8))
 
     bx,by,b = DIVAnd.extract_bath(bathname,bathisglobal,lonr,latr);
 
@@ -107,17 +106,17 @@ function plot_section(
         #tmp[erri .> .5] .= NaN;
 
         sel = DIVAnd.select(TS,itime,obstime)
-        k=1
+        k = 1
         @time @sync @distributed  for k = 1:size(fit,3)
             #@time @sync @distributed  for k = 1:16
             #@time for k = 1:32
-            clf()
+            fig = figure(figsize = (15,8))
+            #clf()
             fig.suptitle("$varname; time index $(itime); depth = $(depthr[k])")
             subplot(1,2,1)
             title("Observations")
 
             Δz = depthr[min(k+1,length(depthr))] - depthr[max(k-1,1)]
-            @show k,Δz
 
             # select the data near depthr[k]
             sel_depth = sel .& (abs.(obsdepth .- depthr[k]) .<= Δz)
@@ -128,6 +127,11 @@ function plot_section(
             tmpk = tmp[:,:,k]
             #vmin,vmax = extrema(tmpk[isfinite.(tmpk)])
             vmin,vmax = quantile(tmpk[isfinite.(tmpk)],quantile_colorbar)
+            @show varname,itime,k,Δz,vmin,vmax
+            if abs(vmax - vmin) < 1e-8
+                vmax = vmin + 1
+                @show vmin,vmax
+            end
 
             # plot the data
             scatter(obslon[sel_depth],obslat[sel_depth],10,obsvalue[sel_depth];
@@ -147,7 +151,11 @@ function plot_section(
             contourf(bx,by,b', levels = [-1e5,0],colors = [[.5,.5,.5]])
             gca().set_aspect(aspect_ratio)
             savefig(joinpath(figdir,"analysis-$(varname * suffix)-$(itime)-$(depthr[k]).png"))
+            PyPlot.close()
+
+            GC.gc()
+            pyGC = pyimport("gc")
+            pyGC.collect()
         end
     end
-    PyPlot.close()
 end
