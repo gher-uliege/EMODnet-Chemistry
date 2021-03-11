@@ -73,6 +73,9 @@ end
 ENV["JULIA_DEBUG"] = "DIVAnd"
 
 include("common.jl")
+clversion = "varlen1"
+
+
 sz = (length(lonr),length(latr),length(depthr))
 @show sz
 mkpath(datadir)
@@ -83,26 +86,35 @@ analysistype = get(ENV,"ANALYSIS_TYPE","background")
 
 @show analysistype
 
-lenz = [min(max(25.,1 + depthr[k]/150),500.) for i = 1:sz[1], j = 1:sz[2], k = 1:sz[3]]
+lenz = [min(max(25.,1 + depthr[k]/10),500.) for i = 1:sz[1], j = 1:sz[2], k = 1:sz[3]]
 
 #varname_index = parse(Int,get(ENV,"VARNAME_INDEX","2"))
-varname_index = parse(Int,get(ENV,"VARNAME_INDEX","5"))
+varname_index = parse(Int,get(ENV,"VARNAME_INDEX","3"))
 
 @show varname_index
 varname = varlist[varname_index]
-maxit = 100
-#maxit = 1000
+varname_ = replace(varname," " => "_")
+
+#maxit = 100
+maxit = 1000
+#maxit = 10000
+reltol = 1e-6;
+reltol = 1e-9;
+#maxit = 5000
 #len_background = 1000_000
 epsilon2_background = 1.
 
 
-filename_corrlen = joinpath(datadir,"correlation_len_$(deltalon).nc")
+filename_corrlen = joinpath(datadir,"correlation_len_$(clversion)_$(deltalon).nc")
 
 lenx_2D = NCDataset(filename_corrlen,"r") do ds
     ds["correlation_length"][:,:] * 111e3
 end
+
+lb = 6
 lenx = repeat(lenx_2D,inner=(1,1,sz[3]))
-lenx_background = lenx*3
+#lenx_background = lenx*3
+lenx_background = lenx*lb
 
 if analysistype == "background"
     epsilon2 = epsilon2_background
@@ -122,11 +134,20 @@ if analysistype == "background"
 else
     # monthly
     TS = TSmonthly
+
     leny = copy(lenx)
     epsilon2 = 1.
 
-    filenamebackground = joinpath(datadir,"Case/$(varname)-res-$(deltalon)-epsilon2-$(epsilon2_background)-varlen0-maxit-$(maxit)-background/Results/$(varname)_background.nc")
+    filenamebackground = joinpath(datadir,"Case/$(varname_)-res-$(deltalon)-epsilon2-$(epsilon2_background)-$(clversion)-lb$(lb)-maxit-$(maxit)-reltol-$(reltol)-background/Results/$(varname_)_background.nc")
     background = DIVAnd.backgroundfile(filenamebackground,varname,TSbackground)
+
+    #debug
+    # TS = DIVAnd.TimeSelectorYearListMonthList(
+    #     [1970:2020],
+    #     [m:m for m in 4:4])
+    # maxit = 200
+    # maxit = 500
+    # maxit = 100
 end
 
 
@@ -134,7 +155,7 @@ end
 
 @show varname
 
-casedir = joinpath(datadir,"Case/$(varname)-res-$(deltalon)-epsilon2-$(epsilon2)-varlen0-maxit-$(maxit)-$(analysistype)")
+casedir = joinpath(datadir,"Case/$(varname_)-res-$(deltalon)-epsilon2-$(epsilon2)-$(clversion)-lb$(lb)-maxit-$(maxit)-reltol-$(reltol)-$(analysistype)")
 mkpath(casedir)
 
 @info "casedir: $casedir"
@@ -149,7 +170,7 @@ mkpath(figdir)
 resdir = joinpath(casedir,"Results")
 mkpath(resdir)
 
-filename = joinpath(resdir,"$(varname)_$(analysistype).nc")
+filename = joinpath(resdir,"$(varname_)_$(analysistype).nc")
 
 #rm(filename)
 
@@ -263,6 +284,9 @@ mask,(pm,pn,po),(xi,yi,zi) = DIVAnd.domain(bathname,bathisglobal,lonr,latr,depth
 if deltalon == 0.1
     label = DIVAnd.floodfill(mask);
     mask = 0 .< label .<= 2
+else
+    out = repeat((32 .<= lonr) .& (latr' .<= 30.2),inner=(1,1,length(depthr)))
+    mask[out] .= false
 end
 
 mean_value = mean(obsvalue[sel])
@@ -352,6 +376,7 @@ dbinfo = @time DIVAnd.diva3d(
     coeff_derivative2 = [0.,0.,1e-8],
     inversion = :cg_amg_sa,
     maxit = maxit,
+    tol = reltol,
     divamethod = DIVAndrun,
     background = background,
     ncvarattrib = ncvarattrib,
