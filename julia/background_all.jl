@@ -20,11 +20,9 @@ pmap(varname -> begin;
     @info varlist[varname_index]
     ENV["VARNAME_INDEX"] = "$varname_index"
     ENV["ANALYSIS_TYPE"] = "background"
-    #ENV["ANALYSIS_TYPE"] = "monthly"
     include("background.jl")
     GC.gc()
 
-    #ENV["ANALYSIS_TYPE"] = "background"
     ENV["ANALYSIS_TYPE"] = "monthly"
     include("background.jl")
     GC.gc()
