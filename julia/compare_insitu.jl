@@ -1,6 +1,7 @@
 ENV["DISPLAY"] = ""
 
 using Distributed
+@everywhere ENV["MPLBACKEND"]="agg"
 @everywhere using PyPlot
 using DIVAnd
 using NCDatasets
@@ -38,39 +39,41 @@ domains = [
 default_label = 6
 domainnames = ["Arctic","Baltic","North Sea","Mediterranean Sea","Black Sea","Atlantic"]
 
-varname_index = parse(Int,get(ENV,"VARNAME_INDEX","2"))
 
-fname = "/data/Case/Water body dissolved oxygen concentration-res-0.25-epsilon2-1.0-varlen0-maxit-100-monthly/Results/Water body dissolved oxygen concentration_monthly.nc"
+#fnames = sort(glob("*-res-0.25-epsilon2-1.0-varlen1-maxit-100-$(analysistype)/Results/*_$(analysistype).nc",joinpath(datadir,"Case")))
+#fnames = sort(glob("*-varlen1-maxit-1000-$(analysistype)/Results/*_$(analysistype).nc",joinpath(datadir,"Case")))
 
-analysistype = get(ENV,"ANALYSIS_TYPE","background")
-analysistype = "monthly"
-#analysistype = "background"
-
-fnames = sort(glob("*-res-0.25-epsilon2-1.0-varlen0-maxit-100-$(analysistype)/Results/*_$(analysistype).nc",joinpath(datadir,"Case")))
-
-if analysistype == "background"
-    TS = TSbackground
-else
-    TS = TSmonthly
+fnames = ARGS;
+if fnames == []
+    #fnames = ["/data/Case/Water_body_ammonium-res-1-epsilon2-1.0-varlen1-lb6-maxit-1000-background/Results/Water_body_ammonium_background.nc"]
 end
+
+@show fnames
 
 ioff()
 
 #figdir = "/tmp/test"
 #mkpath(figdir)
 
-@time for fname in fnames[2:2]
+@time for fname in fnames
     figdir = joinpath(dirname(fname),"..","Figures")
+    @show figdir
 
     ds = NCDataset(fname)
     varname = ds.attrib["parameter_keyword"]
+
+    if ds.dim["time"] == 1
+        TS = TSbackground
+    else
+        TS = TSmonthly
+    end
     close(ds)
 
     filenames_obs = glob("*" * replace(varname," " => "_") * "*.nc",obsdir)
 
     plot_section(
         fname,
-        filenames_obs,
+        filenames_obs, TS,
         bathname;
         #suffix = "_L2",
         figdir = figdir)

@@ -72,6 +72,7 @@ end
 function plot_section(
     fname,
     filenames_obs,
+    TS,
     bathname;
     suffix = "",
     figdir = joinpath(dirname(fname),"..","Figures"),
@@ -108,6 +109,7 @@ function plot_section(
         sel = DIVAnd.select(TS,itime,obstime)
         k = 1
         @time @sync @distributed  for k = 1:size(fit,3)
+        #@time @sync @distributed  for k = 1:1
             #@time @sync @distributed  for k = 1:16
             #@time for k = 1:32
             fig = figure(figsize = (15,8))
