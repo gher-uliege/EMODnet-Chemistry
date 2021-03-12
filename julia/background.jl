@@ -86,7 +86,6 @@ analysistype = get(ENV,"ANALYSIS_TYPE","background")
 
 @show analysistype
 
-lenz = [min(max(25.,1 + depthr[k]/10),500.) for i = 1:sz[1], j = 1:sz[2], k = 1:sz[3]]
 
 #varname_index = parse(Int,get(ENV,"VARNAME_INDEX","2"))
 varname_index = parse(Int,get(ENV,"VARNAME_INDEX","3"))
@@ -100,16 +99,21 @@ maxit = 1000
 #maxit = 10000
 reltol = 1e-6;
 reltol = 1e-9;
-#maxit = 5000
+maxit = 5000
 #len_background = 1000_000
 epsilon2_background = 1.
-
+suffix = "redvert"
 
 filename_corrlen = joinpath(datadir,"correlation_len_$(clversion)_$(deltalon).nc")
 
-lenx_2D = NCDataset(filename_corrlen,"r") do ds
-    ds["correlation_length"][:,:] * 111e3
-end
+ds = NCDataset(filename_corrlen,"r")
+lenx_2D = ds["correlation_length"][:,:] * 111e3
+minlenz = ds["minlenz"][:,:]
+close(ds)
+
+#lenz = [min(max(25.,1 + depthr[k]/10),500.) for i = 1:sz[1], j = 1:sz[2], k = 1:sz[3]]
+lenz = [min(max(minlenz[i,j],depthr[k]/10),500.) for i = 1:sz[1], j = 1:sz[2], k = 1:sz[3]]
+
 
 lb = 6
 lenx = repeat(lenx_2D,inner=(1,1,sz[3]))
@@ -138,7 +142,7 @@ else
     leny = copy(lenx)
     epsilon2 = 1.
 
-    filenamebackground = joinpath(datadir,"Case/$(varname_)-res-$(deltalon)-epsilon2-$(epsilon2_background)-$(clversion)-lb$(lb)-maxit-$(maxit)-reltol-$(reltol)-background/Results/$(varname_)_background.nc")
+    filenamebackground = joinpath(datadir,"Case/$(varname_)-res-$(deltalon)-epsilon2-$(epsilon2_background)-$(clversion)-lb$(lb)-maxit-$(maxit)-reltol-$(reltol)-$(suffix)-background/Results/$(varname_)_background.nc")
     background = DIVAnd.backgroundfile(filenamebackground,varname,TSbackground)
 
     #debug
@@ -155,7 +159,7 @@ end
 
 @show varname
 
-casedir = joinpath(datadir,"Case/$(varname_)-res-$(deltalon)-epsilon2-$(epsilon2)-$(clversion)-lb$(lb)-maxit-$(maxit)-reltol-$(reltol)-$(analysistype)")
+casedir = joinpath(datadir,"Case/$(varname_)-res-$(deltalon)-epsilon2-$(epsilon2)-$(clversion)-lb$(lb)-maxit-$(maxit)-reltol-$(reltol)-$(suffix)-$(analysistype)")
 mkpath(casedir)
 
 @info "casedir: $casedir"

@@ -8,11 +8,14 @@ using Dates
 deltalon = 0.1
 deltalat = 0.1
 
-deltalon = 0.25
-deltalat = 0.25
+#deltalon = 0.25
+#deltalat = 0.25
 
 #deltalon = 0.5
 #deltalat = 0.5
+
+deltalon = 1
+deltalat = 1
 
 #lonr = -40.:deltalon:55.
 #latr = 24.:deltalat:67.

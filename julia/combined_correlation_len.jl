@@ -23,21 +23,23 @@ sz = (length(lonr),length(latr),length(depthr))
 sz = (length(lonr),length(latr))
 @show sz
 
+default_minlenz = 25.
+
 domains = [
     # Arctic 1
     #(len = 1, lonr = (-44.25,70), latr = (56.5,83)),
-    (len = 1, lonr = (-Inf,70), latr = (56.5,83)),
-    (len = 2, lonr = (-Inf,70), latr = (56.5,83)),
+    (len = 1, minlenz = 25, lonr = (-Inf,70), latr = (56.5,83)),
+    (len = 2, minlenz = 25, lonr = (-Inf,70), latr = (56.5,83)),
     # Baltic 0.7
-    (len = 0.7, lonr = (9.4,30.9), latr = (53,60)),
-    (len = 0.7, lonr = (14,30.9), latr = (60,65.9)),
+    (len = 0.7, minlenz = 25, lonr = (9.4,30.9), latr = (53,60)),
+    (len = 0.7, minlenz = 25, lonr = (14,30.9), latr = (60,65.9)),
     # NS 0.7
-    (len = 0.7, lonr = (-5.4,13), latr = (47.9,62)),
+    (len = 0.7, minlenz = 25, lonr = (-5.4,13), latr = (47.9,62)),
     # # Med 2
-    (len = 2, lonr = (-0.8,36.375), latr = (30,46.375)),
-    (len = 2, lonr = (-7,36.375), latr = (30,43)),
+    (len = 2, minlenz = 25, lonr = (-0.8,36.375), latr = (30,46.375)),
+    (len = 2, minlenz = 25, lonr = (-7,36.375), latr = (30,43)),
     # # BS 1.5
-    (len = 1.5, lonr = (26.5,41.95), latr = (40,47.95)),
+    (len = 1.5, minlenz = 15, lonr = (26.5,41.95), latr = (40,47.95)),
 ]
 
 # Atlantic 3
@@ -45,12 +47,14 @@ default_len = 3.
 
 
 len = fill(default_len,sz)
+minlenz = fill(default_minlenz,sz)
 
 
 for i = 1:length(domains)
     inside = (domains[i].lonr[1] .<= lonr .<= domains[i].lonr[2]) .&
        (domains[i].latr[1] .<= latr' .<= domains[i].latr[2])
     len[inside] .= domains[i].len
+    minlenz[inside] .= domains[i].minlenz
 end
 
 
@@ -64,6 +68,7 @@ slen = (100e3,100e3)
 slen = (800e3,800e3)
 
 lenf = DIVAnd.diffusion(mask,pmn,slen,len)
+minlenzf = DIVAnd.diffusion(mask,pmn,slen,minlenz)
 
 sigmoid(x) = (tanh(x)+1)/2
 
@@ -85,11 +90,13 @@ lenf2 = (1 .- nearcoastf) .* lenf + nearcoastf .* lenf/5
 
 #@code_warntype DIVAnd.diffusion(mask,pmn,slen,len)
 lenf2[.!mask] .= NaN
+minlenzf[.!mask] .= NaN
 
 lenfilled = DIVAnd.ufill(lenf2,isfinite.(lenf2));
+minlenzfilled = DIVAnd.ufill(minlenzf,isfinite.(minlenzf));
 
-ioff()
-#ion()
+#ioff()
+ion()
 clf()
 title("Correlation length")
 #pcolormesh(lonr,latr,lenf'-len')
@@ -104,8 +111,15 @@ colorbar()
 figdir = joinpath(datadir,"Figures")
 mkpath(figdir)
 savefig(joinpath(figdir,"correlation_len_$(clversion)_$(deltalon).png"))
+clf()
+title("minimum vert. correlation length")
+pcolormesh(lonr,latr,minlenzf')
+colorbar()
+savefig(joinpath(figdir,"minlenz_$(clversion)_$(deltalon).png"))
+
 
 filename_corrlen = joinpath(datadir,"correlation_len_$(clversion)_$(deltalon).nc")
 NCDataset(filename_corrlen,"c") do ds
     defVar(ds,"correlation_length",lenfilled,("lon","lat"))
+    defVar(ds,"minlenz",minlenzfilled,("lon","lat"))
 end
