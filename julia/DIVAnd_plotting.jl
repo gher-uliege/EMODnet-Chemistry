@@ -36,7 +36,7 @@ function plot_profile(
     L = splitobs(X,Y,domains,default_label)
 
     itime = 1
-    for itime = 1:length(TS)
+    for itime = 1:size(ds[varname],4)
         analysis = ds[varname][:,:,:,itime];
         units = ds[varname].attrib["units"]
 
@@ -100,7 +100,7 @@ function plot_section(
     bx,by,b = DIVAnd.extract_bath(bathname,bathisglobal,lonr,latr);
 
     #itime = 1
-    for itime = 1:length(TS)
+    for itime = 1:size(ds[varname],4)
         fit = nomissing(ds[varname * suffix][:,:,:,itime],NaN);
 
         tmp = copy(fit)
