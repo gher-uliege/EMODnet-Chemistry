@@ -189,14 +189,15 @@ obsvalue,obslon,obslat,obsdepth,obstime,obsids = DIVAnd.loadobs(
 
 obslon = mod.(obslon .+ 180,360) .- 180
 
-#=
-sel = 1:10
+sel = obsvalue .>= 0
+
+@info "remove $(sum(.!sel)) negative value(s)"
 obslon = obslon[sel]
 obslat = obslat[sel]
 obsdepth = obsdepth[sel]
 obstime = obstime[sel]
-=#
-
+obsvalue = obsvalue[sel]
+obsids = obsids[sel]
 
 filename_rdiag = joinpath(obsdir,"weights","$(varname)_rdiag.nc")
 
@@ -279,6 +280,11 @@ sel = (qcvalues .<= maxqcvalue) .& (obsvaluemin .<= obsvalue) .& (obsvalue .<= o
 =#
 
 #filename = replace(@__FILE__,r".jl$" => "_$(randstring()).nc")
+
+
+if isfile(varname_ * ".jl")
+    include(varname_ * ".jl")
+end
 
 sel = trues(size(obsvalue))
 
