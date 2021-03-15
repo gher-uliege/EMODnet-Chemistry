@@ -93,6 +93,7 @@ varname_index = parse(Int,get(ENV,"VARNAME_INDEX","3"))
 @show varname_index
 varname = varlist[varname_index]
 varname_ = replace(varname," " => "_")
+@show varname
 
 #maxit = 100
 maxit = 1000
@@ -157,7 +158,49 @@ end
 
 #--
 
-@show varname
+#rm(filename)
+
+bx,by,b = DIVAnd.extract_bath(bathname,bathisglobal,lonr,latr);
+
+filenames_obs = glob("*" * replace(varname," " => "_") * "*.nc",obsdir)
+
+obsvalue,obslon,obslat,obsdepth,obstime,obsids = DIVAnd.loadobs(
+    Float64,filenames_obs,varname)
+
+obslon = mod.(obslon .+ 180,360) .- 180
+
+
+filename_rdiag = joinpath(obsdir,"weights","$(varname)_rdiag.nc")
+
+if isfile(filename_rdiag)
+    rdiag = NCDataset(filename_rdiag,"r") do ds
+        ds[varname * "_rdiag"][:]
+    end
+else
+    @info "creating '$filename_rdiag'"
+    #rdiag = 1.0 ./ DIVAnd.weight_RtimesOne((obslon,obslat,obsdepth,Dates.datetime2julian.(obstime)),(0.1,0.1,10.,60.))
+    rdiag = 1.0 ./ DIVAnd.weight_RtimesOne((obslon,obslat,obsdepth),(0.1,0.1,10.))
+
+    NCDataset(filename_rdiag,"c") do ds
+        defVar(ds,varname * "_rdiag", rdiag, ("observations",))
+    end
+end
+
+sel = obsvalue .>= 0
+
+@info "remove $(sum(.!sel)) negative value(s)"
+obslon = obslon[sel]
+obslat = obslat[sel]
+obsdepth = obsdepth[sel]
+obstime = obstime[sel]
+obsvalue = obsvalue[sel]
+obsids = obsids[sel]
+rdiag = rdiag[sel]
+
+# variable specific code
+if isfile(varname_ * ".jl")
+    include(varname_ * ".jl")
+end
 
 casedir = joinpath(datadir,"Case/$(varname_)-res-$(deltalon)-epsilon2-$(epsilon2)-$(clversion)-lb$(lb)-maxit-$(maxit)-reltol-$(reltol)-$(suffix)-$(analysistype)")
 mkpath(casedir)
@@ -176,60 +219,6 @@ mkpath(resdir)
 
 filename = joinpath(resdir,"$(varname_)_$(analysistype).nc")
 
-#rm(filename)
-
-bx,by,b = DIVAnd.extract_bath(bathname,bathisglobal,lonr,latr);
-
-filenames_obs = glob("*" * replace(varname," " => "_") * "*.nc",obsdir)
-
-obsvalue,obslon,obslat,obsdepth,obstime,obsids = DIVAnd.loadobs(
-    Float64,filenames_obs,varname)
-
-
-
-obslon = mod.(obslon .+ 180,360) .- 180
-
-sel = obsvalue .>= 0
-
-@info "remove $(sum(.!sel)) negative value(s)"
-obslon = obslon[sel]
-obslat = obslat[sel]
-obsdepth = obsdepth[sel]
-obstime = obstime[sel]
-obsvalue = obsvalue[sel]
-obsids = obsids[sel]
-
-filename_rdiag = joinpath(obsdir,"weights","$(varname)_rdiag.nc")
-
-if isfile(filename_rdiag)
-    rdiag = NCDataset(filename_rdiag,"r") do ds
-        ds[varname * "_rdiag"][:]
-    end
-else
-    @info "creating '$filename_rdiag'"
-    #rdiag = 1.0 ./ DIVAnd.weight_RtimesOne((obslon,obslat,obsdepth,Dates.datetime2julian.(obstime)),(0.1,0.1,10.,60.))
-    rdiag = 1.0 ./ DIVAnd.weight_RtimesOne((obslon,obslat,obsdepth),(0.1,0.1,10.))
-
-    NCDataset(filename_rdiag,"c") do ds
-        defVar(ds,varname * "_rdiag", rdiag, ("observations",))
-    end
-end
-
-
-
-
-#bad = (-11 .<= obslon .<= 0.7) .& (34 .<= obslat .<= 47) .& (obsvalue .<= 100);
-#minvalue = 0.01
-#sel = (obsvalue .> minvalue)
-#=
-
-obslon = obslon[sel]
-obslat = obslat[sel]
-obsdepth = obsdepth[sel]
-obstime = obstime[sel]
-obsvalue = obsvalue[sel]
-obsids = obsids[sel]
-=#
 
 DIVAnd.checkobs((obslon,obslat,obsdepth,obstime),obsvalue,obsids)
 
@@ -281,10 +270,6 @@ sel = (qcvalues .<= maxqcvalue) .& (obsvaluemin .<= obsvalue) .& (obsvalue .<= o
 
 #filename = replace(@__FILE__,r".jl$" => "_$(randstring()).nc")
 
-
-if isfile(varname_ * ".jl")
-    include(varname_ * ".jl")
-end
 
 sel = trues(size(obsvalue))
 
@@ -355,8 +340,6 @@ metadata = OrderedDict(
     # # Digital Object Identifier of the data product
     # "doi" => "...",
 );
-
-
 
 
 ncglobalattrib, ncvarattrib = SDNMetadata(metadata, filename, varname, lonr, latr)
