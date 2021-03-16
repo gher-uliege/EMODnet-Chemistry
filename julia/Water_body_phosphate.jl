@@ -3,9 +3,11 @@ if analysistype == "monthly"
     #    epsilon2 = 0.1    # too noisy
 end
 
-maxit = 100
+# debug
+epsilon2 = 10
+#maxit = 100
 
-#TSmonthly = DIVAnd.TimeSelectorYearListMonthList(
+#TS = DIVAnd.TimeSelectorYearListMonthList(
 #    [1970:2020],
 #    [m:m for m in 1:1])
 
@@ -17,7 +19,9 @@ BS = repeat((26.5 .<= lonr .<= 41.95) .& (40 .<= latr' .<= 47.95),inner=(1,1,len
 # reduce CL in Black Sea
 #lenx[BS] .= lenx[BS] / lb / 1.5
 #lenx[BS] .= lenx[BS] / lb
-lenx[BS] .= lenx[BS] / 3
+if analysistype == "background"
+    lenx[BS] .= lenx[BS] / 3
+end
 
 @show mean(lenx[BS])
 @show mean(leny[BS])
@@ -50,4 +54,4 @@ lenx .= bath_RL .* lenx
 @show mean(lenx[BS])
 @show mean(leny[BS])
 
-suffix = "bathcl-noerr"
+suffix = "bathcl"
