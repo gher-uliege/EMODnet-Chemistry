@@ -1,6 +1,6 @@
 #!/usr/bin/env julia
 
-ENV["DISPLAY"] = ""
+#ENV["DISPLAY"] = ""
 using Distributed
 using Dates
 using Printf
@@ -16,65 +16,10 @@ using Glob
 using JLD2
 using DataStructures
 
-# uses lonr,latr,varname,figdir,bx,by,b,obslon,obslat...
-# from global scope
-
-#=
-function plotres(timeindex,sel,fit,erri)
-    tmp = copy(fit)
-    #tmp[erri .> .5] .= NaN;
-    figure(figsize = (12,8))
-    aspect_ratio = 1/cosd(mean(latr))
-
-    for k = 1:size(fit,3)
-        clf()
-        subplot(1,2,1)
-        title("Time index $(timeindex); depth = $(depthr[k])")
-
-        Δz = depthr[min(k+1,length(depthr))] - depthr[max(k-1,1)]
-        @show Δz
-
-        # select the data near depthr[k]
-        sel_depth = sel .& (abs.(obsdepth .- depthr[k]) .<= Δz)
-
-        #vmin = minimum(value[sel_depth])
-        #vmax = maximum(value[sel_depth])
-
-        tmpk = tmp[:,:,k]
-        vmin,vmax = extrema(tmpk[isfinite.(tmpk)])
-
-        # plot the data
-        scatter(obslon[sel_depth],obslat[sel_depth],10,obsvalue[sel_depth];
-                vmin = vmin, vmax = vmax)
-        xlim(minimum(lonr),maximum(lonr))
-        ylim(minimum(latr),maximum(latr))
-        colorbar(orientation="horizontal")
-        contourf(bx,by,b', levels = [-1e5,0],colors = [[.5,.5,.5]])
-        gca().set_aspect(aspect_ratio)
-
-        # plot the analysis
-        subplot(1,2,2)
-        pcolor(lonr,latr,permutedims(tmp[:,:,k],[2,1]);
-               vmin = vmin, vmax = vmax)
-        colorbar(orientation="horizontal")
-        contourf(bx,by,b', levels = [-1e5,0],colors = [[.5,.5,.5]])
-        gca().set_aspect(aspect_ratio)
-        savefig(joinpath(figdir,"analysis-$(varname)-$(timeindex)-$(depthr[k]).png"))
-    end
-    PyPlot.close()
-end
-=#
-
-
-function plotres_timeindex(timeindex,sel,fit,erri)
-    @show timeindex
-end
-
 ENV["JULIA_DEBUG"] = "DIVAnd"
 
 include("common.jl")
 clversion = "varlen1"
-
 
 sz = (length(lonr),length(latr),length(depthr))
 @show sz
@@ -102,8 +47,8 @@ reltol = 1e-6;
 reltol = 1e-9;
 maxit = 5000
 #len_background = 1000_000
-epsilon2_background = 1.
-suffix = "redvert"
+epsilon2_background = 10
+suffix = "bathcl"
 
 filename_corrlen = joinpath(datadir,"correlation_len_$(clversion)_$(deltalon).nc")
 
@@ -141,7 +86,7 @@ else
     TS = TSmonthly
 
     leny = copy(lenx)
-    epsilon2 = 1.
+    epsilon2 = 10
 
     filenamebackground = joinpath(datadir,"Case/$(varname_)-res-$(deltalon)-epsilon2-$(epsilon2_background)-$(clversion)-lb$(lb)-maxit-$(maxit)-reltol-$(reltol)-$(suffix)-background/Results/$(varname_)_background.nc")
     background = DIVAnd.backgroundfile(filenamebackground,varname,TSbackground)
@@ -155,10 +100,53 @@ else
     # maxit = 100
 end
 
+# reduced correlation in Black Sea
+BS = repeat((26.5 .<= lonr .<= 41.95) .& (40 .<= latr' .<= 47.95),inner=(1,1,length(depthr)))
+
+@show mean(lenx[BS])
+@show mean(leny[BS])
+
+if analysistype == "background"
+    lenx[BS] .= lenx[BS] / 3
+end
+
+@show mean(lenx[BS])
+@show mean(leny[BS])
+
+hxi,hyi,h = DIVAnd.load_bath(bathname,bathisglobal,lonr,latr)
+mask2D,(pm2D,pn2D) = DIVAnd.domain(bathname,bathisglobal,lonr,latr)
+
+h[.!mask2D] .= 0
+
+slen = (50e3,50e3)
+hf = DIVAnd.diffusion(mask2D,(pm2D,pn2D),slen,h)
+
+bath_RL = DIVAnd.lengraddepth((pm2D,pn2D),hf,20e3; hmin = 30)
+clamp!(bath_RL,0.5,1);
+bath_RL[.!mask2D] .= NaN
+#bath_RLf = DIVAnd.diffusion(mask2D,(pm2D,pn2D),slen,bath_RL)
+
+#=
+clf(); pcolormesh(lonr,latr,bath_RL'); colorbar();
+figdir = joinpath(datadir,"Figures")
+mkpath(figdir)
+savefig(joinpath(figdir,"bath_RL_$(deltalon).png"))
+=#
+
+bath_RL = DIVAnd.ufill(bath_RL,mask2D)
+
+# This also updates leny
+lenx .= bath_RL .* lenx
+
+#@show mean(lenx[BS])
+#@show mean(leny[BS])
+
+#suffix="redvert"
+suffix = "bathcl"
 
 #--
 
-#rm(filename)
+# load data
 
 bx,by,b = DIVAnd.extract_bath(bathname,bathisglobal,lonr,latr);
 
