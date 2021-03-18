@@ -1,12 +1,21 @@
+"""Create netCDF and CSV files containing the residuals for each of the
+regions. Plots are also created to check that the splitting was correct.
+"""
+
 using NCDatasets
 using DIVAnd
 using DataStructures
+using DataFrames
+using CSV
 
 # Files and directories
-datadir = "/data/EMODnet/Eutrophication/Products/Water body phosphate-res-0.25-epsilon2-1.0-lenx-250000.0-maxit-100-monthly/Results"
+datadir = "/data/EMODnet/Eutrophication/Products/Water_body_phosphate-res-1-epsilon2-1.0-varlen1-lb6-maxit-5000-reltol-1.0e-9-monthly"
+datadir = "/data/EMODnet/Eutrophication/Products/Water_body_phosphate-res-0.25-epsilon2-10-varlen1-lb6-maxit-5000-reltol-1.0e-9-bathcl-go-monthly/"
+datafile = joinpath(datadir, "Water_body_phosphate_monthly_residuals.nc")
 figdir = "../figures/domain-split"
 outputdir = joinpath(datadir, "Split/")
-datafile = joinpath(datadir, "Water body phosphate_monthly_residuals.nc")
+
+!isfile(datafile) ? @warning("Data file does not exist") : @debug("Data file exists")
 !isdir(outputdir) ? mkpath(outputdir) : @debug("Directory already created")
 
 # Set as true to generate plots
@@ -76,11 +85,10 @@ function domain_split(domainext::OrderedDict, obsvalue, obslon, obslat, obsdepth
 
         # Create output file
         fname = split(basename(datafile), ".")[1] * "_" * replace(domain, " " => "_") * ".nc"
-        @info("Saving new file as $(fname)")
+        @info("Saving new netCDF file as $(fname)")
         outputfile = joinpath(outputdir, fname)
 
         isfile(outputfile) ? rm(outputfile) : " "
-
 
         DIVAnd.saveobs(
             outputfile,
@@ -102,6 +110,19 @@ function domain_split(domainext::OrderedDict, obsvalue, obslon, obslat, obsdepth
         ds = NCDatasets.Dataset(outputfile, "a")
             defVar(ds, varname * "_residuals", residuals[goodcoord], ("observations", ))
         close(ds)
+
+        @info("Saving residuals as CSV file")
+        fname2 = split(basename(datafile), ".")[1] * "_" * replace(domain, " " => "_") * ".csv"
+        outputfile2 = joinpath(outputdir, fname2)
+        df = DataFrame(lon=obslon[goodcoord], lat=obslat[goodcoord],
+        depth=obsdepth[goodcoord],
+        time=obstime[goodcoord],
+        IDs=obsids[goodcoord],
+        values=obsvalue[goodcoord],
+        residuals=residuals[goodcoord],
+        SDNflag=0)
+
+        CSV.write(outputfile2, df)
 
         # Keep only the unused data points
         badcoords = trues(length(obslon))
