@@ -9,14 +9,15 @@ using DataFrames
 using CSV
 
 # Files and directories
-datadir = "/data/EMODnet/Eutrophication/Products/Water_body_phosphate-res-1-epsilon2-1.0-varlen1-lb6-maxit-5000-reltol-1.0e-9-monthly"
+# datadir = "/data/EMODnet/Eutrophication/Products/Water_body_phosphate-res-1-epsilon2-1.0-varlen1-lb6-maxit-5000-reltol-1.0e-9-monthly"
 datadir = "/data/EMODnet/Eutrophication/Products/Water_body_phosphate-res-0.25-epsilon2-10-varlen1-lb6-maxit-5000-reltol-1.0e-9-bathcl-go-monthly/"
 datafile = joinpath(datadir, "Water_body_phosphate_monthly_residuals.nc")
-figdir = "../figures/domain-split"
+figdir = "../figures/domain-split/2"
 outputdir = joinpath(datadir, "Split/")
 
-!isfile(datafile) ? @warning("Data file does not exist") : @debug("Data file exists")
+!isfile(datafile) ? @warn("Data file does not exist") : @debug("Data file exists")
 !isdir(outputdir) ? mkpath(outputdir) : @debug("Directory already created")
+!isdir(figdir) ? mkpath(figdir) : @debug("Figure directory already created")
 
 # Set as true to generate plots
 testplot = true
@@ -120,7 +121,7 @@ function domain_split(domainext::OrderedDict, obsvalue, obslon, obslat, obsdepth
         IDs=obsids[goodcoord],
         values=obsvalue[goodcoord],
         residuals=residuals[goodcoord],
-        SDNflag=0)
+        exclude=0)
 
         CSV.write(outputfile2, df)
 
@@ -143,3 +144,5 @@ end
 
 @info("Splitting data into sub-domains")
 domain_split(domainext, obsvalue, obslon, obslat, obsdepth, obstime, obsids, residuals)
+
+@info("Splitted files available in $(outputdir)")
