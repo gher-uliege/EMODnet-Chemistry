@@ -49,6 +49,7 @@ maxit = 5000
 #len_background = 1000_000
 epsilon2_background = 10
 suffix = "bathcl"
+suffix = "bathcl-go"
 
 filename_corrlen = joinpath(datadir,"correlation_len_$(clversion)_$(deltalon).nc")
 
@@ -142,7 +143,7 @@ lenx .= bath_RL .* lenx
 #@show mean(leny[BS])
 
 #suffix="redvert"
-suffix = "bathcl"
+#suffix = "bathcl"
 
 #--
 
@@ -352,13 +353,18 @@ dbinfo = @time DIVAnd.diva3d(
 #    QCMETHOD = 3,
     minfield = minimum(obsvalue),
     maxfield = maximum(obsvalue),
-    #solver = :direct,
+
+    solver = :direct,
+    MEMTOFIT = 100,
+
     #surfextend = true,
     coeff_derivative2 = [0.,0.,1e-8],
+#=
     inversion = :cg_amg_sa,
     maxit = maxit,
     tol = reltol,
     divamethod = DIVAndrun,
+=#
     background = background,
     ncvarattrib = ncvarattrib,
     ncglobalattrib = ncglobalattrib,
