@@ -7,17 +7,7 @@ using DIVAnd
 using DataStructures
 using DataFrames
 using CSV
-
-# Files and directories
-# datadir = "/data/EMODnet/Eutrophication/Products/Water_body_phosphate-res-1-epsilon2-1.0-varlen1-lb6-maxit-5000-reltol-1.0e-9-monthly"
-datadir = "/data/EMODnet/Eutrophication/Products/Water_body_phosphate-res-0.25-epsilon2-10-varlen1-lb6-maxit-5000-reltol-1.0e-9-bathcl-go-monthly/"
-datafile = joinpath(datadir, "Water_body_phosphate_monthly_residuals.nc")
-figdir = "../figures/domain-split/2"
-outputdir = joinpath(datadir, "Split/")
-
-!isfile(datafile) ? @warn("Data file does not exist") : @debug("Data file exists")
-!isdir(outputdir) ? mkpath(outputdir) : @debug("Directory already created")
-!isdir(figdir) ? mkpath(figdir) : @debug("Figure directory already created")
+using Glob
 
 # Set as true to generate plots
 testplot = true
@@ -26,6 +16,7 @@ if testplot
 end
 
 # List of variables
+"""
 varlist = ["Water body phosphate",
            "Water body dissolved oxygen concentration",
            "Water body chlorophyll-a",
@@ -33,13 +24,27 @@ varlist = ["Water body phosphate",
            "Water body ammonium",
            "Water body silicate",
            ]
+"""
 
-varname = varlist[1]
-@info("Working on variable $(varname)")
 
-@info("Loading variables from netCDF file $(basename(datafile))")
-obsvalue, obslon, obslat, obsdepth, obstime, obsids = DIVAnd.loadobs(
-    Float64, datafile, varname)
+# Files and directories
+casenamelist = [
+"Water_body_chlorophyll-a-res-0.25-epsilon2-10-varlen1-lb6-maxit-5000-reltol-1.0e-9-bathcl-go-monthly",
+"Water_body_dissolved_inorganic_nitrogen_(DIN)-res-0.25-epsilon2-10-varlen1-lb6-maxit-5000-reltol-1.0e-9-bathcl-go-monthly",
+"Water_body_dissolved_oxygen_concentration-res-0.25-epsilon2-10-varlen1-lb6-maxit-5000-reltol-1.0e-9-bathcl-go-monthly",
+"Water_body_phosphate-res-0.25-epsilon2-10-varlen1-lb6-maxit-5000-reltol-1.0e-9-bathcl-go-monthly",
+"Water_body_silicate-res-0.25-epsilon2-10-varlen1-lb6-maxit-5000-reltol-1.0e-9-bathcl-go-monthly",
+]
+
+domainext = OrderedDict(
+    "Baltic" => [[9.4, 30.9, 53., 60.], [14. , 30.9, 60., 65.9]],
+    "Black Sea" => [[26.5, 41.95, 40., 47.95]],
+    "Mediterranean Sea" => [[-0.8, 36.375, 30., 46.375], [-7, 36.375, 30. ,43.]],
+    "North Sea" => [[-5.4, 13., 47.9, 62.]],
+    "Arctic" => [[-180., 70., 56.5, 83.]],
+    "Atlantic" => [[-180., 180., 0., 90.]]
+    )
+
 
 function get_residuals(datafile::String, vname::String)
     NCDatasets.Dataset(datafile, "r") do ds
@@ -48,21 +53,12 @@ function get_residuals(datafile::String, vname::String)
         return residuals::Vector{Float64}
     end
 end
-residuals = get_residuals(datafile, varname);
 
-npoints = length(obsvalue);
-@info("Number of data points: $(npoints)")
+function domain_split(datafile::String, outputdir::String, varname, domainext::OrderedDict,
+    obsvalue, obslon, obslat, obsdepth, obstime, obsids, residuals, figdir)
 
-domainext = OrderedDict(
-    "Baltic" => [[9.4, 30.9, 53., 60.], [14. , 30.9, 60., 65.9]],
-    "Black Sea" => [[26.5, 41.95, 40., 47.95]],
-    "Mediterranean Sea" => [[-0.8, 36.375, 30., 46.375], [-7,36.375, 30. ,43.]],
-    "North Sea" => [[-5.4, 13., 47.9, 62.]],
-    "Arctic" => [[-180., 70., 56.5, 83.]],
-    "Atlantic" => [[-180., 180., 0., 90.]]
-    )
-
-function domain_split(domainext::OrderedDict, obsvalue, obslon, obslat, obsdepth, obstime, obsids, residuals)
+    npoints = length(obslon)
+    npointscheck = 0
 
     # Loop on domains
     for (domain, extension) in domainext
@@ -79,10 +75,14 @@ function domain_split(domainext::OrderedDict, obsvalue, obslon, obslat, obsdepth
             @debug(dd);
             gg = findall((obslon .<= dd[2]) .& (obslon .>= dd[1]) .& (obslat .<= dd[4]) .& (obslat .>= dd[3]) )
             append!(goodcoord, gg)
-
+            @info(length(gg))
         end
 
-        @info("Found $(length(goodcoord)) data points for domain $(domain)");
+        # Need to apply 'unique' since subdomains have sometimes overlay
+        unique!(goodcoord)
+        npointsdomain = length(goodcoord)
+        npointscheck += npointsdomain
+        @info("Found $(npointsdomain) data points for domain $(domain)");
 
         # Create output file
         fname = split(basename(datafile), ".")[1] * "_" * replace(domain, " " => "_") * ".nc"
@@ -104,7 +104,9 @@ function domain_split(domainext::OrderedDict, obsvalue, obslon, obslat, obsdepth
             domainstr =replace(domain, " "=>"_")
             PyPlot.plot(obslon[goodcoord],obslat[goodcoord], "ko",
             markersize=1)
-            PyPlot.savefig(joinpath(figdir, "domain_split_test_$(domainstr).jpg"))
+            PyPlot.title("$(length(goodcoord)) data points")
+            vname = replace(varname, " "=> "_")
+            PyPlot.savefig(joinpath(figdir, "domain_split_test_$(domainstr)_$(vname).jpg"))
             PyPlot.close()
         end
 
@@ -140,9 +142,50 @@ function domain_split(domainext::OrderedDict, obsvalue, obslon, obslat, obsdepth
         @info("Remaining data points: $(length(obsvalue))")
 
     end
+    if npoints == npointscheck
+        @info("Check OK")
+    else
+        @warn("Problem with the number of points")
+    end
 end
 
-@info("Splitting data into sub-domains")
-domain_split(domainext, obsvalue, obslon, obslat, obsdepth, obstime, obsids, residuals)
+@info("Loop on $(length(casenamelist)) cases")
+for casename in casenamelist
 
-@info("Splitted files available in $(outputdir)")
+    datadir = "/data/EMODnet/Eutrophication/Products/$(casename)/"
+    fileglob = glob("*residual*nc", datadir)
+    if isempty(fileglob)
+        @warn("No residual file found in $(datadir)")
+        break
+    end
+
+    datafile = fileglob[1]
+    figdir = "../figures/domain-split/$(casename)"
+    outputdir = joinpath(datadir, "Split/")
+
+    !isdir(outputdir) ? mkpath(outputdir) : @debug("Directory already created")
+    !isdir(figdir) ? mkpath(figdir) : @debug("Figure directory already created")
+
+    # Get variable name from file name:
+    varname = replace(basename(datafile), "_monthly_residuals.nc" => "")
+    varname = replace(varname, "_" => " ")
+
+    @info("Working on variable $(varname)")
+
+    @info("Loading variables from netCDF file $(basename(datafile))")
+    obsvalue, obslon, obslat, obsdepth, obstime, obsids = DIVAnd.loadobs(
+        Float64, datafile, varname)
+
+    @info("Loading residuals")
+    residuals = get_residuals(datafile, varname);
+
+    npoints = length(obsvalue);
+    @info("Number of data points: $(npoints)")
+
+    @info("Splitting data into sub-domains")
+    domain_split(datafile, outputdir, varname, domainext, obsvalue, obslon, obslat, obsdepth, obstime, obsids, residuals, figdir)
+
+    @info("Splitted files available in $(outputdir)")
+    @info(" ")
+    @info("Finished processing $(casename)")
+end
