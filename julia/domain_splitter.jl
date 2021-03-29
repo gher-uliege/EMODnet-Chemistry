@@ -15,7 +15,7 @@ if testplot
     using PyPlot
 end
 
-# List of variables
+# List of variables (not used anymore)
 """
 varlist = ["Water body phosphate",
            "Water body dissolved oxygen concentration",
@@ -29,13 +29,14 @@ varlist = ["Water body phosphate",
 
 # Files and directories
 casenamelist = [
-"Water_body_chlorophyll-a-res-0.25-epsilon2-10-varlen1-lb6-maxit-5000-reltol-1.0e-9-bathcl-go-monthly",
-"Water_body_dissolved_inorganic_nitrogen_(DIN)-res-0.25-epsilon2-10-varlen1-lb6-maxit-5000-reltol-1.0e-9-bathcl-go-monthly",
-"Water_body_dissolved_oxygen_concentration-res-0.25-epsilon2-10-varlen1-lb6-maxit-5000-reltol-1.0e-9-bathcl-go-monthly",
-"Water_body_phosphate-res-0.25-epsilon2-10-varlen1-lb6-maxit-5000-reltol-1.0e-9-bathcl-go-monthly",
-"Water_body_silicate-res-0.25-epsilon2-10-varlen1-lb6-maxit-5000-reltol-1.0e-9-bathcl-go-monthly",
+    "Water_body_chlorophyll-a-res-0.25-epsilon2-10-varlen1-lb6-maxit-5000-reltol-1.0e-9-bathcl-go-monthly",
+    "Water_body_dissolved_inorganic_nitrogen_(DIN)-res-0.25-epsilon2-10-varlen1-lb6-maxit-5000-reltol-1.0e-9-bathcl-go-monthly",
+    "Water_body_dissolved_oxygen_concentration-res-0.25-epsilon2-10-varlen1-lb6-maxit-5000-reltol-1.0e-9-bathcl-go-monthly",
+    "Water_body_phosphate-res-0.25-epsilon2-10-varlen1-lb6-maxit-5000-reltol-1.0e-9-bathcl-go-monthly",
+    "Water_body_silicate-res-0.25-epsilon2-10-varlen1-lb6-maxit-5000-reltol-1.0e-9-bathcl-go-monthly",
 ]
 
+"""
 domainext = OrderedDict(
     "Baltic" => [[9.4, 30.9, 53., 60.], [14. , 30.9, 60., 65.9]],
     "Black Sea" => [[26.5, 41.95, 40., 47.95]],
@@ -44,6 +45,19 @@ domainext = OrderedDict(
     "Arctic" => [[-180., 70., 56.5, 83.]],
     "Atlantic" => [[-180., 180., 0., 90.]]
     )
+"""
+
+# Julie's email:
+# NE Atlantic extends Northward to 48°N and in the Gibraltar strait until
+# 5°55'°
+domainext = OrderedDict(
+    "Baltic" => [[9.4, 30.9, 53., 60.], [14. , 30.9, 60., 65.9]],
+    "Black Sea" => [[26.5, 41.95, 40., 47.95]],
+    "Mediterranean Sea" => [[2., 36.375, 30., 46.375], [-5.917, 2., 30., 42.]],
+    "North Sea" => [[-5.4, 13., 48., 62.]],
+    "Arctic" => [[-180., 70., 56.5, 83.]],
+    "Atlantic" => [[-180., 180., 0., 48.]]
+)
 
 
 function get_residuals(datafile::String, vname::String)
@@ -141,6 +155,11 @@ function domain_split(datafile::String, outputdir::String, varname, domainext::O
 
         @info("Remaining data points: $(length(obsvalue))")
 
+        @info("Creating plot of the remaining data points")
+        PyPlot.plot(obslon, obslat, "ko", markersize=0.5)
+        PyPlot.savefig(joinpath(figdir, "remainingdata_$(varname)"), dpi=300, bbox_inches="tight")
+        PyPlot.close()
+
     end
     if npoints == npointscheck
         @info("Check OK")
@@ -161,7 +180,7 @@ for casename in casenamelist
 
     datafile = fileglob[1]
     figdir = "../figures/domain-split/$(casename)"
-    outputdir = joinpath(datadir, "Split/")
+    outputdir = joinpath(datadir, "Split_V2/")
 
     !isdir(outputdir) ? mkpath(outputdir) : @debug("Directory already created")
     !isdir(figdir) ? mkpath(figdir) : @debug("Figure directory already created")
