@@ -45,7 +45,10 @@ dimensions:
 	lon = 310 ;
   ...
 ```
-We see that now the time is unlimited
+We see that now the time is unlimited: it is the record variable.
 
+### Step 2: merge all the files
 
-### Step 2: merge all the files with `nco`
+```bash
+ncrcat Water\ body\ phosphate_* output1.nc
+```
