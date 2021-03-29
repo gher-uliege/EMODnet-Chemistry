@@ -19,24 +19,24 @@ NCDatasets.Dataset(datafile, "a") do nc
 
     newvarname = varname * "_deepest_depth"
     @info("Creating new variable $(newvarname)")
-    ncvardeepestdepth = defVar(nc, newvarname, Float32, ("lon", "lat", "depth", "time"))
+    ncvardeepestdepth = defVar(nc, newvarname, Float32, ("lon", "lat"))
     ncvardeepestdepth.attrib["long_name"] = "Deepest depth for $(varname)"
     ncvardeepestdepth.attrib["_FillValue"] = Float32(valex)
     ncvardeepestdepth.attrib["missing_value"] = Float32(valex)
     ncvardeepestdepth.attrib["units"] = "meters"
     ncvardeepestdepth.attrib["positive"] = "down"
 
-    # Loop on depth
-    for (idepth, dd) in enumerate(depth)
-        nonmissing = (.!ismissing.(field3D[:,:,idepth]))
+    # Loop on depth (reversed; starting at the bottom)
+    for (idepth, dd) in enumerate(reverse(depth))
+
+        # Look for non-missing values at the considered depth
+        nonmissing = (.!ismissing.(field3D[:,:,end - idepth + 1]))
         @info("Found $(sum(nonmissing)) non missing values for depth $(dd)")
 
-        # Initialise with exclusion value everywhere
-        deepest_depth = valex * ones(Float32, size(field3D)[1:2])
         # Add the actual depth when the field value exists
-        deepest_depth[nonmissing, idepth] .= dd
+        @info("Size of deepest depth: $(size(deepest_depth))")
         # Write the variabe
-        ncvardeepestdepth[:,:,idepth] = deepest_depth
+        ncvardeepestdepth[nonmissing] .= dd
     end
 
     @info("Written new variable deepest depth")
