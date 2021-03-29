@@ -1,8 +1,0 @@
-using NCDatasets
-
-datafile = "/data/EMODnet/Eutrophication/BlackSeaResults/1/Water body phosphate_Winter.4Danl.nc"
-
-NCDatasets.Dataset(datafile) do nc
-    print(nc.vars)
-
-end
