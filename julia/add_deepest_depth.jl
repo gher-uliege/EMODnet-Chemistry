@@ -1,7 +1,8 @@
 using NCDatasets
 
-datafile = "/home/ctroupin/Water body phosphate_Winter.4Danl.nc"
+datafile = "/home/ctroupin/sample_file.nc"
 varname = "Water body phosphate"
+varname = "Salinity"
 
 NCDatasets.Dataset(datafile, "a") do nc
 
@@ -26,17 +27,17 @@ NCDatasets.Dataset(datafile, "a") do nc
     ncvardeepestdepth.attrib["units"] = "meters"
     ncvardeepestdepth.attrib["positive"] = "down"
 
-    # Loop on depth (reversed; starting at the bottom)
-    for (idepth, dd) in enumerate(reverse(depth))
-
+    # Loop on depth: start from surface and go to the bottom
+    # (I also add "abs" in case depth are negative, but not probable)
+    depthindex = sortperm(abs.(depth))
+    for idepth in depthindex
+        @info("Depth index: $(idepth)")
         # Look for non-missing values at the considered depth
-        nonmissing = (.!ismissing.(field3D[:,:,end - idepth + 1]))
-        @info("Found $(sum(nonmissing)) non missing values for depth $(dd)")
+        nonmissing = (.!ismissing.(field3D[:,:,idepth]))
+        @info("Found $(sum(nonmissing)) non missing values for depth $(depth[idepth])")
 
-        # Add the actual depth when the field value exists
-        @info("Size of deepest depth: $(size(deepest_depth))")
-        # Write the variabe
-        ncvardeepestdepth[nonmissing] .= dd
+        # Write the variable
+        ncvardeepestdepth[nonmissing] .= depth[idepth]
     end
 
     @info("Written new variable deepest depth")
