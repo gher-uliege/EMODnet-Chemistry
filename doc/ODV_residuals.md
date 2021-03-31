@@ -57,3 +57,25 @@ Set the ranges for the residuals, for instance between -5. and 5.
 In this case we can see the measurements in the _Black Sea_ for which the residuals exceed a concentration of 5 µmol/l.
 
 ![Black Sea residuals](../figures/ODV-residuals/odv_res14.png "Black Sea")
+
+
+## Post-processing
+
+The goal is to obtain a list of identifier (`obsid`) that will be black-listed
+for the next round of analysis.
+
+Starting from a CSV file, it is straightforward to work with `awk`:
+
+* To list identifiers for which the residuals is above a given value
+```bash
+awk -F  "," '$7 > 10.0 {print $5}' inputfile > blacklist.txt
+```
+
+* To list identifiers of the data that have been excluded (last column set to __1__):
+```bash
+awk -F  "," '$8 == 1 {print $5}' inputfile > blacklist.txt
+
+### User notes
+
+Atlantic, oxygen:
+> Remove data for which residuals > 150 and < -115.
