@@ -55,8 +55,8 @@ if isfile(inputfile)
 
       if !isfile(outputfile)
          @info("Reading original netCDF file")
-         @time obsval, obslon, obslat, obsdepth, obstime, obsid =
-             NCODV.load(Float64, inputfile, varname);
+            @time obsval, obslon, obslat, obsdepth, obstime, obsid =
+                NCODV.load(Float64, inputfile, varname);
 
          @info("Writing new netCDF file")
          @time DIVAnd.saveobs(outputfile, varname, obsval,
