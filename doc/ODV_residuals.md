@@ -74,8 +74,13 @@ awk -F  "," '$7 > 10.0 {print $5}' inputfile > blacklist.txt
 * To list identifiers of the data that have been excluded (last column set to __1__):
 ```bash
 awk -F  "," '$8 == 1 {print $5}' inputfile > blacklist.txt
+```
 
 ### User notes
 
-Atlantic, oxygen:
+#### Atlantic
+* Oxygen:
 > Remove data for which residuals > 150 and < -115.
+
+* Chlorophyll:
+> exclude points with residuals > 50
