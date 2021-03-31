@@ -1,6 +1,7 @@
 using NCDatasets
 using PyPlot
 using DataStructures
+using Dates
 
 datafileold = "/data/EMODnet/Eutrophication/BlackSeaResults/Old/Water body phosphate.4Danl.nc"
 datafilenew = "/data/EMODnet/Eutrophication/BlackSeaResults/1/Water body phosphate_Autumn.4Danl.nc"
@@ -72,15 +73,17 @@ function write_obs(datafile::String, obslon::Vector{Float64}, obslat::Vector{Flo
     obsdepth::Vector{Float64}, obstime::Vector{Dates.DateTime},
     obsid::Matrix{Char})
 
+    idlen, nobs = size(obsid)
+
     # Write in the new file
     NCDatasets.Dataset(datafilemerge, "a") do nc
-        nc.dim["idlen"] = maximum((idlen1, idlen2))
-        nc.dim["observations"] = nobs1 + nobs2
+        nc.dim["idlen"] = idlen
+        nc.dim["observations"] = nobs
 
         ncobsdepth = defVar(nc,"obsdepth", Float64, ("observations",),
             attrib = OrderedDict(
                         "units" => "meters",
-                        "positive" => "down"
+                        "positive" => "down",
                         "long_name" => "depth of the observations",
                         "standard_name" => "depth"
                     )
@@ -122,9 +125,10 @@ function write_obs(datafile::String, obslon::Vector{Float64}, obslat::Vector{Flo
         ncobsdepth[:] = obsdepth
         ncobstime[:] = obstime
         ncobsid[:] = obsid;
-    end;
-end
 
+        return 
+    end;
+end;
 
 
 # Read observations from old and new files
