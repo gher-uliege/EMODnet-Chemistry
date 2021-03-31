@@ -34,6 +34,7 @@ analysistype = get(ENV,"ANALYSIS_TYPE","background")
 
 #varname_index = parse(Int,get(ENV,"VARNAME_INDEX","2"))
 varname_index = parse(Int,get(ENV,"VARNAME_INDEX","3"))
+varname_index = parse(Int,get(ENV,"VARNAME_INDEX","1"))
 
 @show varname_index
 varname = varlist[varname_index]
@@ -327,7 +328,7 @@ metadata = OrderedDict(
     # "documentation" => "https://doi.org/doi_of_doc",
 
     # # Digital Object Identifier of the data product
-    # "doi" => "...",
+    "doi" => varinfo[varname]["doi"],
 );
 
 
