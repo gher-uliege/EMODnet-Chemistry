@@ -1,5 +1,6 @@
 using DIVAnd
 using Dates
+using DelimitedFiles
 
 # common parameters to various scripts
 
@@ -14,8 +15,8 @@ deltalat = 0.25
 #deltalon = 0.5
 #deltalat = 0.5
 
-deltalon = 1
-deltalat = 1
+#deltalon = 1
+#deltalat = 1
 
 #lonr = -40.:deltalon:55.
 #latr = 24.:deltalat:67.
@@ -60,6 +61,7 @@ datadir = first(filter(isdir,["/data",expanduser("~/tmp/EMODnet-Chemistry-data/"
 woddir = joinpath(datadir,"WOD")
 
 obsdir = joinpath(datadir,"EMODnet")
+excludedir = joinpath(datadir,"EMODnet","blacklist")
 
 # Name of the variables (WOD)
 varnames = ["Oxygen","Phosphate","Silicate","Nitrate and Nitrate+Nitrite","pH","Chlorophyll"]
@@ -69,9 +71,10 @@ varlist = ["Water body phosphate",
            "Water body dissolved oxygen concentration",
            "Water body chlorophyll-a",
            "Water body dissolved inorganic nitrogen (DIN)",
-           "Water body ammonium",
+#           "Water body ammonium",
            "Water body silicate",
            ]
+
 
 #=
 using DIVAnd
@@ -98,6 +101,8 @@ area_keywords_urn = [
     "SDN:C19::3_1",
 ]
 
+
+
 varinfo = Dict(
     "Water body dissolved oxygen concentration" => Dict(
          # http://vocab.nerc.ac.uk/collection/P02/current/
@@ -105,7 +110,8 @@ varinfo = Dict(
         "netcdf_units" => "umol/l",
         # http://cfconventions.org/Data/cf-standard-names/current/build/cf-standard-name-table.html
         "netcdf_standard_name" => "mole_concentration_of_dissolved_molecular_oxygen_in_sea_water",
-        "woa_depthr" => [0.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0, 55.0, 60.0, 65.0, 70.0, 75.0, 80.0, 85.0, 90.0, 95.0, 100.0, 125.0, 150.0, 175.0, 200.0, 225.0, 250.0, 275.0, 300.0, 325.0, 350.0, 375.0, 400.0, 425.0, 450.0, 475.0, 500.0, 550.0, 600.0, 650.0, 700.0, 750.0, 800.0, 850.0, 900.0, 950.0, 1000.0, 1050.0, 1100.0, 1150.0, 1200.0, 1250.0, 1300.0, 1350.0, 1400.0, 1450.0, 1500.0]
+        "woa_depthr" => [0.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0, 55.0, 60.0, 65.0, 70.0, 75.0, 80.0, 85.0, 90.0, 95.0, 100.0, 125.0, 150.0, 175.0, 200.0, 225.0, 250.0, 275.0, 300.0, 325.0, 350.0, 375.0, 400.0, 425.0, 450.0, 475.0, 500.0, 550.0, 600.0, 650.0, 700.0, 750.0, 800.0, 850.0, 900.0, 950.0, 1000.0, 1050.0, 1100.0, 1150.0, 1200.0, 1250.0, 1300.0, 1350.0, 1400.0, 1450.0, 1500.0],
+        "doi" => "https://doi.org/10.6092/yepr-1a13", # Water body dissolved oxygen concentration
     ),
     "Water body phosphate" => Dict(
          # http://vocab.nerc.ac.uk/collection/P02/current/
@@ -113,7 +119,8 @@ varinfo = Dict(
         "netcdf_units" => "umol/l",
         # http://cfconventions.org/Data/cf-standard-names/current/build/cf-standard-name-table.html
         "netcdf_standard_name" => "moles_of_phosphate_per_unit_mass_in_sea_water",
-        "woa_depthr" => [0.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0, 55.0, 60.0, 65.0, 70.0, 75.0, 80.0, 85.0, 90.0, 95.0, 100.0, 125.0, 150.0, 175.0, 200.0, 225.0, 250.0, 275.0, 300.0, 325.0, 350.0, 375.0, 400.0, 425.0, 450.0, 475.0, 500.0, 550.0, 600.0, 650.0, 700.0, 750.0, 800.0]
+        "woa_depthr" => [0.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0, 55.0, 60.0, 65.0, 70.0, 75.0, 80.0, 85.0, 90.0, 95.0, 100.0, 125.0, 150.0, 175.0, 200.0, 225.0, 250.0, 275.0, 300.0, 325.0, 350.0, 375.0, 400.0, 425.0, 450.0, 475.0, 500.0, 550.0, 600.0, 650.0, 700.0, 750.0, 800.0],
+        "doi" => "https://doi.org/10.6092/njj3-hk55", # Water body phosphate
     ),
     "Water body chlorophyll-a" => Dict(
          # http://vocab.nerc.ac.uk/collection/P02/current/
@@ -121,6 +128,7 @@ varinfo = Dict(
         "netcdf_units" => "mg/m3",
         # http://cfconventions.org/Data/cf-standard-names/current/build/cf-standard-name-table.html
         "netcdf_standard_name" => "mass_concentration_of_chlorophyll_in_sea_water",
+        "doi" => "https://doi.org/10.6092/av67-qz53", # Water body chlorophyll-a
     ),
     "Water body ammonium" => Dict(
          # http://vocab.nerc.ac.uk/collection/P02/current/
@@ -136,6 +144,7 @@ varinfo = Dict(
         # http://cfconventions.org/Data/cf-standard-names/current/build/cf-standard-name-table.html
         "netcdf_standard_name" => "mole_concentration_of_silicate_in_sea_water",
         "woa_depthr" => [0.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0, 55.0, 60.0, 65.0, 70.0, 75.0, 80.0, 85.0, 90.0, 95.0, 100.0, 125.0, 150.0, 175.0, 200.0, 225.0, 250.0, 275.0, 300.0, 325.0, 350.0, 375.0, 400.0, 425.0, 450.0, 475.0, 500.0, 550.0, 600.0, 650.0, 700.0, 750.0, 800.0],
+        "doi" => "https://doi.org/10.6092/cyd3-ew67", # Water body silicate
     ),
     "Water body dissolved inorganic nitrogen (DIN)" => Dict(
          # http://vocab.nerc.ac.uk/collection/P02/current/
@@ -143,6 +152,7 @@ varinfo = Dict(
         "netcdf_units" => "umol/l",
         # http://cfconventions.org/Data/cf-standard-names/current/build/cf-standard-name-table.html
         "netcdf_standard_name" => "mole_concentration_of_dissolved_inorganic_nitrogen_in_sea_water",
+        "doi" => "https://doi.org/10.6092/xjj3-7d14", # Water body dissolved inorganic nitrogen (DIN)
     )
 )
 
@@ -167,3 +177,42 @@ function gitdiff(casedir)
         write(joinpath(casedir,"EMODnet-Chemistry.diff"), read(`git diff`))
     end;
 end
+
+
+
+
+
+function loadexclude(fname_exclude::AbstractString)
+    #data, headers = readdlm(fname_exclude, header = true)
+    #headers = vec(headers)
+    #@assert headers == ["lon",  "lat",  "depth",  "time",  "IDs"]
+    data = readdlm(fname_exclude, header = false)
+
+    obslon = data[:,1]
+    obslat = data[:,2]
+    obsdepth = data[:,3]
+    obstime = DateTime.(data[:,4])
+    obsids = data[:,5]
+
+    obslon = mod.(obslon .+ 180,360) .- 180
+    return obslon,obslat,obsdepth,obstime,obsids
+end
+
+
+function sampleid(obslon,obslat,obsdepth,obstime,obsids)
+    obslon = mod.(obslon .+ 180,360) .- 180
+
+    return (
+        round(Int,obslon*10000),
+        round(Int,obslat*10000),
+        round(Int,obsdepth*10000),
+        # round to seconds
+        Dates.epochms2datetime(1000 * (Dates.datetime2epochms(obstime) ÷ 1000)),
+        obsids,
+    )
+end
+
+exclude_sampleid(fname_exclude::AbstractString) = sampleid.(loadexclude(fname_exclude)...)
+
+
+exclude_sampleid(fnames_exclude::AbstractVector) = reduce(vcat,exclude_sampleid.(fnames_exclude))

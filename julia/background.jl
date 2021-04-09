@@ -34,6 +34,7 @@ analysistype = get(ENV,"ANALYSIS_TYPE","background")
 
 #varname_index = parse(Int,get(ENV,"VARNAME_INDEX","2"))
 varname_index = parse(Int,get(ENV,"VARNAME_INDEX","3"))
+varname_index = parse(Int,get(ENV,"VARNAME_INDEX","1"))
 
 @show varname_index
 varname = varlist[varname_index]
@@ -49,6 +50,8 @@ maxit = 5000
 #len_background = 1000_000
 epsilon2_background = 10
 suffix = "bathcl"
+suffix = "bathcl-go"
+suffix = "bathcl-go-exclude"
 
 filename_corrlen = joinpath(datadir,"correlation_len_$(clversion)_$(deltalon).nc")
 
@@ -142,7 +145,7 @@ lenx .= bath_RL .* lenx
 #@show mean(leny[BS])
 
 #suffix="redvert"
-suffix = "bathcl"
+#suffix = "bathcl"
 
 #--
 
@@ -176,7 +179,18 @@ end
 
 sel = obsvalue .>= 0
 
+# exclude values flagged as unrepresentative
+fnames_exclude = glob("exclude_" * replace(varname," " => "_")  * "*.csv",excludedir)
+exclude_sampleid_set = Set(exclude_sampleid(fnames_exclude))
+@show length(obsvalue)
+obs_sampleid = sampleid.(obslon,obslat,obsdepth,obstime,obsids)
+good = [sid ∉ exclude_sampleid_set for sid in obs_sampleid];
+
+@info "remove $(sum(.!good)) unrepresentative value(s)"
 @info "remove $(sum(.!sel)) negative value(s)"
+
+sel = sel .& good
+
 obslon = obslon[sel]
 obslat = obslat[sel]
 obsdepth = obsdepth[sel]
@@ -326,7 +340,7 @@ metadata = OrderedDict(
     # "documentation" => "https://doi.org/doi_of_doc",
 
     # # Digital Object Identifier of the data product
-    # "doi" => "...",
+    "doi" => varinfo[varname]["doi"],
 );
 
 
@@ -352,13 +366,18 @@ dbinfo = @time DIVAnd.diva3d(
 #    QCMETHOD = 3,
     minfield = minimum(obsvalue),
     maxfield = maximum(obsvalue),
-    #solver = :direct,
+
+    solver = :direct,
+    MEMTOFIT = 100,
+
     #surfextend = true,
     coeff_derivative2 = [0.,0.,1e-8],
+#=
     inversion = :cg_amg_sa,
     maxit = maxit,
     tol = reltol,
     divamethod = DIVAndrun,
+=#
     background = background,
     ncvarattrib = ncvarattrib,
     ncglobalattrib = ncglobalattrib,
