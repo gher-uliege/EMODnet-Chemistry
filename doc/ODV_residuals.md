@@ -53,7 +53,7 @@ Set the ranges for the residuals, for instance between -5. and 5.
 ![Display residuals](../figures/ODV-residuals/odv_res13.png "Display residuals")
 
 ### 6. Select your region of interest using the _Set ranges_ tool
-
+s
 In this case we can see the measurements in the _Black Sea_ for which the residuals exceed a concentration of 5 µmol/l.
 
 ![Black Sea residuals](../figures/ODV-residuals/odv_res14.png "Black Sea")
@@ -62,25 +62,55 @@ In this case we can see the measurements in the _Black Sea_ for which the residu
 ## Post-processing
 
 The goal is to obtain a list of identifier (`obsid`) that will be black-listed
-for the next round of analysis.
+for the next round of analysis. We can either store the identifiers (only), or
+keep also the other variables (position, time, depth) if we don't want to remove a whole
+profile.
 
 Starting from a CSV file, it is straightforward to work with `awk`:
 
 * To list identifiers for which the residuals is above a given value
 ```bash
-awk -F  "," '$7 > 10.0 {print $5}' inputfile > blacklist.txt
+awk -F "," '$7 > 50.0 {print $5}' inputfile > blacklist.txt
 ```
 
 * To list identifiers of the data that have been excluded (last column set to __1__):
 ```bash
-awk -F  "," '$8 == 1 {print $5}' inputfile > blacklist.txt
+awk -F "," '$8 == 1 {print $5}' inputfile > excludelist.txt
 ```
+
+* If we need to combine several conditions (`||` = or; `&&` = and):
+```bash
+awk -F "," '($7 > 150.0) || ($7 < -115.) { print $5}' inputfile > excludelist.txt
+
+
+__Notes:__
+
+- In some cases, the separator can be the semicolon `;`.`
+- If we want to print more than one column:
+```bash
+awk -F  ";" '$8 == 1 {print $1, $2, $3, $4, $5}' inputfile > excludelist.txt
+```
+
 
 ### User notes
 
+#### Arctic
+
+Files for all the variables, except DIN, were prepared by the regional leader.
+
+Note that the order of the column is slightly different.
+
 #### Atlantic
+Phosphate, silicate and nitrogen were prepared by the regional leader.
+
 * Oxygen:
 > Remove data for which residuals > 150 and < -115.
 
 * Chlorophyll:
 > exclude points with residuals > 50
+
+#### Baltic Sea
+All the variables were processed by the regional leader and the files sent to us.
+
+#### Black Sea
+Same.
