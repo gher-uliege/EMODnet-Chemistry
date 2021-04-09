@@ -51,6 +51,7 @@ maxit = 5000
 epsilon2_background = 10
 suffix = "bathcl"
 suffix = "bathcl-go"
+suffix = "bathcl-go-exclude"
 
 filename_corrlen = joinpath(datadir,"correlation_len_$(clversion)_$(deltalon).nc")
 
@@ -178,7 +179,18 @@ end
 
 sel = obsvalue .>= 0
 
+# exclude values flagged as unrepresentative
+fnames_exclude = glob("exclude_" * replace(varname," " => "_")  * "*.csv",excludedir)
+exclude_sampleid_set = Set(exclude_sampleid(fnames_exclude))
+@show length(obsvalue)
+obs_sampleid = sampleid.(obslon,obslat,obsdepth,obstime,obsids)
+good = [sid ∉ exclude_sampleid_set for sid in obs_sampleid];
+
+@info "remove $(sum(.!good)) unrepresentative value(s)"
 @info "remove $(sum(.!sel)) negative value(s)"
+
+sel = sel .& good
+
 obslon = obslon[sel]
 obslat = obslat[sel]
 obsdepth = obsdepth[sel]
