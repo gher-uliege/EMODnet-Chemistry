@@ -78,8 +78,13 @@ ioff()
         #suffix = "_L2",
         figdir = figdir)
 
+    plot_section(
+        fname,
+        filenames_obs, TS,
+        bathname;
+        #suffix = "_L1",
+        suffix = "_L2",
+        figdir = figdir)
+
     plot_profile(domains,domainnames,fname,filenames_obs,TS; figdir = figdir)
 end
-
-
-
