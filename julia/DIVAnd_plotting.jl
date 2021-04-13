@@ -1,3 +1,5 @@
+using Printf
+
 function splitobs(obslon,obslat,domains,default_label = 0)
     obslabel = fill(default_label,size(obslon))
 
@@ -63,7 +65,7 @@ function plot_profile(
 
             colorbar()
             title("$(domainnames[idomain]); time=$(itime)/$(length(TS))")
-            savefig(joinpath(figdir,"profile_$(domainnames[idomain])_$(itime).png"))
+            savefig(joinpath(figdir,"profile_$(domainnames[idomain])_$(@sprintf("%02d",itime)).png"))
         end
     end
     close(ds)
@@ -128,7 +130,13 @@ function plot_section(
 
             tmpk = tmp[:,:,k]
             #vmin,vmax = extrema(tmpk[isfinite.(tmpk)])
-            vmin,vmax = quantile(tmpk[isfinite.(tmpk)],quantile_colorbar)
+            subset = tmpk[isfinite.(tmpk)]
+            vmin,vmax =
+                if length(subset) >= 2
+                    quantile(subset,quantile_colorbar)
+                else
+                    -1,1
+                end
             @show varname,itime,k,Δz,vmin,vmax
             if abs(vmax - vmin) < 1e-8
                 vmax = vmin + 1
@@ -152,7 +160,8 @@ function plot_section(
             colorbar(orientation="horizontal")
             contourf(bx,by,b', levels = [-1e5,0],colors = [[.5,.5,.5]])
             gca().set_aspect(aspect_ratio)
-            savefig(joinpath(figdir,"analysis-$(varname * suffix)-$(itime)-$(depthr[k]).png"))
+
+            savefig(joinpath(figdir,"analysis-$(varname * suffix)-time$(@sprintf("%02d",itime))-depth$(@sprintf("%08.1f",depthr[k])).png"))
             PyPlot.close()
 
             GC.gc()
