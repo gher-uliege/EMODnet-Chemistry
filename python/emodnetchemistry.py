@@ -223,7 +223,7 @@ def plot_data_locations(m, varname, regiondict, figname=None):
     plt.legend(fontsize=14, loc=3)
     plt.title(f"Observations of sea water {varname} concentration", fontsize=20)
     if figname is not None:
-        plt.savefig(figname, dpi=300, bbox_inches="tight", facecolor="w",
+        plt.savefig(figname, dpi=300, bbox_inches="tight", facecolor=".2",
         transparent=False)
     plt.close()
 
@@ -274,7 +274,7 @@ def plot_hexbin_datalocations(m, varname, figname=None):
     nfiles = len(datafilelist)
     logger.info("Working on {} files".format(nfiles))
 
-    lonall, latall = all_positions(datafilelist)
+    lonall, latall = all_positions(m, datafilelist)
     fig = plt.figure(figsize=(10, 10))
 
     m.hexbin(lonall, latall, bins="log", vmin=1, vmax=100000,
@@ -285,7 +285,7 @@ def plot_hexbin_datalocations(m, varname, figname=None):
     #cb.set_ticklabels(["10", "100", "1000", "10000", "100000"])
     cb.set_label("Number of profiles\nper cell", fontsize=14, rotation=0, ha="left")
     if figname is not None:
-        plt.savefig(figname, dpi=300, bbox_inches="tight", facecolor="w",
+        plt.savefig(figname, dpi=300, bbox_inches="tight", facecolor=".2",
         transparent=False)
     plt.close()
 
