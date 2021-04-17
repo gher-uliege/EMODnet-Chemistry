@@ -155,10 +155,12 @@ function domain_split(datafile::String, outputdir::String, varname, domainext::O
 
         @info("Remaining data points: $(length(obsvalue))")
 
-        @info("Creating plot of the remaining data points")
-        PyPlot.plot(obslon, obslat, "ko", markersize=0.5)
-        PyPlot.savefig(joinpath(figdir, "remainingdata_$(varname)"), dpi=300, bbox_inches="tight")
-        PyPlot.close()
+        if testplot
+            @info("Creating plot of the remaining data points")
+            PyPlot.plot(obslon, obslat, "ko", markersize=0.5)
+            PyPlot.savefig(joinpath(figdir, "remainingdata_$(varname)"), dpi=300, bbox_inches="tight")
+            PyPlot.close()
+        end
 
     end
     if npoints == npointscheck
@@ -168,10 +170,15 @@ function domain_split(datafile::String, outputdir::String, varname, domainext::O
     end
 end
 
+
+datadirori = "/data/EMODnet/Eutrophication/Split/"
+outputdir = "/data/EMODnet/Eutrophication/Residuals/All/"
+isdir(outputdir) ? @debug("ok") : mkpath(outputdir)
+
 @info("Loop on $(length(casenamelist)) cases")
 for casename in casenamelist
 
-    datadir = "/data/EMODnet/Eutrophication/Products/$(casename)/"
+    local datadir = "/data/EMODnet/Eutrophication/Products/$(casename)/"
     fileglob = glob("*residual*nc", datadir)
     if isempty(fileglob)
         @warn("No residual file found in $(datadir)")
@@ -179,15 +186,15 @@ for casename in casenamelist
     end
 
     datafile = fileglob[1]
-    figdir = "../figures/domain-split/$(casename)"
-    outputdir = joinpath(datadir, "Split_V2/")
+    figdir = "../figures/domain-split/$(casename)/V3"
+    # outputdir = joinpath(datadir, "Split_V3/")
 
     !isdir(outputdir) ? mkpath(outputdir) : @debug("Directory already created")
     !isdir(figdir) ? mkpath(figdir) : @debug("Figure directory already created")
 
     # Get variable name from file name:
-    varname = replace(basename(datafile), "_monthly_residuals.nc" => "")
-    varname = replace(varname, "_" => " ")
+    varname_ = replace(basename(datafile), "_monthly_residuals.nc" => "")
+    varname = replace(varname_, "_" => " ")
 
     @info("Working on variable $(varname)")
 
@@ -201,10 +208,57 @@ for casename in casenamelist
     npoints = length(obsvalue);
     @info("Number of data points: $(npoints)")
 
-    @info("Splitting data into sub-domains")
-    domain_split(datafile, outputdir, varname, domainext, obsvalue, obslon, obslat, obsdepth, obstime, obsids, residuals, figdir)
+    #@info("Splitting data into sub-domains")
+    #domain_split(datafile, outputdir, varname, domainext, obsvalue, obslon, obslat, obsdepth, obstime, obsids, residuals, figdir)
+
+    # Loop on regions
+    filelistori = glob("*$(varname_)*.nc", datadirori)
+    @info(filelistori);
+
+    for datafileori in filelistori
+        @info("Reading ID's from original file $(datafileori)")
+        _, _, _, _, _, obsids_ori = loadobs(Float64, datafileori, varname);
+        @info(length(obsids), length(obsids_ori));
+
+        # Find the ID's of the residual file that were in the original data files
+        # (i.e., provided by the users)
+        Set1 = Set(obsids_ori);
+        obsmask = [id in Set1 for id = obsids];
+        @info("Number of points present in the initial datafile: $(sum(obsmask))")
+
+        # Create a CSV file with the corresponding data and residuals
+        df = DataFrame(lon=obslon[obsmask], lat=obslat[obsmask],
+        depth=obsdepth[obsmask],
+        time=obstime[obsmask],
+        IDs=obsids[obsmask],
+        values=obsvalue[obsmask],
+        residuals=residuals[obsmask],
+        exclude=0)
+
+        @info("Saving residuals as CSV file")
+        fname3 = replace(basename(datafileori), ".nc" => ".csv")
+        outputfile3 = joinpath(outputdir, fname3)
+
+        CSV.write(outputfile3, df)
+        @info("Written CSV file $(fname3)")
+
+        @info("Compress the output file")
+        zipcommand = `zip $(outputfile3).zip $(outputfile3)`
+        run(zipcommand)
+
+        if testplot
+            figname = replace(fname3, ".csv" => ".jpg")
+            @info("Creating plot of the remaining data points")
+            PyPlot.plot(obslon[obsmask], obslat[obsmask], "ko", markersize=0.5)
+            PyPlot.title("$(sum(obsmask)) data points")
+            PyPlot.savefig(joinpath(figdir, figname), dpi=300, bbox_inches="tight")
+            PyPlot.close()
+        end
+
+    end
 
     @info("Splitted files available in $(outputdir)")
-    @info(" ")
     @info("Finished processing $(casename)")
+    @info(" ")
+
 end
