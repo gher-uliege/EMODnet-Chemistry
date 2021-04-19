@@ -1,6 +1,10 @@
 ## Julia
 
-Tools used to prepare the merged products using the regional climatologies.
+Tools used to
+1. prepare the merged products that combine the regional climatologies.
+2. create new, pan-European sea climatologies with `DIVAnd`.
+
+### Files
 
 `MergingClim.jl` is the module where all the functions are defined.       
 `merge_products.jl` is the script that actually performs the merging.

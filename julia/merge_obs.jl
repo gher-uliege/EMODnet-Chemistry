@@ -45,14 +45,14 @@ julia> obsid = merge_obsids(obsid_old, obsid_new)
 function merge_obsids(obsid1::Matrix{Char}, obsid2::Matrix{Char})
     idlen1, nobs1 = size(obsid1)
     idlen2, nobs2 = size(obsid2)
-    @info(idlen1, idlen2, nobs1, nobs2);
+    @debug(idlen1, idlen2, nobs1, nobs2);
 
     # Allocate new matrix for obsid
     obsid = Array{Char, 2}(undef, maximum((idlen1, idlen2)), nobs1 + nobs2);
     # Merge obsid's
-    obsid[1:idlen1, 1:nobs1] = obsid_old;
-    obsid[1:idlen2, nobs1+1:nobs1 + nobs2] = obsid_new;
-    @info(size(obsid));
+    obsid[1:idlen1, 1:nobs1] = obsid1;
+    obsid[1:idlen2, nobs1+1:nobs1 + nobs2] = obsid2;
+    @debug(size(obsid));
 
     return obsid
 end
@@ -76,7 +76,7 @@ function write_obs(datafile::String, obslon::Vector{Float64}, obslat::Vector{Flo
     idlen, nobs = size(obsid)
 
     # Write in the new file
-    NCDatasets.Dataset(datafilemerge, "a") do nc
+    NCDatasets.Dataset(datafile, "a") do nc
         nc.dim["idlen"] = idlen
         nc.dim["observations"] = nobs
 
@@ -126,7 +126,7 @@ function write_obs(datafile::String, obslon::Vector{Float64}, obslat::Vector{Flo
         ncobstime[:] = obstime
         ncobsid[:] = obsid;
 
-        return 
+        return
     end;
 end;
 
