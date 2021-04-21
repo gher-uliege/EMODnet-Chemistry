@@ -1,3 +1,20 @@
+"""
+Example of script to merge the observations containing in a list of netCDF files
+and write them in a new file.
+
+The 2 main inputs to modify are:
+1) `datafilelist`: a list of file paths
+2) `datafilemerge`: the path of a netCDF file into which the combined observations
+will be written.
+
+Typically, `datafilemerge` would be a file obtained following these
+[instructions](https://github.com/gher-ulg/EMODnet-Chemistry/blob/master/doc/merging_netCDF.md),
+after the command
+```bash
+ncks -x -v obslon,obslat,obsdepth,obstime,obsid inputfile.nc outputfile.nc
+```
+"""
+
 using NCDatasets
 using PyPlot
 using DataStructures
@@ -71,7 +88,9 @@ function read_obs(datafilelist::Vector{String})
         end
     end
 
-    return obslon, obslat, obsdepth, obstime, obsid
+    return obslon::Vector{Float64}, obslat::Vector{Float64},
+    obsdepth::Vector{Float64}, obstime::Vector{DateTime},
+    obsid::Matrix{Char}
 
 end
 
@@ -97,7 +116,7 @@ function merge_obsids(obsid1::Matrix{Char}, obsid2::Matrix{Char})
     obsid[1:idlen2, nobs1+1:nobs1 + nobs2] = obsid2;
     @debug(size(obsid));
 
-    return obsid
+    return obsid::Matrix{Char}
 end
 
 
