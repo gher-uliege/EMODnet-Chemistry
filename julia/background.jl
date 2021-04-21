@@ -15,6 +15,7 @@ using FileIO
 using Glob
 using JLD2
 using DataStructures
+using Interpolations
 
 ENV["JULIA_DEBUG"] = "DIVAnd"
 
@@ -52,6 +53,8 @@ epsilon2_background = 10
 suffix = "bathcl"
 suffix = "bathcl-go"
 suffix = "bathcl-go-exclude"
+suffix = "bathcl-go-exclude-rdiag"
+suffix = "bathcl-go-exclude-mL"
 
 filename_corrlen = joinpath(datadir,"correlation_len_$(clversion)_$(deltalon).nc")
 
@@ -60,11 +63,14 @@ lenx_2D = ds["correlation_length"][:,:] * 111e3
 minlenz = ds["minlenz"][:,:]
 close(ds)
 
+#lenx_2D[lenx_2D .< 80_000] .= 80_000
+
 #lenz = [min(max(25.,1 + depthr[k]/10),500.) for i = 1:sz[1], j = 1:sz[2], k = 1:sz[3]]
 lenz = [min(max(minlenz[i,j],depthr[k]/10),500.) for i = 1:sz[1], j = 1:sz[2], k = 1:sz[3]]
 
 
 lb = 6
+lb = 5
 lenx = repeat(lenx_2D,inner=(1,1,sz[3]))
 #lenx_background = lenx*3
 lenx_background = lenx*lb
@@ -90,6 +96,10 @@ else
 
     leny = copy(lenx)
     epsilon2 = 10
+    #epsilon2 = 5
+    epsilon2 = 1.
+    epsilon2 = 2.
+    #epsilon2 = 0.5
 
     filenamebackground = joinpath(datadir,"Case/$(varname_)-res-$(deltalon)-epsilon2-$(epsilon2_background)-$(clversion)-lb$(lb)-maxit-$(maxit)-reltol-$(reltol)-$(suffix)-background/Results/$(varname_)_background.nc")
     background = DIVAnd.backgroundfile(filenamebackground,varname,TSbackground)
@@ -161,16 +171,21 @@ obsvalue,obslon,obslat,obsdepth,obstime,obsids = DIVAnd.loadobs(
 obslon = mod.(obslon .+ 180,360) .- 180
 
 
+rdiag_len = 0.1
+#rdiag_len = 0.5
+
+#filename_rdiag = joinpath(obsdir,"weights","$(varname)_len$(rdiag_len)_rdiag.nc")
 filename_rdiag = joinpath(obsdir,"weights","$(varname)_rdiag.nc")
 
 if isfile(filename_rdiag)
+    @info "loading '$filename_rdiag'"
     rdiag = NCDataset(filename_rdiag,"r") do ds
         ds[varname * "_rdiag"][:]
     end
 else
     @info "creating '$filename_rdiag'"
     #rdiag = 1.0 ./ DIVAnd.weight_RtimesOne((obslon,obslat,obsdepth,Dates.datetime2julian.(obstime)),(0.1,0.1,10.,60.))
-    rdiag = 1.0 ./ DIVAnd.weight_RtimesOne((obslon,obslat,obsdepth),(0.1,0.1,10.))
+    rdiag = 1.0 ./ DIVAnd.weight_RtimesOne((obslon,obslat,obsdepth),(rdiag_len,rdiag_len,10.))
 
     NCDataset(filename_rdiag,"c") do ds
         defVar(ds,varname * "_rdiag", rdiag, ("observations",))
@@ -188,6 +203,35 @@ good = [sid ∉ exclude_sampleid_set for sid in obs_sampleid];
 
 @info "remove $(sum(.!good)) unrepresentative value(s)"
 @info "remove $(sum(.!sel)) negative value(s)"
+
+
+dsc = NCDataset(joinpath(datadir,"dist2coast.nc"))
+distance2coast = dsc["distance2coast"][:,:]
+distance2coast_lon = dsc["lon"][:]
+distance2coast_lat = dsc["lat"][:]
+
+distance2coast_lat = distance2coast_lat[end:-1:1]
+distance2coast = distance2coast[:,end:-1:1]
+close(dsc)
+
+itp = interpolate((distance2coast_lon,distance2coast_lat),
+            distance2coast,Gridded(Linear()))
+obsdistance2coast = itp.(obslon,obslat)
+rdiag_coastal = ones(size(obsvalue))
+coastal_lim = 10 # km
+rdiag_coastal = ones(size(obsdistance2coast));
+rdiag_coastal[ obsdistance2coast .<  coastal_lim] .= 30;
+rdiag = rdiag .* rdiag_coastal;
+
+@show sum(rdiag_coastal .> 1)
+@show sum(rdiag_coastal .<= 1)
+
+#=
+clf(); hist(obsdistance2coast,0:5:100)
+savefig("/data/Figures/dist2coast_phosphate.png")
+=#
+
+# (-18.61436491935485, 46.021723790322554, 29.82312530335926, 72.3762527284168)
 
 sel = sel .& good
 

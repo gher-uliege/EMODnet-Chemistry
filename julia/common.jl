@@ -45,7 +45,8 @@ TSbackground = DIVAnd.TimeSelectorYearListMonthList(
 
 TSmonthly = DIVAnd.TimeSelectorYearListMonthList(
     [1970:2020],
-    [m:m for m in 1:12])
+    [m:m for m in 1:12]
+)
 
 # time range of the in-situ data
 timerange = [Date(1000,1,1),Date(3000,12,31)]
