@@ -1,11 +1,30 @@
+"""
+Example of script to merge the observations containing in a list of netCDF files
+and write them in a new file.
+
+The 2 main inputs to modify are:
+1) `datafilelist`: a list of file paths
+2) `datafilemerge`: the path of a netCDF file into which the combined observations
+will be written.
+
+Typically, `datafilemerge` would be a file obtained following these
+[instructions](https://github.com/gher-ulg/EMODnet-Chemistry/blob/master/doc/merging_netCDF.md),
+after the command
+```bash
+ncks -x -v obslon,obslat,obsdepth,obstime,obsid inputfile.nc outputfile.nc
+```
+"""
+
 using NCDatasets
 using PyPlot
 using DataStructures
 using Dates
 
-datafileold = "/data/EMODnet/Eutrophication/BlackSeaResults/Old/Water body phosphate.4Danl.nc"
-datafilenew = "/data/EMODnet/Eutrophication/BlackSeaResults/1/Water body phosphate_Autumn.4Danl.nc"
-datafilemerge = "/data/EMODnet/Eutrophication/BlackSeaResults/Old/output2.nc"
+datadir = "/data/EMODnet/Eutrophication/BlackSeaResults/"
+datafilelist = [joinpath(datadir, "Old/Water body phosphate.4Danl.nc"),
+                joinpath(datadir, "1/Water body phosphate_Autumn.4Danl.nc")
+               ]
+datafilemerge = joinpath(datadir, "Old/output000.nc")
 
 """
     read_obs(datafile)
@@ -27,9 +46,52 @@ function read_obs(datafile::String)
         obstime = nc["obstime"][:]
         obsid = nc["obsid"][:]
 
-        return obslon, obslat, obsdepth, obstime, obsid
+        return obslon::Vector{Float64}, obslat::Vector{Float64},
+        obsdepth::Vector{Float64}, obstime::Vector{DateTime},
+        obsid::Matrix{Char}
 
     end
+end
+
+"""
+    read_obs(filelist)
+
+Read the observations from a list of netCDF files.
+
+## Example
+```julia-repl
+julia> obslon, obslat, obsdepth, obstime, obsid = read_obs(datafilelist)
+```
+"""
+function read_obs(datafilelist::Vector{String})
+
+    # Empty vectors
+    obslon = Vector{Float64}(undef, 0)
+    obslat = Vector{Float64}(undef, 0)
+    obsdepth = Vector{Float64}(undef, 0)
+    obstime = Vector{DateTime}(undef, 0)
+    obsid = Matrix{Char}(undef, 0, 0)
+
+    for datafile in datafilelist
+        @debug("Working on $(datafile)")
+        NCDatasets.Dataset(datafile, "r") do nc
+
+            obslon_n, obslat_n, obsdepth_n, obstime_n, obsid_n = read_obs(datafile)
+
+            # Append the coordinate arrays
+            append!(obslon, obslon_n);
+            append!(obslat, obslat_n);
+            append!(obsdepth, obsdepth_n);
+            append!(obstime, obstime_n);
+
+            obsid = merge_obsids(obsid, obsid_n)
+        end
+    end
+
+    return obslon::Vector{Float64}, obslat::Vector{Float64},
+    obsdepth::Vector{Float64}, obstime::Vector{DateTime},
+    obsid::Matrix{Char}
+
 end
 
 """
@@ -54,7 +116,7 @@ function merge_obsids(obsid1::Matrix{Char}, obsid2::Matrix{Char})
     obsid[1:idlen2, nobs1+1:nobs1 + nobs2] = obsid2;
     @debug(size(obsid));
 
-    return obsid
+    return obsid::Matrix{Char}
 end
 
 
@@ -131,18 +193,8 @@ function write_obs(datafile::String, obslon::Vector{Float64}, obslat::Vector{Flo
 end;
 
 
-# Read observations from old and new files
-obslon_new, obslat_new, obsdepth_new, obstime_new, obsid_new = read_obs(datafilenew);
-obslon, obslat, obsdepth, obstime, obsid_old = read_obs(datafileold);
-
-# Append the coordinate arrays
-append!(obslon, obslon_new);
-append!(obslat, obslat_new);
-append!(obsdepth, obsdepth_new);
-append!(obstime, obstime_new);
-
-# Merge the obsid's
-obsid = merge_obsids(obsid_old, obsid_new)
+# Read observations from the file list
+obslon, obslat, obsdepth, obstime, obsid = read_obs(datafilelist);
 
 # Write the file
 write_obs(datafilemerge, obslon, obslat, obsdepth, obstime, obsid)
