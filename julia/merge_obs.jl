@@ -40,9 +40,9 @@ function read_obs(datafile::String)
 
     NCDatasets.Dataset(datafile, "r") do nc
 
-        obslon = nc["obslon"][:]
-        obslat = nc["obslat"][:]
-        obsdepth = nc["obsdepth"][:]
+        obslon = Float64.(nc["obslon"][:])
+        obslat = Float64.(nc["obslat"][:])
+        obsdepth = Float64.(nc["obsdepth"][:])
         obstime = nc["obstime"][:]
         obsid = nc["obsid"][:]
 
