@@ -39,12 +39,15 @@ depthr = Float64[0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 8
 #depthr = depthr[15:25]
 #depthr = depthr[1:4]
 
+yearlist = [1970:2020]
+yearlist = [1960:2020]
+
 TSbackground = DIVAnd.TimeSelectorYearListMonthList(
-    [1970:2020],
+    yearlist,
     [1:12])
 
 TSmonthly = DIVAnd.TimeSelectorYearListMonthList(
-    [1970:2020],
+    yearlist,
     [m:m for m in 1:12]
 )
 
