@@ -105,6 +105,8 @@ include("sort_times.jl")
 
 ![Sorted times ](../figures/sorted_times.jpg "Black Sea times")
 
+__⌛__ this can take several minutes for a realistic example.
+
 ### Step 5: merge observations
 
 When merging with `ncrcat`, we merged the files according to time. This means that
@@ -133,3 +135,6 @@ or
 ```julia
 include("merge_obs.jl")
 ```
+
+⌛ this steps also takes several minutes (10' on my machine) for a realistic example
+with more than 1 million observations.

@@ -99,6 +99,7 @@ awk -F  ";" '$8 == 1 {print $1, $2, $3, $4, $5}' inputfile > excludelist.txt
 Files for all the variables, except DIN, were prepared by the regional leader.
 
 Note that the order of the column is slightly different.
+(print $2, $3, $5, $1, $4)
 
 #### Atlantic
 Phosphate, silicate and nitrogen were prepared by the regional leader.
