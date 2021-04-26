@@ -93,11 +93,17 @@ time = UNLIMITED ; // (184 currently)
 If the files were properly prepared, the time variable should already be sorted in
 chronological order. If this is not the case, you can use the tool [`sort_times.jl`](../julia/sort_times.jl) (an detailed example can be found in this [notebook](https://github.com/gher-ulg/SeaDataCloud/blob/master/Julia/sort_climatology_time.ipynb)).
 
+1. Edit the file paths in the script
+2. Run it:
+```bash
+julia sort_times.jl
+```
+or
 ```julia
-
+include("sort_times.jl")
 ```
 
-
+![Sorted times ](../figures/sorted_times.jpg "Black Sea times")
 
 ### Step 5: merge observations
 
@@ -113,10 +119,17 @@ As the dimension is already fixed in the file, we cannot directly append the new
 
 __Solution:__ delete the variables that depends on the dimension `observations`:
 ```bash
-ncks -x -v obslon,obslat,obsdepth,obstime,obsid output1.nc output2.nc
+ncks -x -v obslon,obslat,obsdepth,obstime,obsid Water_body_dissolved_oxygen_concentration_year.nc Water_body_dissolved_oxygen_concentration_year.nc
 ```
 
 Once the variables have been removed, use the script [merge_obs.jl](https://github.com/gher-ulg/EMODnet-Chemistry/blob/master/julia/merge_obs.jl) to merge the observations
-from the 2 input files.
-- Adapt the paths of the files
-- Run the file `merge_obs.jl`
+from the 2 input files:
+1. Adapt the paths of the files
+2. Run the script:
+```bash
+julia merge_obs.jl
+```
+or
+```julia
+include("merge_obs.jl")
+```
