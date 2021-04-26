@@ -2,5 +2,5 @@
 
 ## Baltic Sea
 
-[x] Standard names
-[ ] DIVAnd version and DOI
+- [x] Standard names
+- [ ] DIVAnd version and DOI?
