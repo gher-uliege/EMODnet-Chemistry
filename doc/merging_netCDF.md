@@ -63,7 +63,7 @@ It is possible that one or several time periods appear in the different files if
 It is obviously not the case when one has to merge seasonal files into yearly files.
 
 Let's assume we want to remove the last time period of the old file, we do:
-```
+```bash
 ncks -d time,0,40 oldfile.nc oldfile.nc
 ```
 We check the time dimension (again with `ncdump -h`):
@@ -94,13 +94,14 @@ If the files were properly prepared, the time variable should already be sorted 
 chronological order. If this is not the case, you can use the tool [`sort_times.jl`](../julia/sort_times.jl) (an detailed example can be found in this [notebook](https://github.com/gher-ulg/SeaDataCloud/blob/master/Julia/sort_climatology_time.ipynb)).
 
 1. Edit the file paths in the script
-2. Run it:
+2. Run the script      
+in bash
 ```bash
 julia sort_times.jl
 ```
-or
+or in a Julia session:
 ```julia
-include("sort_times.jl")
+julia> include("sort_times.jl")
 ```
 
 ![Sorted times ](../figures/sorted_times.jpg "Black Sea times")
@@ -127,13 +128,14 @@ ncks -x -v obslon,obslat,obsdepth,obstime,obsid Water_body_dissolved_oxygen_conc
 Once the variables have been removed, use the script [merge_obs.jl](https://github.com/gher-ulg/EMODnet-Chemistry/blob/master/julia/merge_obs.jl) to merge the observations
 from the 2 input files:
 1. Adapt the paths of the files
-2. Run the script:
+2. Run the script      
+in bash:
 ```bash
 julia merge_obs.jl
 ```
-or
+or in a Julia session:
 ```julia
-include("merge_obs.jl")
+julia> include("merge_obs.jl")
 ```
 
 ⌛ this steps also takes several minutes (10' on my machine) for a realistic example
