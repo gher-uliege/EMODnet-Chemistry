@@ -25,6 +25,8 @@ shopt -s globstar
 
 declare -A stdnames
 
+# /!\ Names with and without spaces!
+# 
 stdnames=( ["Water_body_ammonium"]="mole_concentration_of_ammonium_in_sea_water"
 ["Water_body_chlorophyll-a"]="mass_concentration_of_chlorophyll_a_in_sea_water"
 ["Water_body_phosphate"]="mass_concentration_of_phosphate_in_sea_water"
