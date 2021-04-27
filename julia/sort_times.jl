@@ -1,7 +1,5 @@
 using NCDatasets
-
-datadir = "/media/ctroupin/My Passport/data/EMODnet/Eutrophication/Products/BlackSea/"
-datafile = joinpath(datadir, "Water_body_dissolved_oxygen_concentration_year.nc")
+using Glob
 
 """
     sort_fields_time(datafile)
@@ -45,8 +43,26 @@ function sort_fields_time(datafile::String)
     end
 end
 
+datadir = "/media/ctroupin/My Passport/data/EMODnet/Eutrophication/Products/BlackSea/"
+datafile = joinpath(datadir, "Water_body_dissolved_oxygen_concentration_year.nc")
+
 if isfile(datafile)
+    @info("Working on $(datafile)")
     @time sort_fields_time(datafile);
 else
     @error("File $(datafile) does not exist")
+end
+
+
+# If you want to work on a list of files:
+datafilelist = Glob.glob("*.nc", datadir)
+
+for datafile in datafilelist
+
+    if isfile(datafile)
+        @info("Working on $(datafile)")
+        @time sort_fields_time(datafile);
+    else
+        @error("File $(datafile) does not exist")
+    end
 end
