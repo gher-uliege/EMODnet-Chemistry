@@ -1,5 +1,4 @@
 using NCDatasets
-using PyPlot
 
 datadir = "/media/ctroupin/My Passport/data/EMODnet/Eutrophication/Products/BlackSea/"
 datafile = joinpath(datadir, "Water_body_dissolved_oxygen_concentration_year.nc")
@@ -46,4 +45,8 @@ function sort_fields_time(datafile::String)
     end
 end
 
-@time sort_fields_time(datafile);
+if isfile(datafile)
+    @time sort_fields_time(datafile);
+else
+    @error("File $(datafile) does not exist")
+end
