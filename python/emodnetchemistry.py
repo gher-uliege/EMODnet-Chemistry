@@ -378,7 +378,7 @@ def plot_data_locations(m, varname, regiondict, figname=""):
     m.fillcontinents(color=".75")
     plt.legend(fontsize=14, loc=3)
     plt.title(f"Observations of sea water {varname} concentration")
-    if len(figname) == 0:
+    if len(figname) > 0:
         plt.savefig(figname)
     plt.close()
 
@@ -518,7 +518,7 @@ def make_histo_month(months, varname, figdir="./"):
     plt.xticks(np.arange(1.5, 13.5), monthlist)
     plt.ylabel("Number of\nobservations", rotation=0, ha="right")
     fig.autofmt_xdate()
-    plt.title(varname.replace("_", " ").capitalize(), fontsize=20)
+    plt.title(varname.replace("_", " ").capitalize())
     plt.savefig(os.path.join(figdir, f"month_histogram_{varname}"))
     plt.close()
 
@@ -570,9 +570,9 @@ def plot_month_depth_ndata(obsdepth, months, figname="", depthlist = [5., 100., 
 
     ax.yaxis.set_major_formatter(FormatStrFormatter('%d'))
     ax.legend(bbox_to_anchor=(1.2, 1.1))
-    plt.title("Number of measurements of {}".format(varname), fontsize=24)
+    plt.title("Number of measurements of {}".format(varname))
     if len(figname) > 0:
-        plt.savefig(figname, dpi=300, bbox_inches="tight", facecolor="w", transparent=False)
+        plt.savefig(figname)
     plt.close()
 
 
