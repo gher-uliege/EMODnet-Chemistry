@@ -434,7 +434,7 @@ def plot_data_locations_domains(m, varname, regiondict, figname=""):
         plt.savefig(figname)
     plt.close()
 
-def plot_hexbin_datalocations(m, varname, figname=None):
+def plot_hexbin_datalocations(m, varname, figname=""):
     """Create hexbin plot using the data positions read from a list of file
 
     Parameters
@@ -466,7 +466,7 @@ def plot_hexbin_datalocations(m, varname, figname=None):
     #cb.set_ticklabels(["10", "100", "1000", "10000", "100000"])
     cb.set_label("Number of\ndata points\nper cell", fontsize=14, rotation=0, ha="left")
     plt.title(varname.replace("_", " ").capitalize())
-    if figname is not None:
+    if len(figname) > 0:
         plt.savefig(figname)
     plt.close()
 
