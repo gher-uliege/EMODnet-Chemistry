@@ -50,6 +50,80 @@ colorlist = {"ArcticSea": "#1f77b4",
 # datadir = "/data/EMODnet/Eutrophication/Split/"
 datadir = "/media/ctroupin/My Passport/data/EMODnet/Eutrophication/Split/"
 
+def read_coords_time_nc(ncfile):
+    """Read the observations positions and the time (year and month)
+
+    Parameters
+    ----------
+    ncfile : str
+        The path of the netCDF file containing the observations
+
+    Returns
+    -------
+    obslon : numpy.ndarray
+    obslat : numpy.ndarray
+    obsdepth : numpy.ndarray
+    years : numpy.ndarray
+    months : numpy.ndarray
+    """
+    with netCDF4.Dataset(ncfile, "r") as nc:
+        obslon = nc.variables["obslon"][:]
+        obslat = nc.variables["obslat"][:]
+        obstime = nc.variables["obstime"][:]
+        timeunits =  nc.variables["obstime"].units
+        obsdates = netCDF4.num2date(obstime, timeunits)
+        obsdepth = nc.variables["obsdepth"][:]
+
+    months = np.array([dd.month for dd in obsdates])
+    years = np.array([dd.year for dd in obsdates])
+
+    return obslon, obslat, obsdepth, years, months
+
+def read_coords_time(residualfile):
+    """Read the coordinates and the time from a residual file (CSV format)
+
+    Parameters
+    ----------
+    residualfile : str
+        Path of the residual file (CSV file)
+
+    Returns
+    -------
+
+    lon : numpy.ndarray
+    lat : numpy.ndarray
+    depths : numpy.ndarray
+    years : numpy.ndarray
+    months : numpy.ndarray
+    """
+
+    lon = []
+    lat = []
+    dates = []
+    months = []
+    years = []
+    depths = []
+    with open(residualfile, newline='') as csvfile:
+        thereader = csv.reader(csvfile, delimiter=',')
+        for lines in thereader:
+            lon.append(float(lines[0]))
+            lat.append(float(lines[1]))
+            depths.append(float(lines[2]))
+            thedate = datetime.datetime.strptime(lines[3], '%Y-%m-%dT%H:%M:%S.%f')
+            months.append(thedate.month)
+            years.append(thedate.year)
+            dates.append(thedate)
+
+    # Convert to arrays
+    months = np.array(months)
+    years = np.array(years)
+
+    lon = np.array(lon)
+    lat = np.array(lat)
+    depths = np.array(depths)
+
+    return lon, lat, depths, years, months
+
 def all_positions(m, datafilelist: list):
     """Read all the longitudes and latitudes from a list of file
 
