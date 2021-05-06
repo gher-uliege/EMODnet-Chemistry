@@ -624,7 +624,7 @@ def make_histo_values(obsval, varname, figdir="./", stack=False):
     #plt.show()
     plt.close()
 
-def make_histo_year(years, varname, figdir="./"):
+def make_histo_year(years, varname, figdir="./", stack=False):
     """Create an histogram from the years
 
     Parameters
@@ -635,16 +635,39 @@ def make_histo_year(years, varname, figdir="./"):
         Name of the variables
     figdir : str, default: "./"
         Path of the figure directory
+    strack : bool, default: False
+        If true, the histogram use different color for each sub-array of years,
+        typically one per region
     """
+
+    year_flat = []
+    for years_region in years:
+        for yyyy in years_region:
+            year_flat.append(yyyy)
+
     fig = plt.figure(figsize=(12, 12))
     ax = plt.subplot(111)
-    plt.hist(years, bins=np.arange(1928, 2021), rwidth=.8, color=".2")
-    plt.xticks(np.arange(1930, 2030, 10))
+
+    if stack is True:
+        plt.hist(years, bins=np.arange(1928, 2021), rwidth=.8, histtype='bar',
+                 stacked=True, color=colorlist2[0:len(years)],
+                 label=histlabels[0:len(years)])
+        plt.legend(loc=2)
+    else:
+        plt.hist(year_flat, bins=np.arange(1928, 2021), rwidth=.8, color=".2")
+
+    plt.xticks(np.arange(1950, 2030, 10))
     fig.autofmt_xdate()
     plt.ylabel("Number of\nobservations", rotation=0, ha="right")
-    plt.xlim(1925, 2021)
-    plt.title(varname.replace("_", " ").capitalize())
-    plt.savefig(os.path.join(figdir, f"year_histogram_{varname}"))
+    plt.xlim(1950, 2021)
+    plt.title(varnamedict[varname])
+
+    if stack is True:
+        fname = os.path.join(figdir, f"year_histogram_{varname}_stack")
+    else:
+        fname = os.path.join(figdir, f"year_histogram_{varname}")
+
+    plt.savefig(fname)
     plt.close()
 
 def make_histo_month(months, varname, figdir="./"):
