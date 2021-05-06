@@ -2,13 +2,13 @@ import os
 import glob
 import netCDF4
 import calendar
+import datetime
+import csv
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
 from matplotlib.patches import Polygon
 
-from pyproj import Transformer
-from pyproj import CRS
 import cartopy
 import cartopy.feature as cfeature
 import cartopy.mpl.gridliner as gridliner
@@ -47,6 +47,27 @@ colorlist = {"ArcticSea": "#1f77b4",
              "BalticSea": "#2ca02c", "BlackSea": "#d62728",
              "MedSea2": "#9467bd", "NorthSea": "#8c564b"}
 
+colorlist2 = ['#1f77b4',
+             '#ff7f0e', '#ff7f0e',
+             '#2ca02c', '#2ca02c',
+             '#d62728',
+             '#9467bd', '#9467bd',
+             '#8c564b']
+
+histlabels = ['Arctic Sea',
+              'North-East Atlantic Ocean', '',
+              'Baltic Sea', '',
+              'Black Sea',
+              'Mediterranean Sea', '',
+              'North Sea']
+
+varnamedict = {"phosphate": "Water body phosphate",
+               "silicate": "Water body silicate",
+               "ammonium": "Water body ammonium",
+               "chlorophyll-a": "Water body chlorophyll-a",
+               "dissolved_inorganic_nitrogen": "Water body dissolved inorganic nitrogen (DIN)",
+               "dissolved_oxygen": "Water body dissolved oxygen concentration"}
+
 # datadir = "/data/EMODnet/Eutrophication/Split/"
 datadir = "/media/ctroupin/My Passport/data/EMODnet/Eutrophication/Split/"
 
@@ -65,19 +86,24 @@ def read_coords_time_nc(ncfile):
     obsdepth : numpy.ndarray
     years : numpy.ndarray
     months : numpy.ndarray
+    obsval : numpy.ndarray
+        Observations
     """
     with netCDF4.Dataset(ncfile, "r") as nc:
         obslon = nc.variables["obslon"][:]
+        obslon[obslon > 180] -= 360.
         obslat = nc.variables["obslat"][:]
         obstime = nc.variables["obstime"][:]
         timeunits =  nc.variables["obstime"].units
         obsdates = netCDF4.num2date(obstime, timeunits)
         obsdepth = nc.variables["obsdepth"][:]
+        varnamenc = (list(nc.variables.keys())[-1])
+        obsval = nc.variables[varnamenc][:]
 
     months = np.array([dd.month for dd in obsdates])
     years = np.array([dd.year for dd in obsdates])
 
-    return obslon, obslat, obsdepth, years, months
+    return obslon, obslat, obsdepth, years, months, obsval
 
 def read_coords_time(residualfile):
     """Read the coordinates and the time from a residual file (CSV format)
@@ -544,13 +570,30 @@ def plot_hexbin_datalocations(m, varname, figname=""):
         plt.savefig(figname)
     plt.close()
 
-def make_histo_values(obsval, varname, figdir="./"):
+def make_histo_values(obsval, varname, figdir="./", stack=False):
     """Create a histogram from the values stored in array `obsval`
+
+    Parameters
+    ----------
+    osbval : numpy.ndarray
+        Values of the observations
+    varname : str
+        Name of the variables
+    figdir : str, default: "./"
+        Path of the figure directory
+    strack : bool, default: False
+        If true, the histogram use different color for each sub-array of obsval,
+        typically one per region
     """
 
+    obsval_flat = []
+    for obsval_region in obsval:
+        for val in obsval_region:
+            obsval_flat.append(val)
+
     # Set limits from the percentile
-    vmax = np.percentile(obsval, 97.5)
-    vmin = np.percentile(obsval, 2.5)
+    vmax = np.percentile(obsval_flat, 97.5)
+    vmin = np.percentile(obsval_flat, 2.5)
 
     if varname == "chlorophyll-a":
         units = r"mg/m$^{3}$"
@@ -560,16 +603,38 @@ def make_histo_values(obsval, varname, figdir="./"):
     fig = plt.figure(figsize=(12, 12))
     ax = plt.subplot(111)
 
-    plt.hist(obsval, bins=np.linspace(vmin, vmax, 20), rwidth=.8, color=".2")
+    if stack is True:
+        plt.hist(obsval, bins=np.linspace(vmin, vmax, 20), rwidth=.8, histtype='bar',
+                 stacked=True, color=colorlist2[0:len(obsval)],
+                 label=histlabels[0:len(obsval)])
+        plt.legend(loc=1)
+    else:
+        plt.hist(obsval_flat, bins=np.linspace(vmin, vmax, 20), rwidth=.8, color=".2")
     plt.ylabel("Number of\nobservations", rotation=0, ha="right")
     plt.xlabel(units)
-    plt.title(varname.replace("_", " ").capitalize())
-    plt.savefig(os.path.join(figdir, f"values_histogram_{varname}"))
+    plt.title(varnamedict[varname])
+    plt.xlim(0., vmax)
+
+    if stack is True:
+        fname = os.path.join(figdir, f"values_histogram_{varname}_stack")
+    else:
+        fname = os.path.join(figdir, f"values_histogram_{varname}")
+
+    plt.savefig(fname)
     #plt.show()
     plt.close()
 
 def make_histo_year(years, varname, figdir="./"):
     """Create an histogram from the years
+
+    Parameters
+    ----------
+    years : numpy.ndarray
+        Years of the observations
+    varname : str
+        Name of the variables
+    figdir : str, default: "./"
+        Path of the figure directory
     """
     fig = plt.figure(figsize=(12, 12))
     ax = plt.subplot(111)
@@ -584,6 +649,15 @@ def make_histo_year(years, varname, figdir="./"):
 
 def make_histo_month(months, varname, figdir="./"):
     """Create an histogram for the month
+
+    Parameters
+    ----------
+    months : numpy.ndarray
+        Months of the observations
+    varname : str
+        Name of the variables
+    figdir : str, default: "./"
+        Path of the figure directory
     """
     monthlist = [calendar.month_name[i] for i in range(1, 13)]
     fig = plt.figure(figsize=(12, 12))
