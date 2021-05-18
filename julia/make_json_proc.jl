@@ -7,7 +7,7 @@ filelist = Glob.glob("*/*.nc", datadir)
 # Get variable name
 function get_varname(datafile::String)
     NCDatasets.Dataset(datafile) do ds
-        varname = keys(nc)[6]
+        varname = keys(ds)[6]
         return varname::String
     end
 end
@@ -29,8 +29,8 @@ function write_json(jsonfile::String, varname::String)
                     \"outlbins\",
                     \"CLfield\",
                     \"$(varname)_deepest\",
-                    \"$(varname)_deepest L1\",
-                    \"$(varname)_deepest L2\",
+                    \"$(varname)_deepest_L1\",
+                    \"$(varname)_deepest_L2\",
                     \"$(varname)_deepest_depth\"
                 ]
             }
