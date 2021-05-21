@@ -2,6 +2,7 @@ using EzXML
 using DelimitedFiles
 using Glob
 
+# input file name is a Sextant record XML, or any XML respecting the XML path and logic below
 function extract_edmo_originators(fname)
     xml = EzXML.readxml(fname);
 
@@ -15,7 +16,7 @@ function extract_edmo_originators(fname)
     end
 
     @info "In $fname found $(length(edmo)) originators"
-    writedlm(replace(fname,".xml" => ".emdo.txt"),edmo)
+    writedlm(replace(fname,".xml" => ".edmo.txt"),edmo)
 end
 
 # apply to a single file
