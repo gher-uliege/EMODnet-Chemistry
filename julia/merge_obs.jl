@@ -13,6 +13,11 @@ after the command
 ```bash
 ncks -x -v obslon,obslat,obsdepth,obstime,obsid inputfile.nc outputfile.nc
 ```
+
+If you get the error
+`ERROR: LoadError: NetCDF error: NetCDF: String match to name in use (NetCDF error code: -42)`,
+this is probably due the fact that the variables you want to create (obslon, obslat etc)
+have not been removed from the file.
 """
 
 using NCDatasets
@@ -20,11 +25,13 @@ using PyPlot
 using DataStructures
 using Dates
 
-datadir = "/data/EMODnet/Eutrophication/BlackSeaResults/"
-datafilelist = [joinpath(datadir, "Old/Water body phosphate.4Danl.nc"),
-                joinpath(datadir, "1/Water body phosphate_Autumn.4Danl.nc")
+datadir = "/media/ctroupin/My Passport/data/EMODnet/Eutrophication/Products/BlackSea"
+datafilelist = [joinpath(datadir, "Water_body_dissolved_oxygen_concentration_Autumn.4Danl.nc"),
+                joinpath(datadir, "Water_body_dissolved_oxygen_concentration_Spring.4Danl.nc"),
+                joinpath(datadir, "Water_body_dissolved_oxygen_concentration_Summer.4Danl.nc"),
+                joinpath(datadir, "Water_body_dissolved_oxygen_concentration_Winter.4Danl.nc"),
                ]
-datafilemerge = joinpath(datadir, "Old/output000.nc")
+datafilemerge = joinpath(datadir, "Water_body_dissolved_oxygen_concentration_year.nc")
 
 """
     read_obs(datafile)
@@ -40,9 +47,9 @@ function read_obs(datafile::String)
 
     NCDatasets.Dataset(datafile, "r") do nc
 
-        obslon = nc["obslon"][:]
-        obslat = nc["obslat"][:]
-        obsdepth = nc["obsdepth"][:]
+        obslon = Float64.(nc["obslon"][:])
+        obslat = Float64.(nc["obslat"][:])
+        obsdepth = Float64.(nc["obsdepth"][:])
         obstime = nc["obstime"][:]
         obsid = nc["obsid"][:]
 
@@ -191,6 +198,10 @@ function write_obs(datafile::String, obslon::Vector{Float64}, obslat::Vector{Flo
         return
     end;
 end;
+
+
+# Main
+# -----
 
 
 # Read observations from the file list

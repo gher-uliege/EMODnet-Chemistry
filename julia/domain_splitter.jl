@@ -48,7 +48,7 @@ domainext = OrderedDict(
 """
 
 # Julie's email:
-# NE Atlantic extends Northward to 48°N and in the Gibraltar strait until
+# NE Atlantic extends Northward to 48°N and in the Gibraltar Strait until
 # 5°55'°
 domainext = OrderedDict(
     "Baltic" => [[9.4, 30.9, 53., 60.], [14. , 30.9, 60., 65.9]],
