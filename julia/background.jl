@@ -55,7 +55,7 @@ suffix = "bathcl-go"
 suffix = "bathcl-go-exclude"
 suffix = "bathcl-go-exclude-rdiag"
 suffix = "bathcl-go-exclude-mL"
-suffix = "bathcl-go-exclude-mL-1960"
+suffix = "bathcl-go-exclude-mL-1960-exNS2"
 
 filename_corrlen = joinpath(datadir,"correlation_len_$(clversion)_$(deltalon).nc")
 
@@ -410,7 +410,7 @@ dbinfo = @time DIVAnd.diva3d(
 #    memtofit = memtofit,
 #    QCMETHOD = 3,
     minfield = minimum(obsvalue),
-    maxfield = maximum(obsvalue),
+#    maxfield = maximum(obsvalue),
 
     solver = :direct,
     MEMTOFIT = 100,
