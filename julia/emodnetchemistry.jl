@@ -19,25 +19,34 @@ function add_deepest_depth(datafile::String, varname::String)
         depth = nc["depth"][:]
         @info("Working on $(length(depth)) depth layers")
 
-        # Load the 4D variable (we can load the first time instance,
-        # as depth is not supposed to change with time)
-        field3D = nc[varname][:,:,:,1]
+        # Load the 4D variable
+		# - we can load a unique time instance, as depth is not supposed to change with time)
+		# - it is better to take the last one, as more data are available than in the past
+		#   and less values will be masked
+        field3D = nc[varname][:,:,:,end]
         @info(size(field3D))
 
         # Get missing value from field
         valex = nc[varname].attrib["missing_value"]
 
+		# List variables from netCDF
+		varlist = keys(nc)
         newvarname = varname * "_deepest_depth"
-        ncvardeepestdepth = nc[newvarname]
-        
-	@info("Creating new variable $(newvarname)")
-        ncvardeepestdepth = defVar(nc, newvarname, Float32, ("lon", "lat"))
-        ncvardeepestdepth.attrib["long_name"] = "Deepest depth for $(varname)"
-        ncvardeepestdepth.attrib["_FillValue"] = Float32(valex)
-        ncvardeepestdepth.attrib["missing_value"] = Float32(valex)
-        ncvardeepestdepth.attrib["units"] = "meters"
-        ncvardeepestdepth.attrib["positive"] = "down"
-	
+
+		# Check if new variable (deepest_depth) already created
+		if newvarname in varlist
+			@debug("$(newvarname) already created")
+			ncvardeepestdepth = nc[newvarname]
+		else
+			@info("Creating new variable $(newvarname)")
+	        ncvardeepestdepth = defVar(nc, newvarname, Float32, ("lon", "lat"))
+	        ncvardeepestdepth.attrib["long_name"] = "Deepest depth for $(varname)"
+	        ncvardeepestdepth.attrib["_FillValue"] = Float32(valex)
+	        ncvardeepestdepth.attrib["missing_value"] = Float32(valex)
+	        ncvardeepestdepth.attrib["units"] = "meters"
+	        ncvardeepestdepth.attrib["positive"] = "down"
+		end
+
         # Loop on depth: start from surface and go to the bottom
         # (I also add "abs" in case depth are negative, but not probable)
         depthindex = sortperm(abs.(depth))
@@ -53,7 +62,6 @@ function add_deepest_depth(datafile::String, varname::String)
         end
 
         @info("Written new variable deepest depth")
-	return field3D
     end
 end
 
