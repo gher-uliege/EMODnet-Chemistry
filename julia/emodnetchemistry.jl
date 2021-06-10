@@ -9,7 +9,7 @@ containing the variable `varname`.
 
 ## Examples
 ```julia-repl
-julia> add_deepest_depth("sample_file.nc", "Salinty")
+julia> add_deepest_depth("sample_file.nc", "Salinity")
 ```
 """
 function add_deepest_depth(datafile::String, varname::String)
@@ -75,7 +75,7 @@ Return a list of file paths (netCDF) contained in `datadir`.
 ## Examples
 
 Listing all the netCDF files in the selected directory:
-```julia
+```julia-repl
 julia> datafilelist = get_file_list("/production/apache/data/emodnet-domains/By sea regions")
 [ Info: No variable selected
 [ Info: No season selected
@@ -154,4 +154,45 @@ function get_file_list(datadir::String, varname::String="", season::String="")::
         end
     end
     return filelist
+end
+
+"""
+	remove_attribs(datafile, varname)
+
+Remove the valid_min and valid_max attributes from the variables.
+
+## Examples
+
+```julia-repl
+julia> remove_attribs("Water_body_chlorophyll-a.4Danl.nc", "Water_body_chlorophyll")
+"""
+function remove_attribs(datafile::String, varname::String)
+    NCDatasets.Dataset(datafile, "a") do nc
+
+        # Get list of variables
+        varlist = keys(nc)
+        for var in varlist
+            # Check if the variable is one of the 4D fields
+            if occursin(varname, var)
+                @info(var)
+                if occursin("relerr", var)
+                    # Keep attributes for error fields
+                    @info("Relative error variable; no need to remove attributes")
+                else
+                    @info("Normal variable; remove valid_min and valid_max")
+                    vv = nc[var]
+
+                    attrib_dict = Dict(vv.attrib)
+                    if haskey(attrib_dict, "valid_max")
+                        @info("Remove valid_max attrib")
+                        delete!(vv.attrib, "valid_max")
+                    end
+                    if haskey(attrib_dict, "valid_min")
+                        @info("Remove valid_min attrib")
+                        delete!(vv.attrib, "valid_min")
+                    end
+                end
+            end
+        end
+    end
 end
