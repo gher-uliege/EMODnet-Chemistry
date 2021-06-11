@@ -2,8 +2,8 @@ include("./emodnetchemistry.jl")
 using NCDatasets
 
 # Files and directories
-datadir = "/production/apache/data/emodnet-domains/By sea regions/"
-datafilelist = get_file_list("/production/apache/data/emodnet-domains/By sea regions")
+datadir = "/production/apache/data/emodnet-domains/By sea regions//Mediterranean Sea/"
+datafilelist = get_file_list(datadir)
 
 @info("Processing $(length(datafilelist)) file(s)");
 
@@ -15,5 +15,6 @@ end
 for datafile in datafilelist
   @info("Working on file $(basename(datafile))")
   varname = get_varname(datafile)
-  @info("Variable name: $(varname)")
+  @debug("Variable name: $(varname)")
+  remove_attribs(datafile, varname)
 end
