@@ -1,22 +1,34 @@
 using NCDatasets
 using Glob
 
-datadir = "/media/ctroupin/My Passport/data/EMODnet/Eutrophication/Products/BalticSea/"
-filelist = Glob.glob("*/*.nc", datadir)
+#datadir = "/production/apache/data/emodnet-domains/By sea regions/Baltic Sea/"
+#datadir = "/production/apache/data/emodnet-domains/All European Seas/"
+#datadir = "/production/apache/data/emodnet-domains/By sea regions/Northeast Atlantic Ocean"
+#datadir = "/production/apache/data/emodnet-domains/By sea regions/Black Sea/"
+#datadir = "/production/apache/data/emodnet-domains/By sea regions/Arctic Ocean/"
+
+datadir = "/production/apache/data/emodnet-domains/Coastal areas/Northeast Atlantic Ocean - Loire River"
+filelist = Glob.glob("*.nc", datadir)
 
 # Get variable name
 function get_varname(datafile::String)
-    NCDatasets.Dataset(datafile) do ds
-        varname = keys(ds)[6]
+    NCDatasets.Dataset(datafile) do nc
+        varname = keys(nc)[6]
         return varname::String
     end
 end
+
+#function get_varname(datafile::String)
+#    fname = basename(datafile)
+#    varname = replace(fname, ".4Danl.nc" => "")
+#    return varname
+#end
 
 
 function write_json(jsonfile::String, varname::String)
     jsontpl = """
     {
-        \"default time\": \"2000\",
+        \"default_time\": \"2000\",
         \"subfolders\": [
             {
                 \"name\": \"Additional fields\",
@@ -46,7 +58,7 @@ end
 for datafile in filelist
     @info("Working on file $(basename(datafile))")
     vname = get_varname(datafile)
-    @info(vname)
+    @info("Variable name: $(vname)")
 
     jsonfile = datafile * ".json"
     @info("Writing JSON file $(basename(jsonfile))");

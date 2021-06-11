@@ -3,12 +3,15 @@ using NCDatasets
 
 
 # Flags for processing (set to true if modifications have to be applied)
-flag_deepest = false
-flag_attrib_din = true
+flag_deepest = false 
+flag_attrib_din = false
 
 # Files and directories
 datadir = "/production/apache/data/emodnet-domains/By sea regions/Northeast Atlantic Ocean/"
-datafilelist = get_file_list(datadir)
+parameter = "chlorophyll-a"
+datafilelist = get_file_list(datadir, parameter, "winter")
+
+@info("Processing $(length(datafilelist)) file(s)");
 
 function get_varname(datafile::String)
   varname = replace(basename(datafile), ".4Danl.nc" => "")
@@ -42,7 +45,7 @@ end
 # 2. Attributes relative to DIN
 
 if flag_attrib_din
-  datafilelist = get_file_list("/production/apache/data/emodnet-domains/By sea regions/Northeast Atlantic Ocean/", "Water_body_dissolved_inorganic_nitrogen_(DIN)")
+  datafilelist = get_file_list(datadir, "Water_body_dissolved_inorganic_nitrogen_(DIN)")
   for datafile in datafilelist[2:end]
     @info("Working on file $(basename(datafile))")
     varname = get_varname(datafile)
