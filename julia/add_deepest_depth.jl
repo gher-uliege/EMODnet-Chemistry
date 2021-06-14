@@ -1,8 +1,7 @@
 using NCDatasets
 
-datafile = "./sample_file.nc"
-varname = "Water body phosphate"
-varname = "Salinity"
+datafile = "/production/apache/data/emodnet-domains/By sea regions/Northeast Atlantic Ocean/Autumn (October-December) - 6-year running averages/Water_body_chlorophyll-a.4Danl.nc"
+varname = "Water_body_chlorophyll-a"
 
 """
     add_deepest_depth(datafile, varname)
@@ -57,17 +56,4 @@ function add_deepest_depth(datafile::String, varname::String)
     end
 end
 
-datafile = "sample_file.nc"
-isfile(datafile) ? @debug("File already downloaded") : download("https://dox.ulg.ac.be/index.php/s/OIz97X8SCqQGbxO", datafile)
 
-add_deepest_depth(datafile, varname)
-
-# Tests
-using Test
-nc = NCDatasets.Dataset(datafile)
-field_deepest_depth = nc["Salinity_deepest_depth"][:]
-close(nc)
-@test sum(ismissing.(field_deepest_depth)) == 33
-@test field_deepest_depth[3,4] == 0.f0
-@test field_deepest_depth[12, 1] == 1000.0f0
-@test size(field_deepest_depth) == (18, 5)

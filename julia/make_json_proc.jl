@@ -13,7 +13,7 @@ filelist = Glob.glob("*.nc", datadir)
 # Get variable name
 function get_varname(datafile::String)
     NCDatasets.Dataset(datafile) do nc
-        varname = keys(nc)[6]
+        varname = keys(nc)[1]
         return varname::String
     end
 end

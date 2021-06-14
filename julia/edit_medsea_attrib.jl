@@ -20,9 +20,9 @@ for (var, id) in var_id_dict
     
     @info(datafile);
     @info(var, id); 
-    #NCDatasets.Dataset(datafile, "a") do ds
-    #  ds.attrib["product_id"] = var_id_dict["var"]
-    #end
+    NCDatasets.Dataset(datafile, "a") do ds
+      ds.attrib["product_id"] = id
+    end
   end
 
 end
