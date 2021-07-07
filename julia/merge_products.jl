@@ -2,6 +2,8 @@ using NCDatasets
 using Dates
 using Glob
 using DIVAnd
+using UUIDs
+
 include("MergingClim.jl")
 
 plotcheck = false
@@ -40,8 +42,8 @@ units = "mg/m^3"
 #var_stdname = "mass_concentration_of_inorganic_nitrogen_in_sea_water"
 #units = "umol/l"
 
-
-product_id = ""
+# Every merged NetCDF file should have a unique identifier
+product_id = string(uuid1())
 
 hostname = gethostname()
 if hostname == "ogs01"
