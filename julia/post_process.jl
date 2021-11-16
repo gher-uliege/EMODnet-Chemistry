@@ -33,6 +33,8 @@ for i = 1:length(varlist)
 
     varname = varlist[i]
     varname_ = replace(varname," " => "_")
+
+
     filename_src = joinpath(datadir,"Case/$(varname_)-res-0.25-epsilon2-2.0-varlen1-lb5-maxit-5000-reltol-1.0e-9-bathcl-go-exclude-mL-1960-exNS2-monthly/Results/$(varname_)_monthly.nc")
 
     resdir = dirname(filename_src)
@@ -42,8 +44,8 @@ for i = 1:length(varlist)
 
     DIVAnd.derived(filename_src,varname,filename)
 
-    titlestr = "DIVAnd 4D monthly analysis of $varname $year0/$year1 v2021"
-    NCDataset(filename,"a") do
+    titlestr = "European seas - DIVAnd 4D monthly analysis of $varname $year0/$year1 v2021"
+    NCDataset(filename,"a") do ds
         ds.attrib["title"] = titlestr
     end
 
@@ -71,12 +73,13 @@ The horizontal resolution of the produced DIVAnd analysis is $(step(lonr)) degre
                 "abstract" => absstr,
             ),
             url_path = url_path,
+            WMSexclude = ["obsid"],
         )
     end
 
 end
 
-
+#=
 for i = 1:length(varlist)
     varname = varlist[i]
     varname_ = replace(varname," " => "_")
@@ -84,3 +87,4 @@ for i = 1:length(varlist)
     filename = replace(filename_src,"_monthly.nc" => ".nc")
     @show dirname(filename)
 end
+=#
