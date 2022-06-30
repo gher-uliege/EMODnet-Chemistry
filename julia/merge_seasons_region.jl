@@ -19,7 +19,7 @@ include("MergingClim.jl")
 hostname = gethostname()
 if hostname == "ogs04"
 	@info "Working in production server"
-	outputdir = "/production/apache/data/emodnet-test-charles/merged"
+	outputbasedir = "/production/apache/data/emodnet-test-charles/merged"
 	databasedir = "/production/apache/data/emodnet-domains/By sea regions"
 elseif hostname == "GHER-ULg-Laptop"
 	outputdir = "/data/EMODnet/Chemistry/merged/"
@@ -27,6 +27,8 @@ elseif hostname == "GHER-ULg-Laptop"
 else
 	@error("Unknown host")
 end
+
+isdir(outputbasedir) ? @debug("Already exists") : mkpath(outputbasedir);
 
 regionlist = readdir(databasedir);
 varnamelist = ["chlorophyll-a", "silicate", "oxygen_concentration", "phosphate", "nitrogen"]
@@ -46,18 +48,28 @@ for region in regionlist[1:1]
 	#@show(datafilelist);
 	nfiles = length(datafilelist)
 	@info("Found $(nfiles) variables");
-        
+
+	# Create new output directory
+	outputdir = joinpath(outputbasedir, region)
+	isdir(outputdir) ? @debug("Already exists") : mkpath(outputdir);	
+        @info("Output directory: $(outputdir)");
+ 
 	# Now for each variable we construct the path of the 4 files (one per season)
 	for variable in datafilelist[1:1]
 		@info("Working on variable $(variable)");
 			
 		outputfile = joinpath(outputdir, replace(variable, ".nc"=>"year.nc"))
 		@info("Creating new output file $(outputfile)")
-		datafilepaths = [joinpath(databasedir, season, variable) for season in seasonlist];
+		datafilepaths = [joinpath(databasedir, region, season, variable) for season in seasonlist];
 		#@show(datafilepaths);
                 ncrcatcommand = """ncrcat $(join(datafilepaths, " ")) $(outputfile)""";
-                ncrcatcommand = """ncrcat "$(datafilepaths[1])" "$(datafilepaths[2])" $(outputfile)""";
+                ncrcatcommand = `ncrcat "$(datafilepaths[1])" "$(datafilepaths[2])" "$(datafilepaths[3])" "$(datafilepaths[4])" $(outputfile)`;
 		@show(ncrcatcommand);
+		# Write the command to a text file
+		#open("commands2run.txt", "w") do io
+		#	write(io, ncrcatcommand)
+		#end
+		
 	end
 
 end
