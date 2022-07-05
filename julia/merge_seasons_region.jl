@@ -2,6 +2,7 @@ using NCDatasets
 using Dates
 using Glob
 using DIVAnd
+using Test
 include("MergingClim.jl")
 
 # Merge the 4 seasonal file into a unique, annual file for each variable and each season.
@@ -58,18 +59,22 @@ for region in regionlist[1:1]
 	for variable in datafilelist[1:1]
 		@info("Working on variable $(variable)");
 			
-		outputfile = joinpath(outputdir, replace(variable, ".nc"=>"year.nc"))
+		outputfile = joinpath(outputdir, replace(variable, ".4Danl.nc"=>"_year.4Danl.nc"))
 		@info("Creating new output file $(outputfile)")
 		datafilepaths = [joinpath(databasedir, region, season, variable) for season in seasonlist];
 		#@show(datafilepaths);
-                ncrcatcommand = """ncrcat $(join(datafilepaths, " ")) $(outputfile)""";
                 ncrcatcommand = `ncrcat "$(datafilepaths[1])" "$(datafilepaths[2])" "$(datafilepaths[3])" "$(datafilepaths[4])" $(outputfile)`;
-		@show(ncrcatcommand);
-		# Write the command to a text file
-		#open("commands2run.txt", "w") do io
-		#	write(io, ncrcatcommand)
-		#end
-		
+	
+	
+		if isfile(outputfile)
+			@info("The output file has already been created")
+		else
+			@time run(ncrcatcommand);
+			@debug("ok");
+		end
+
+		@info("Sort fields according to time");
+		@time MergingClim.sort_fields_time(outputfile);
 	end
 
 end
