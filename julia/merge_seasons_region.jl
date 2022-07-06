@@ -37,6 +37,7 @@ varnamelist = ["chlorophyll-a", "silicate", "oxygen_concentration", "phosphate",
 # Loop on regions
 for region in regionlist[1:1]
 	@info("Working on region $(region)")
+	regionstring = replace(region, " "=>"_")
 	regiondir = joinpath(databasedir, region)
 	isdir(regiondir) ? @debug("Directory exists") : @warn("Directory does not exist")
 
@@ -52,7 +53,9 @@ for region in regionlist[1:1]
 
 	# Create new output directory
 	outputdir = joinpath(outputbasedir, region)
-	isdir(outputdir) ? @debug("Already exists") : mkpath(outputdir);	
+        splitdir = joinpath(outputbasedir, "split/")
+	isdir(outputdir) ? @debug("Already exists") : mkpath(outputdir);
+	isdir(splitdir) ? @debug("Already exists") : mkpath(splitdir);	
         @info("Output directory: $(outputdir)");
  
 	# Now for each variable we construct the path of the 4 files (one per season)
@@ -63,9 +66,29 @@ for region in regionlist[1:1]
 		@info("Creating new output file $(outputfile)")
 		datafilepaths = [joinpath(databasedir, region, season, variable) for season in seasonlist];
 		#@show(datafilepaths);
-                ncrcatcommand = `ncrcat "$(datafilepaths[1])" "$(datafilepaths[2])" "$(datafilepaths[3])" "$(datafilepaths[4])" $(outputfile)`;
+
+		for datafile in datafilepaths
+           	    NCDatasets.Dataset(datafile, "r") do ds
+                	for (ii, tt) in enumerate(ds["time"][:])
+                            timesuffix = Dates.format(tt, "yyyymmdd")
+                            splitfile = joinpath(splitdir, "$(regionstring)_$(variable)_$(timesuffix).nc")
+                            nckscommand = `ncks -d time,$(ii-1) "$(datafile)" $(splitfile)`;
+                    
+                            if isfile(splitfile)
+                                @debug("The output file has already been created")
+                            else
+                                @time run(nckscommand);
+                                @debug("ok");
+			    end
+                        end
+
+                    end
+                end
+		splitfiles = Glob.glob("*.nc*", splitdir)
+		ncrcatcommand = `ncrcat $(splitfiles) "$(outputfile)"`;
+		#@info(ncrcatcommand);
 	
-	
+		
 		if isfile(outputfile)
 			@info("The output file has already been created")
 		else
@@ -73,8 +96,10 @@ for region in regionlist[1:1]
 			@debug("ok");
 		end
 
-		@info("Sort fields according to time");
-		@time MergingClim.sort_fields_time(outputfile);
+		#@info("Sort fields according to time");
+		#@time MergingClim.sort_fields_time_test(outputfile);
+
+	
 	end
 
 end
