@@ -23,8 +23,11 @@ if hostname == "ogs04"
 	outputbasedir = "/production/apache/data/emodnet-test-charles/merged"
 	databasedir = "/production/apache/data/emodnet-domains/By sea regions"
 elseif hostname == "GHER-ULg-Laptop"
-	outputdir = "/data/EMODnet/Chemistry/merged/"
+	outputbasedir = "/data/EMODnet/Chemistry/merged/"
 	databasedir = "/data/EMODnet/Chemistry/prod/"
+elseif hostname == "gherdivand"
+	outputbasedir = "/home/ctroupin/data/EMODnet/merged"
+	databasedir = "/home/ctroupin/data/EMODnet/By sea regions"
 else
 	@error("Unknown host")
 end
