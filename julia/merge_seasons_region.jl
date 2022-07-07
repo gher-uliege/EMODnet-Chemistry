@@ -30,6 +30,8 @@ else
 end
 
 isdir(outputbasedir) ? @debug("Already exists") : mkpath(outputbasedir);
+# Splitdir is an intermediate directory where all the individual files are stored
+splitdir = joinpath(outputbasedir, "split/")
 
 regionlist = readdir(databasedir);
 varnamelist = ["chlorophyll-a", "silicate", "oxygen_concentration", "phosphate", "nitrogen"]
@@ -53,21 +55,31 @@ for region in regionlist[1:1]
 
 	# Create new output directory
 	outputdir = joinpath(outputbasedir, region)
-        splitdir = joinpath(outputbasedir, "split/")
 	isdir(outputdir) ? @debug("Already exists") : mkpath(outputdir);
 	isdir(splitdir) ? @debug("Already exists") : mkpath(splitdir);	
         @info("Output directory: $(outputdir)");
  
 	# Now for each variable we construct the path of the 4 files (one per season)
-	for variable in datafilelist[1:1]
+	for variable in datafilelist
 		@info("Working on variable $(variable)");
 			
+		# Ensure the intermediate directory is there
+		# (cause delete it at the end of the loop)
+	        isdir(splitdir) ? @debug("ok") : mkpath(splitdir);
+	
+		# Create the name of the new output file
+		# (adding a '_year' suffix; could be modified)	
 		outputfile = joinpath(outputdir, replace(variable, ".4Danl.nc"=>"_year.4Danl.nc"))
 		@info("Creating new output file $(outputfile)")
-		datafilepaths = [joinpath(databasedir, region, season, variable) for season in seasonlist];
-		#@show(datafilepaths);
 
+		# Generate a list of file path for: 1 region and 1 variable (and hence 4 seasons)
+		datafilepaths = [joinpath(databasedir, region, season, variable) for season in seasonlist];
+
+		# Loop on all the 4 files
 		for datafile in datafilepaths
+
+		    # Open the netCDF and loop on the time instances 
+		    # to create new files
            	    NCDatasets.Dataset(datafile, "r") do ds
                 	for (ii, tt) in enumerate(ds["time"][:])
                             timesuffix = Dates.format(tt, "yyyymmdd")
@@ -86,9 +98,8 @@ for region in regionlist[1:1]
                 end
 		splitfiles = Glob.glob("*.nc*", splitdir)
 		ncrcatcommand = `ncrcat $(splitfiles) "$(outputfile)"`;
-		#@info(ncrcatcommand);
-	
-		
+	        
+                # Merge all the individual files into a single one	
 		if isfile(outputfile)
 			@info("The output file has already been created")
 		else
@@ -96,9 +107,8 @@ for region in regionlist[1:1]
 			@debug("ok");
 		end
 
-		#@info("Sort fields according to time");
-		#@time MergingClim.sort_fields_time_test(outputfile);
-
+		@info("Cleaning intermediate files")
+		rm(splitdir, recursive=true)
 	
 	end
 
