@@ -40,7 +40,7 @@ regionlist = readdir(databasedir);
 varnamelist = ["chlorophyll-a", "silicate", "oxygen_concentration", "phosphate", "nitrogen"]
 
 # Loop on regions
-for region in regionlist[1:1]
+for region in regionlist[6:6]
 	@info("Working on region $(region)")
 	regionstring = replace(region, " "=>"_")
 	regiondir = joinpath(databasedir, region)
@@ -63,7 +63,7 @@ for region in regionlist[1:1]
         @info("Output directory: $(outputdir)");
  
 	# Now for each variable we construct the path of the 4 files (one per season)
-	for variable in datafilelist
+	for variable in datafilelist[2:end]
 		@info("Working on variable $(variable)");
 			
 		# Ensure the intermediate directory is there
@@ -77,6 +77,9 @@ for region in regionlist[1:1]
 
 		# Generate a list of file path for: 1 region and 1 variable (and hence 4 seasons)
 		datafilepaths = [joinpath(databasedir, region, season, variable) for season in seasonlist];
+
+		# TODO check if the dimensions are the same in the 4 files
+		# if not: cannot be merged using nco; need manual editing.
 
 		# Loop on all the 4 files
 		for datafile in datafilepaths
@@ -92,7 +95,7 @@ for region in regionlist[1:1]
                             if isfile(splitfile)
                                 @debug("The output file has already been created")
                             else
-                                @time run(nckscommand);
+                                run(nckscommand);
                                 @debug("ok");
 			    end
                         end
@@ -106,7 +109,7 @@ for region in regionlist[1:1]
 		if isfile(outputfile)
 			@info("The output file has already been created")
 		else
-			@time run(ncrcatcommand);
+			run(ncrcatcommand);
 			@debug("ok");
 		end
 
