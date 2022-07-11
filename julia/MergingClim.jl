@@ -2,6 +2,7 @@ module MergingClim
 using NCDatasets
 using Dates
 using Glob
+using DataStructures
 using GridInterpolations
 using Interpolations
 using Missings
@@ -554,6 +555,38 @@ function merge_obsids(obsid1::Matrix{Char}, obsid2::Matrix{Char})
     @debug(size(obsid));
 
     return obsid::Matrix{Char}
+end
+
+"""
+    merge_obsids(obslon, obslat, obsdepth, obstime, obsid)
+
+Ensure uniqueness of observation vectors
+
+## Example
+```julia-repl
+julia> obslon_u, obslat_u, obsdepth_u, obstime_u, obsid_u =
+merge_obsids(obslon, obslat, obsdepth, obstime, obsid)
+```
+"""
+function unique_obs(obslon::Vector{Float64}, obslat::Vector{Float64},
+	obsdepth::Vector{Float64}, obstime::Vector{DateTime}, obsidMatrix{Char})
+	obsid_string = [String(obsid[:,ii]) for ii in 1:size(obsid)[2]];
+	obsmatrix = hcat(obslon, obslat, obsdepth, obstime, obsid_string);
+	obsmatrix = unique(obsmatrix, dims=1);
+	obslon_u = Float64.(obsmatrix[:,1]);
+	obslat_u = Float64.(obsmatrix[:,2]);
+	obsdepth_u = Float64.(obsmatrix[:,3]);
+	obstime_u = DateTime.(obsmatrix[:,4]);
+	obsid_string_u = obsmatrix[:,5];
+
+	# Process the obsid matrix (should be matrix of Char)
+	obsid_u = Matrix{Char}(undef, 63, length(obslon_u))
+
+	for ii = 1:length(obslat_u)
+	    obsid_u[:,ii] = collect(obsid_string_u[ii])
+	end;
+
+	return obslon_u, obslat_u, obsdepth_u, obstime_u, obsid_u
 end
 
 
