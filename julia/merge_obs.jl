@@ -22,7 +22,6 @@ have not been removed from the file.
 
 using NCDatasets
 using PyPlot
-using DataStructures
 using Dates
 include("MergingClim.jl")
 
@@ -42,7 +41,11 @@ datafilemerge = joinpath(datadir, "Water_body_dissolved_oxygen_concentration_yea
 nckscommand = `ncks -O -x -v obslon,obslat,obsdepth,obstime,obsid $(datafilemerge) $(datafilemerge)`
 
 # Read observations from the file list
-obslon, obslat, obsdepth, obstime, obsid = MergingClim.read_obs(datafilelist);
+@time obslon, obslat, obsdepth, obstime, obsid = MergingClim.read_obs(datafilelist);
+
+# Ensure uniqueness
+obslon_u, obslat_u, obsdepth_u, obstime_u, obsid_u =
+MergingClim.merge_obsids(obslon, obslat, obsdepth, obstime, obsid)
 
 # Write the file
-MergingClim.write_obs(datafilemerge, obslon, obslat, obsdepth, obstime, obsid)
+MergingClim.write_obs(datafilemerge, obslon_u, obslat_u, obsdepth_u, obstime_u, obsid_u);
