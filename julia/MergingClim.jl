@@ -409,4 +409,103 @@ function get_region_name(datafile::String)::String
     return split(datafile,"/")[6]
 end
 
+"""
+    sort_fields_time(datafile)
+
+Sort chronologically the variables that depend on the time variable.
+
+## Example
+```julia-repl
+sort_fields_time("Water_body_dissolved_oxygen_concentration_year.nc")
+```
+"""
+function sort_fields_time(datafile::String)
+    Dataset(datafile::String, "a") do ds
+
+        @debug("Read time and sort index")
+        times = ds["time"][:];
+        sorting_index = sortperm(times);
+
+        # Loop on the variables
+        for varname in keys(ds)[2:2]
+
+            # Check if time is a dimension
+            if "time" in dimnames(ds[varname])
+                @info("Variable '$(varname)' contains 'time' dimension")
+                #var = ds[varname][:]
+                ndims = length(size(ds[varname][:]))
+                @info("Number of dimensions: $(ndims)")
+                if ndims == 1
+                    ds[varname][:] = ds[varname][sorting_index]
+                elseif ndims == 2
+                    ds[varname][:] = ds[varname][:,sorting_index]
+                elseif ndims == 3
+                    ds[varname][:] = ds[varname][:,:,sorting_index]
+                elseif ndims == 4
+                    ds[varname][:] = ds[varname][:,:,:,sorting_index]
+                else
+                    @warn("Number of dimensions larger than 4")
+                end
+            end
+        end
+    end
+end
+
+"""
+    sort_fields_time(datafile)
+
+Sort chronologically the variables that depend on the time variable.
+
+## Example
+```julia-repl
+sort_fields_time("Water_body_dissolved_oxygen_concentration_year.nc")
+```
+"""
+function sort_fields_time_test(datafile::String)
+    
+    # First get the 
+    sorting_index, varlist = get_time_varlist(datafile);
+
+    # Loop on the variables:
+    # we open/close the netCDF file for each variable
+    # to see if we avoid the memory problem
+
+    for varname in varlist
+	@info("Variable name: $(varname)");
+        Dataset(datafile, "a") do ds
+            # Check if time is a dimension
+	    if "time" in dimnames(ds[varname])
+                @info("Variable '$(varname)' contains 'time' dimension")
+                var = ds[varname][:]
+                ndims = length(size(ds[varname][:]))
+                @info("Number of dimensions: $(ndims)")
+                if ndims == 1
+                    ds[varname][:] = var[sorting_index]
+                elseif ndims == 2
+                    ds[varname][:,:] = var[:,sorting_index]
+                elseif ndims == 3
+                    ds[varname][:,:,:] = var[:,:,sorting_index]
+                elseif ndims == 4
+                    ds[varname][:,:,:,:] = var[:,:,:,sorting_index]
+                else
+                    @warn("Number of dimensions larger than 4")
+              end 
+	   end
+        end
+    end
+end
+
+function get_time_varlist(datafile::String)
+    Dataset(datafile, "r") do ds
+
+        times = ds["time"][:];
+        sorting_index = sortperm(times);
+
+        # Loop on the variables
+        varlist = keys(ds)
+        return sorting_index, varlist
+    end
+end
+
+
 end

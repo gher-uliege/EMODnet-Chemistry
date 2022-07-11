@@ -1,4 +1,6 @@
 XML_combined/
+*.nc
+*.swp
 *.xml
 *.html
 *.jl.cov
