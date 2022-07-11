@@ -40,7 +40,7 @@ regionlist = readdir(databasedir);
 varnamelist = ["chlorophyll-a", "silicate", "oxygen_concentration", "phosphate", "nitrogen"]
 
 # Loop on regions
-for region in regionlist[6:6]
+for region in regionlist[1:1]
 	@info("Working on region $(region)")
 	regionstring = replace(region, " "=>"_")
 	regiondir = joinpath(databasedir, region)
@@ -63,7 +63,7 @@ for region in regionlist[6:6]
         @info("Output directory: $(outputdir)");
  
 	# Now for each variable we construct the path of the 4 files (one per season)
-	for variable in datafilelist[2:end]
+	for variable in datafilelist[2:2]
 		@info("Working on variable $(variable)");
 			
 		# Ensure the intermediate directory is there
@@ -95,7 +95,7 @@ for region in regionlist[6:6]
                             if isfile(splitfile)
                                 @debug("The output file has already been created")
                             else
-                                run(nckscommand);
+                                #run(nckscommand);
                                 @debug("ok");
 			    end
                         end
@@ -109,12 +109,15 @@ for region in regionlist[6:6]
 		if isfile(outputfile)
 			@info("The output file has already been created")
 		else
-			run(ncrcatcommand);
+			#run(ncrcatcommand);
 			@debug("ok");
 		end
 
 		@info("Cleaning intermediate files")
 		rm(splitdir, recursive=true)
+
+		@info("input: $(datafilepaths)");
+		@info("output: $(outputfile)");
 	
 	end
 
