@@ -558,7 +558,7 @@ function merge_obsids(obsid1::Matrix{Char}, obsid2::Matrix{Char})
 end
 
 """
-    merge_obsids(obslon, obslat, obsdepth, obstime, obsid)
+    unique_obs(obslon, obslat, obsdepth, obstime, obsid)
 
 Ensure uniqueness of observation vectors
 
@@ -569,7 +569,7 @@ merge_obsids(obslon, obslat, obsdepth, obstime, obsid)
 ```
 """
 function unique_obs(obslon::Vector{Float64}, obslat::Vector{Float64},
-	obsdepth::Vector{Float64}, obstime::Vector{DateTime}, obsidMatrix{Char})
+	obsdepth::Vector{Float64}, obstime::Vector{DateTime}, obsid::Matrix{Char})
 	obsid_string = [String(obsid[:,ii]) for ii in 1:size(obsid)[2]];
 	obsmatrix = hcat(obslon, obslat, obsdepth, obstime, obsid_string);
 	obsmatrix = unique(obsmatrix, dims=1);
