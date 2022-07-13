@@ -4,21 +4,22 @@
 
 include("MergingClim.jl")
 using NCDatasets
+using Glob
 
 datadir = "/production/apache/data/emodnet-test-charles/merged/"
 regionlist = readdir(datadir);
 
-for region in regionalist
+for region in regionlist
 	@info("Working on file $(region)");
 
-	datafilelist = basename.(glob("*.nc", joinpath(datadir, region))
+	datafilelist = basename.(glob("*.nc", joinpath(datadir, region)))
 
 	# Loop on the files
 	for datafile in datafilelist
 		@info("Working on file $(basename(datafile))");
 
-		NCDatasets.Dataset(datafile, "r") do ds
-			oldcomment = ds["comment"]
+		NCDatasets.Dataset(joinpath(datadir, region, datafile), "r") do ds
+			oldcomment = ds.attrib["comment"]
 			@show(oldcomment);
 		end
 
