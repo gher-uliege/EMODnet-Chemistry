@@ -40,7 +40,7 @@ regionlist = readdir(databasedir);
 varnamelist = ["chlorophyll-a", "silicate", "oxygen_concentration", "phosphate", "nitrogen"]
 
 # Loop on regions
-for region in regionlist[1:1]
+for region in regionlist[4:end]
 	@info("Working on region $(region)")
 	regionstring = replace(region, " "=>"_")
 	regiondir = joinpath(databasedir, region)
@@ -63,7 +63,7 @@ for region in regionlist[1:1]
         @info("Output directory: $(outputdir)");
  
 	# Now for each variable we construct the path of the 4 files (one per season)
-	for variable in datafilelist[2:2]
+	for variable in datafilelist[1:3]
 		@info("Working on variable $(variable)");
 			
 		# Ensure the intermediate directory is there
@@ -103,7 +103,7 @@ for region in regionlist[1:1]
                     end
                 end
 		splitfiles = Glob.glob("*.nc*", splitdir)
-		ncrcatcommand = `ncrcat $(splitfiles) "$(outputfile)"`;
+		ncrcatcommand = `ncrcat -h $(splitfiles) "$(outputfile)"`;
 	        
                 # Merge all the individual files into a single one	
 		if isfile(outputfile)
@@ -118,6 +118,20 @@ for region in regionlist[1:1]
 
 		@info("input: $(datafilepaths)");
 		@info("output: $(outputfile)");
+
+
+		# Remove the observation-related variables
+		nckscommand = `ncks -O -x -v obslon,obslat,obsdepth,obstime,obsid "$(outputfile)" "$(outputfile)"`
+		run(nckscommand);
+
+		# Read observations from the file list
+		@time obslon, obslat, obsdepth, obstime, obsid = MergingClim.read_obs(datafilepaths);
+
+		# Ensure unique observations
+		obslon_u, obslat_u, obsdepth_u, obstime_u, obsid_u = MergingClim.unique_obs(obslon, obslat, obsdepth, obstime, obsid);
+
+		# Write the file
+		MergingClim.write_obs(outputfile, obslon_u, obslat_u, obsdepth_u, obstime_u, obsid_u);
 	
 	end
 
