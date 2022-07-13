@@ -580,10 +580,10 @@ function unique_obs(obslon::Vector{Float64}, obslat::Vector{Float64},
 	obsid_string_u = obsmatrix[:,5];
 
 	# Process the obsid matrix (should be matrix of Char)
-	obsid_u = Matrix{Char}(undef, 63, length(obslon_u))
+	obsid_u = Matrix{Char}(undef, size(obsid)[1], length(obslon_u))
 
 	for ii = 1:length(obslat_u)
-	    obsid_u[:,ii] = collect(obsid_string_u[ii])
+	    obsid_u[:,ii] = collect(obsid_string_u[ii])[1:size(obsid_u)[1]]
 	end;
 
 	return obslon_u, obslat_u, obsdepth_u, obstime_u, obsid_u
