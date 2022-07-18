@@ -264,10 +264,10 @@ NCDatasets.Dataset(datafile1, "r") do ds
     
     ncWater_body_dissolved_oxygen_concentration_deepest_L2[:] = ds["Water body dissolved oxygen concentration_deepest_L2"][:]
     
-    emptyfield4D[:,:,2:end,:] = ds["Water body dissolved oxygen concentration err"][:]
+    emptyfield4D[:,:,2:end,:] = ds["Water body dissolved oxygen concentration_err"][:]
     ncWater_body_dissolved_oxygen_concentration_err[:] = emptyfield4D
     
-    emptyfield4D[:,:,2:end,:] = ds["Water body dissolved oxygen concentration relerr"][:]
+    emptyfield4D[:,:,2:end,:] = ds["Water body dissolved oxygen concentration_relerr"][:]
     ncWater_body_dissolved_oxygen_concentration_relerr[:] = emptyfield4D
 
     ncclimatology_bounds[:] = ds["climatology_bounds"][:]
