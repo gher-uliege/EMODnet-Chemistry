@@ -7,9 +7,18 @@ using DataStructures
 
 datadir = "/production/apache/data/emodnet-domains/By sea regions/Black Sea/Autumn (September-November) - 6-year running averages/"
 datafile1 = joinpath(datadir, "Water_body_dissolved_oxygen_concentration.4Danl.nc")
-datafile2 = joinpath(datadir, "test.nc")
+outputfile = joinpath(datadir, "test.nc")
 
-ds = NCDataset(datafile2,"c", attrib = OrderedDict(
+isfile(outputfile) ? rm(outputfile) : @debug("Creating new output file")
+
+# Dimensions
+ndepth = 13
+nlon = 310
+nlat = 160
+ntimes = 46
+valex = Float32(-99.0)
+
+ds = NCDataset(outputfile,"c", attrib = OrderedDict(
     "Conventions"               => "CF-1.0",
     "project"                   => "SeaDataNetII: http://www.seadatanet.org/",
     "institution"               => "University of Liege, GeoHydrodynamics and Environment Research",
@@ -43,13 +52,6 @@ Thu Apr  1 18:55:29 2021: ncks --ovr --mk_rec_dmn time Water_body_dissolved_oxyg
     "NCO"                       => "netCDF Operators version 4.9.9 (Homepage = http://nco.sf.net, Code = http://github.com/nco/nco)",
     "nco_openmp_thread_number"  => Int32(1),
 ))
-
-# Dimensions
-ndepth = 13
-nlon = 310
-nlat = 160
-ntimes = 46
-valex = Float32(-99.0)
 
 ds.dim["time"] = Inf # unlimited dimension
 ds.dim["depth"] = ndepth
@@ -226,7 +228,8 @@ nctime = defVar(ds,"time", Float32, ("time",), attrib = OrderedDict(
 
 # Read info from the original netCDF file
     NCDatasets.Dataset(datafile1, "r") do ds
-        emptyfield = valex * ones(nlon, nlat, ndepth, ntimes)
+        emptyfield = Array{Union{Missing, Float32}, 4}(undef, nlon, nlat, ndepth, ntimes);
+        emptyfield[:,:,1,:] .= valex 
         emptyfield[:,:,2:end,:] = ds["CLfield"][:]
         ncCLfield[:] = emptyfield
         # ncCORRLEN[:] = ...
