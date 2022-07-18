@@ -45,11 +45,16 @@ Thu Apr  1 18:55:29 2021: ncks --ovr --mk_rec_dmn time Water_body_dissolved_oxyg
 ))
 
 # Dimensions
+ndepth = 13
+nlon = 310
+nlat = 160
+ntimes = 46
+valex = Float32(-99.0)
 
 ds.dim["time"] = Inf # unlimited dimension
-ds.dim["depth"] = 13
-ds.dim["lat"] = 160
-ds.dim["lon"] = 310
+ds.dim["depth"] = ndepth
+ds.dim["lat"] = nlat
+ds.dim["lon"] = nlon
 ds.dim["nv"] = 2
 ds.dim["observations"] = 311840
 ds.dim["idlen"] = 51
@@ -221,7 +226,9 @@ nctime = defVar(ds,"time", Float32, ("time",), attrib = OrderedDict(
 
 # Read info from the original netCDF file
     NCDatasets.Dataset(datafile1, "r") do ds
-        # ncCLfield[:] = ...
+        emptyfield = valex * ones(nlon, nlat, ndepth, ntimes)
+        emptyfield[:,:,2:end,:] = ds["CLfield"][:]
+        ncCLfield[:] = emptyfield
         # ncCORRLEN[:] = ...
         # ncSNR[:] = ...
         # ncVARBACK[:] = ...
