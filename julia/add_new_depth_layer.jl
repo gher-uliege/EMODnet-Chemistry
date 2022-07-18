@@ -245,9 +245,8 @@ NCDatasets.Dataset(datafile1, "r") do ds
     emptyfield[2:end,:] = ds["VARBACK"][:]
     ncVARBACK[:] = emptyfield
 
-    
-    emptyfield4D[:,:,2:end,:] = ds["emptyfield4D"][:]
-    ncemptyfield4D[:] = emptyfield4D
+    emptyfield4D[:,:,2:end,:] = ds["Water_body_dissolved_oxygen_concentration"][:]
+    ncWater_body_dissolved_oxygen_concentration[:] = emptyfield4D
 
     # ncWater_body_dissolved_oxygen_concentration_L1[:] = emptyfield4D
     # ncWater_body_dissolved_oxygen_concentration_L2[:] = emptyfield4D
