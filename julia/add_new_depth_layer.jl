@@ -258,11 +258,11 @@ NCDatasets.Dataset(datafile1, "r") do ds
     ncWater_body_dissolved_oxygen_concentration_L2[:] = emptyfield4D
     
     # The 'deepest' fields don't have to be modified
-    ncWater_body_dissolved_oxygen_concentration_deepest[:] = ds["Water body dissolved oxygen concentration deepest"][:]
+    ncWater_body_dissolved_oxygen_concentration_deepest[:] = ds["Water body dissolved oxygen concentration_deepest"][:]
     
-    ncWater_body_dissolved_oxygen_concentration_deepest_L1[:] = ds["Water body dissolved oxygen concentration deepest_L1"][:]
+    ncWater_body_dissolved_oxygen_concentration_deepest_L1[:] = ds["Water body dissolved oxygen concentration_deepest_L1"][:]
     
-    ncWater_body_dissolved_oxygen_concentration_deepest_L2[:] = ds["Water body dissolved oxygen concentration deepest_L2"][:]
+    ncWater_body_dissolved_oxygen_concentration_deepest_L2[:] = ds["Water body dissolved oxygen concentration_deepest_L2"][:]
     
     emptyfield4D[:,:,2:end,:] = ds["Water body dissolved oxygen concentration err"][:]
     ncWater_body_dissolved_oxygen_concentration_err[:] = emptyfield4D
