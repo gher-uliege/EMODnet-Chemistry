@@ -8,7 +8,7 @@ using DataStructures
 datadir = "/production/apache/data/emodnet-domains/By sea regions/Black Sea/Autumn (September-November) - 6-year running averages/"
 datafile1 = joinpath(datadir, "Water_body_dissolved_oxygen_concentration.4Danl.nc")
 outputdir = "/production/apache/data/emodnet-domains/Tests"
-outputfile = joinpath(datadir, "test.nc")
+outputfile = joinpath(outputdir, "test.nc")
 
 isfile(outputfile) ? rm(outputfile) : @debug("Creating new output file")
 
@@ -229,6 +229,9 @@ nctime = defVar(ds,"time", Float32, ("time",), attrib = OrderedDict(
 
 # Read info from the original netCDF file
 NCDatasets.Dataset(datafile1, "r") do ds
+
+    # Create an empty 4D array that will be filled using the values from
+    # the original fields
     emptyfield4D = Array{Union{Missing, Float32}, 4}(undef, nlon, nlat, ndepth, ntimes);
     emptyfield4D[:,:,1,:] .= valex 
     emptyfield4D[:,:,2:end,:] = ds["CLfield"][:]
@@ -248,15 +251,29 @@ NCDatasets.Dataset(datafile1, "r") do ds
     emptyfield4D[:,:,2:end,:] = ds["Water body dissolved oxygen concentration"][:]
     ncWater_body_dissolved_oxygen_concentration[:] = emptyfield4D
 
-    # ncWater_body_dissolved_oxygen_concentration_L1[:] = emptyfield4D
-    # ncWater_body_dissolved_oxygen_concentration_L2[:] = emptyfield4D
-    # ncWater_body_dissolved_oxygen_concentration_deepest[:] = ...
-    # ncWater_body_dissolved_oxygen_concentration_deepest_L1[:] = ...
-    # ncWater_body_dissolved_oxygen_concentration_deepest_L2[:] = ...
-    # ncWater_body_dissolved_oxygen_concentration_err[:] = emptyfield4D
-    # ncWater_body_dissolved_oxygen_concentration_relerr[:] = emptyfield4D
+    emptyfield4D[:,:,2:end,:] = ds["Water body dissolved oxygen concentration L1"][:]
+    ncWater_body_dissolved_oxygen_concentration_L1[:] = emptyfield4D
+    
+    emptyfield4D[:,:,2:end,:] = ds["Water body dissolved oxygen concentration L2"][:]
+    ncWater_body_dissolved_oxygen_concentration_L2[:] = emptyfield4D
+    
+    # The 'deepest' fields don't have to be modified
+    ncWater_body_dissolved_oxygen_concentration_deepest[:] = ds["Water body dissolved oxygen concentration deepest"][:]
+    
+    ncWater_body_dissolved_oxygen_concentration_deepest_L1[:] = ds["Water body dissolved oxygen concentration deepest L1"][:]
+    
+    ncWater_body_dissolved_oxygen_concentration_deepest_L2[:] = ds["Water body dissolved oxygen concentration deepest L2"][:]
+    
+    emptyfield4D[:,:,2:end,:] = ds["Water body dissolved oxygen concentration err"][:]
+    ncWater_body_dissolved_oxygen_concentration_err[:] = emptyfield4D
+    
+    emptyfield4D[:,:,2:end,:] = ds["Water body dissolved oxygen concentration relerr"][:]
+    ncWater_body_dissolved_oxygen_concentration_relerr[:] = emptyfield4D
+
     ncclimatology_bounds[:] = ds["climatology_bounds"][:]
     ncdatabins[:] = ds["databins"][:]
+
+    # We add one depth layer...
     ncdepth[:] = Float32.([250, 200, 150, 125, 100, 75, 50, 40, 30, 20, 10, 5, 0])
     nclat[:] = ds["lat"][:]
     nclon[:] = ds["lon"][:]
