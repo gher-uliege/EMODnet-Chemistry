@@ -234,7 +234,7 @@ NCDatasets.Dataset(datafile1, "r") do ds
     emptyfield4D[:,:,2:end,:] = ds["CLfield"][:]
     ncCLfield[:] = emptyfield4D
 
-    emptyfield = Array{Union{Missing, Float32}, 4}(undef, ndepth, ntimes);
+    emptyfield = Array{Union{Missing, Float32}, 2}(undef, ndepth, ntimes);
     emptyfield[1,:] .= valex 
     emptyfield[2:end,:] = ds["CORRLEN"][:]
     ncCORRLEN[:] = emptyfield
