@@ -7,6 +7,7 @@ using DataStructures
 
 datadir = "/production/apache/data/emodnet-domains/By sea regions/Black Sea/Autumn (September-November) - 6-year running averages/"
 datafile1 = joinpath(datadir, "Water_body_dissolved_oxygen_concentration.4Danl.nc")
+outputdir = "/production/apache/data/emodnet-domains/Tests"
 outputfile = joinpath(datadir, "test.nc")
 
 isfile(outputfile) ? rm(outputfile) : @debug("Creating new output file")
@@ -227,34 +228,46 @@ nctime = defVar(ds,"time", Float32, ("time",), attrib = OrderedDict(
 
 
 # Read info from the original netCDF file
-    NCDatasets.Dataset(datafile1, "r") do ds
-        emptyfield = Array{Union{Missing, Float32}, 4}(undef, nlon, nlat, ndepth, ntimes);
-        emptyfield[:,:,1,:] .= valex 
-        emptyfield[:,:,2:end,:] = ds["CLfield"][:]
-        ncCLfield[:] = emptyfield
-        # ncCORRLEN[:] = ...
-        # ncSNR[:] = ...
-        # ncVARBACK[:] = ...
-        # ncWater_body_dissolved_oxygen_concentration[:] = ...
-        # ncWater_body_dissolved_oxygen_concentration_L1[:] = ...
-        # ncWater_body_dissolved_oxygen_concentration_L2[:] = ...
-        # ncWater_body_dissolved_oxygen_concentration_deepest[:] = ...
-        # ncWater_body_dissolved_oxygen_concentration_deepest_L1[:] = ...
-        # ncWater_body_dissolved_oxygen_concentration_deepest_L2[:] = ...
-        # ncWater_body_dissolved_oxygen_concentration_err[:] = ...
-        # ncWater_body_dissolved_oxygen_concentration_relerr[:] = ...
-        # ncclimatology_bounds[:] = ...
-        ncdatabins[:] = ds["databins"][:]
-        ncdepth[:] = Float32.([250, 200, 150, 125, 100, 75, 50, 40, 30, 20, 10, 5, 0])
-        nclat[:] = ds["lat"][:]
-        nclon[:] = ds["lon"][:]
-        ncobsdepth[:] = ds["obsdepth"][:]
-        ncobsid[:] = ds["obsid"][:]
-        ncobslat[:] = ds["obslat"][:]
-        ncobslon[:] = ds["obslon"][:]
-        ncobstime[:] = ds["obstime"][:]
-        ncoutlbins[:] = ds["outlbins"][:]
-        nctime[:] = ds["time"]
-    end
+NCDatasets.Dataset(datafile1, "r") do ds
+    emptyfield4D = Array{Union{Missing, Float32}, 4}(undef, nlon, nlat, ndepth, ntimes);
+    emptyfield4D[:,:,1,:] .= valex 
+    emptyfield4D[:,:,2:end,:] = ds["CLfield"][:]
+    ncCLfield[:] = emptyfield4D
+
+    emptyfield = Array{Union{Missing, Float32}, 4}(undef, ndepth, ntimes);
+    emptyfield[1,:] .= valex 
+    emptyfield[2:end,:] = ds["CORRLEN"][:]
+    ncCORRLEN[:] = emptyfield
+
+    emptyfield[2:end,:] = ds["SNR"][:]
+    ncSNR[:] = emptyfield
+
+    emptyfield[2:end,:] = ds["VARBACK"][:]
+    ncVARBACK[:] = emptyfield
+
+    
+    emptyfield4D[:,:,2:end,:] = ds["emptyfield4D"][:]
+    ncemptyfield4D[:] = emptyfield4D
+
+    # ncWater_body_dissolved_oxygen_concentration_L1[:] = emptyfield4D
+    # ncWater_body_dissolved_oxygen_concentration_L2[:] = emptyfield4D
+    # ncWater_body_dissolved_oxygen_concentration_deepest[:] = ...
+    # ncWater_body_dissolved_oxygen_concentration_deepest_L1[:] = ...
+    # ncWater_body_dissolved_oxygen_concentration_deepest_L2[:] = ...
+    # ncWater_body_dissolved_oxygen_concentration_err[:] = emptyfield4D
+    # ncWater_body_dissolved_oxygen_concentration_relerr[:] = emptyfield4D
+    ncclimatology_bounds[:] = ds["climatology_bounds"][:]
+    ncdatabins[:] = ds["databins"][:]
+    ncdepth[:] = Float32.([250, 200, 150, 125, 100, 75, 50, 40, 30, 20, 10, 5, 0])
+    nclat[:] = ds["lat"][:]
+    nclon[:] = ds["lon"][:]
+    ncobsdepth[:] = ds["obsdepth"][:]
+    ncobsid[:] = ds["obsid"][:]
+    ncobslat[:] = ds["obslat"][:]
+    ncobslon[:] = ds["obslon"][:]
+    ncobstime[:] = ds["obstime"][:]
+    ncoutlbins[:] = ds["outlbins"][:]
+    nctime[:] = ds["time"]
+end
 
 close(ds)
