@@ -40,14 +40,15 @@ regionlist = readdir(databasedir);
 varnamelist = ["chlorophyll-a", "silicate", "oxygen_concentration", "phosphate", "nitrogen"]
 
 # Loop on regions
-for region in regionlist[4:end]
+for region in regionlist[3:3]
 	@info("Working on region $(region)")
 	regionstring = replace(region, " "=>"_")
 	regiondir = joinpath(databasedir, region)
 	isdir(regiondir) ? @debug("Directory exists") : @warn("Directory does not exist")
 
-	seasonlist = readdir(regiondir)
-	seasondir = joinpath(regiondir, seasonlist[1])	
+	seasonlist = readdir(regiondir, join=true)
+	seasonlist = seasonlist[isdir.(seasonlist)]
+	seasondir = seasonlist[1]
 
 	# Generate a list of files from the first season directory
 	# (since the file names are the same for each season)
@@ -63,7 +64,7 @@ for region in regionlist[4:end]
         @info("Output directory: $(outputdir)");
  
 	# Now for each variable we construct the path of the 4 files (one per season)
-	for variable in datafilelist[1:3]
+	for variable in datafilelist[3:3]
 		@info("Working on variable $(variable)");
 			
 		# Ensure the intermediate directory is there
@@ -71,9 +72,8 @@ for region in regionlist[4:end]
 	        isdir(splitdir) ? @debug("ok") : mkpath(splitdir);
 	
 		# Create the name of the new output file
-		# (adding a '_year' suffix; could be modified)	
-		outputfile = joinpath(outputdir, replace(variable, ".4Danl.nc"=>"_year.4Danl.nc"))
-		@info("Creating new output file $(outputfile)")
+		outputfile = joinpath(outputdir, variable)
+		@info("Creating new output file $(outputfile)");
 
 		# Generate a list of file path for: 1 region and 1 variable (and hence 4 seasons)
 		datafilepaths = [joinpath(databasedir, region, season, variable) for season in seasonlist];
@@ -95,7 +95,7 @@ for region in regionlist[4:end]
                             if isfile(splitfile)
                                 @debug("The output file has already been created")
                             else
-                                #run(nckscommand);
+                                run(nckscommand);
                                 @debug("ok");
 			    end
                         end
@@ -109,7 +109,7 @@ for region in regionlist[4:end]
 		if isfile(outputfile)
 			@info("The output file has already been created")
 		else
-			#run(ncrcatcommand);
+			run(ncrcatcommand);
 			@debug("ok");
 		end
 
