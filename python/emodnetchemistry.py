@@ -35,10 +35,13 @@ plt.rcParams.update({
     'figure.titlesize': 20
 })
 
-
 logger = logging.getLogger("EMODnet-Chemistry-Data-positions")
 logger.setLevel(logging.DEBUG)
 logging.info("Starting")
+
+# Setting colors
+coastfacecolor = ".75"
+coastedgecolor = None
 
 colorlist = {"ArcticSea": "#1f77b4",
              "NorthAtlantic": "#ff7f0e",
@@ -66,7 +69,6 @@ varnamedict = {"phosphate": "Water body phosphate",
                "dissolved_inorganic_nitrogen": "Water body dissolved inorganic nitrogen (DIN)",
                "dissolved_oxygen": "Water body dissolved oxygen concentration"}
 
-# datadir = "/data/EMODnet/Eutrophication/Split/"
 datadir = "/data/EMODnet/Eutrophication/Split/"
 
 def read_coords_time_nc(ncfile):
@@ -149,7 +151,7 @@ def read_coords_time(residualfile):
     return lon, lat, depths, years, months
 
 def all_positions(datafilelist: list):
-    """Read all the longitudes and latitudes from a list of file
+    """Read all the longitudes and latitudes from a list of files
 
     Parameters
     ----------
@@ -177,48 +179,11 @@ def all_positions(datafilelist: list):
         # (bug in previous version of ODV for the export)
         lon[lon > 180] -= 360.
 
-        
         lonall = np.append(lonall, lon)
         latall = np.append(latall, lat)
         datesall = np.append(datesall, dates)
     return lonall, latall, datesall
 
-def all_positions_basemap(m, datafilelist: list):
-    """Read all the longitudes and latitudes from a list of file
-
-    Parameters
-    ----------
-    m : Basemap
-        An instance of a mpl_toolkits.basemap.Basemap
-    datafilelist : list
-        A list of file paths
-
-    Returns
-    -------
-    lonall : numpy.ndarray
-    latall : numpy.ndarray
-    datesall : numpy.ndarray
-        Array of DatetimeGregorian (as obtained by `netCDF4.num2date` method)
-    """
-    lonall = np.array([])
-    latall = np.array([])
-    datesall = np.array([])
-    for datafile in datafilelist:
-        with netCDF4.Dataset(datafile, "r") as nc:
-            lon = nc.get_variables_by_attributes(standard_name="longitude")[0][:]
-            lat = nc.get_variables_by_attributes(standard_name="latitude")[0][:]
-            times = nc.get_variables_by_attributes(standard_name="time")[0]
-            dates = netCDF4.num2date(times[:], times.units)
-
-        # Ensure longitudes between -180° and 180°
-        # (bug in previous version of ODV for the export)
-        lon[lon > 180] -= 360.
-
-        llon, llat = m(lon, lat)
-        lonall = np.append(lonall, llon)
-        latall = np.append(latall, llat)
-        datesall = np.append(datesall, dates)
-    return lonall, latall, datesall
 
 def read_variable_woa(datafile, domain=[-180., 180., -90., 90.]):
     """Read the variable from the WOA or DIVAnd netCDF file `datafile`
@@ -314,7 +279,7 @@ def read_variable_diva(datafile, domain=[-180., 180., -90., 90.], timeindex=0):
 
     return lon, lat, depth, date, field
 
-def plot_oxy_map(llon, llat, field, depth, figname=""):
+def plot_oxy_map(llon, llat, field, depth, theproj, figname=""):
     """Create map with the interpolated values of oxygen concentration
 
     Parameters
@@ -324,22 +289,19 @@ def plot_oxy_map(llon, llat, field, depth, figname=""):
     field : numpy.ndarray
     depth : float
         Depth (in meters) of the layer to be plotted.
+    theproj : cartopy.crs
+        A cartopy projection
     figname : str, default: ""
         Path of the figure to be saved. If "", no figure is saved
 
     """
-    fig = plt.figure(figsize=(10, 10))
-    ax = plt.subplot(111)
-    pcm = m.pcolormesh(llon, llat, field, latlon=True, vmin=200., vmax=375.)
+    plt.figure(figsize=(10, 10))
+    ax = plt.subplot(111, projection=theproj)
+    pcm = ax.pcolormesh(llon, llat, field, latlon=True, vmin=200., vmax=375.)
     cb = plt.colorbar(pcm, shrink=.6, extend="both")
     cb.set_label(r"$\mu$moles/kg", rotation=0, ha="left")
     cb.set_ticks(np.arange(200., 376., 25))
-    m.drawmeridians(np.arange(-40., 60., 20.), zorder=2, labels=[0, 0, 0, 1], fontsize=14,
-                    linewidth=.25)
-    m.drawparallels(np.arange(20., 80., 10.), zorder=2, labels=[1, 0, 0, 0], fontsize=14,
-                    linewidth=.25)
-    m.fillcontinents(color=".85", zorder=3)
-    m.drawcoastlines(linewidth=0.1, zorder=4)
+    ax.coastlines(facecolor=coastfacecolor)
     plt.title("Oxygen concentration at {} m".format(depth))
     if len(figname) > 0:
         plt.savefig(figname)
@@ -489,7 +451,7 @@ def plot_data_locations(theproj, varname, regiondict, figname=""):
     nfiles = len(datafilelist)
     logger.info("Working on {} files".format(nfiles))
 
-    fig = plt.figure(figsize=(12, 12))
+    plt.figure(figsize=(12, 12))
     ax = plt.subplot(111, projection=theproj)
     regionkeyold = ""
     for datafile in datafilelist:
@@ -513,7 +475,7 @@ def plot_data_locations(theproj, varname, regiondict, figname=""):
     ax.plot(xxx.flatten(), yyy.flatten(), "wo", ms=.1, transform=ccrs.PlateCarree(), zorder=5)
 
     # ax.plot(5., 51., "o", ms=6, color=".75", markerfacecolor=".75", transform=ccrs.PlateCarree(), zorder=4)
-    ax.add_feature(coast, facecolor=".75")
+    ax.add_feature(coast, facecolor=coastfacecolor, edgecolor=coastedgecolor)
 
     # gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=False)
     plt.legend(fontsize=14, loc=3)
@@ -540,7 +502,7 @@ def plot_data_locations_basemap(m, varname, regiondict, figname=""):
     nfiles = len(datafilelist)
     logger.info("Working on {} files".format(nfiles))
 
-    fig = plt.figure(figsize=(12, 12))
+    plt.figure(figsize=(12, 12))
     regionkeyold = ""
     for datafile in datafilelist:
         regionkey = os.path.basename(datafile).split("_")[0]
@@ -624,7 +586,7 @@ def plot_hexbin_datalocations(theproj, varname, figname=""):
     ----------
 
     theproj : cartopy.crs
-        Cartpy projection 
+        Cartopy projection 
     varname : str
         Name of the variable; should be one of those:
         "phosphate", "silicate", "ammonium", "chlorophyll-a",
@@ -638,21 +600,28 @@ def plot_hexbin_datalocations(theproj, varname, figname=""):
     nfiles = len(datafilelist)
     logger.info("Working on {} files".format(nfiles))
 
-    lonall, latall, dates_all = all_positions(datafilelist)
-    fig = plt.figure(figsize=(10, 10))
+    # Read all the data
+    lonall, latall, _ = all_positions(datafilelist)
+
+    # Project data (issue with Cartopy/hexbin)
+    coords_proj = theproj.transform_points(ccrs.PlateCarree(), lonall, latall)
+    lonp = coords_proj[:,0]
+    latp = coords_proj[:,1]
+
+    plt.figure(figsize=(10, 10))
     ax = plt.subplot(111, projection=theproj)
     xx = np.arange(-180, 180, 30)
     yy = np.arange(-90, 90, 30.)
     xxx, yyy = np.meshgrid(xx, yy)
     ax.plot(xxx.flatten(), yyy.flatten(), "wo", ms=.1, transform=ccrs.PlateCarree(), zorder=5)
-    hb = ax.hexbin(lonall, latall, bins="log", vmin=1, vmax=100000, transform=datacrs,
-             mincnt=3, gridsize=30, zorder=3, cmap=plt.cm.hot_r)
+    hb = ax.hexbin(lonp, latp, bins="log", vmin=1, vmax=100000,
+             mincnt=3, gridsize=30, zorder=3, cmap=plt.cm.Greens_r)
     cb = plt.colorbar(hb, shrink=.7, extend="both")
-    ax.add_feature(coast, facecolor=".75")
+    ax.add_feature(coast, facecolor=coastfacecolor, edgecolor=coastedgecolor, zorder=6)
     #cb.set_ticks([1., 2., 3., 4., 5.])
     #cb.set_ticklabels(["10", "100", "1000", "10000", "100000"])
     cb.set_label("Number of\ndata points\nper cell", fontsize=14, rotation=0, ha="left")
-    plt.title(varname.replace("_", " ").capitalize())
+    plt.title("Sea water {varname.replace('_', ' ')}")
     if len(figname) > 0:
         plt.savefig(figname)
     plt.close()
