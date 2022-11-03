@@ -49,17 +49,17 @@ colorlist = {"ArcticSea": "#1f77b4",
              "MediterraneanSea": "#9467bd", "NorthSea": "#8c564b"}
 
 colorlist2 = ['#1f77b4',
-             '#ff7f0e', '#ff7f0e',
-             '#2ca02c', '#2ca02c',
+             '#ff7f0e', #'#ff7f0e',
+             '#2ca02c', #'#2ca02c',
              '#d62728',
-             '#9467bd', '#9467bd',
+             '#9467bd', #'#9467bd',
              '#8c564b']
 
 histlabels = ['Arctic Sea',
-              'North-East Atlantic Ocean', '',
-              'Baltic Sea', '',
+              'Baltic Sea', 
               'Black Sea',
-              'Mediterranean Sea', '',
+              'Mediterranean Sea',
+              'North-East Atlantic Ocean',
               'North Sea']
 
 varnamedict = {"phosphate": "Water body phosphate",
@@ -434,7 +434,7 @@ def plot_WOA_DIVAnd_comparison(m, lon1, lat1, field1, lon2, lat2, field2, depth,
         plt.savefig(figname, dpi=300, bbox_inches="tight")
     plt.close()
     
-def plot_data_locations(theproj, varname, regiondict, figname=""):
+def plot_data_locations(theproj, varname, regiondict, figname="", bathy=False):
     """Plot the data location on a map, one color per region
 
     Parameters
@@ -462,22 +462,29 @@ def plot_data_locations(theproj, varname, regiondict, figname=""):
         region.get_data_coords(datafile)
 
         col = colorlist[regionkey]
-        pp = ax.plot(region.londata, region.latdata, "o", color=col, ms=.03, transform=ccrs.PlateCarree())
+        pp = ax.plot(region.londata, region.latdata, "o", color=col, ms=.03, 
+        transform=ccrs.PlateCarree(), zorder=3)
 
         if regionkey != regionkeyold:
-            ax.plot(5., 51., "o", ms=5, color=col, markerfacecolor=col, transform=ccrs.PlateCarree(), label=region.name)
+            ax.plot(5., 51., "o", ms=5, color=col, markerfacecolor=col, 
+            transform=ccrs.PlateCarree(), label=region.name, zorder=1)
 
         regionkeyold = regionkey
 
     xx = np.arange(-180, 180, 30)
     yy = np.arange(-90, 90, 30.)
     xxx, yyy = np.meshgrid(xx, yy)
-    ax.plot(xxx.flatten(), yyy.flatten(), "wo", ms=.1, transform=ccrs.PlateCarree(), zorder=5)
+    ax.plot(xxx.flatten(), yyy.flatten(), "wo", ms=.1, transform=ccrs.PlateCarree(), zorder=1)
 
     # ax.plot(5., 51., "o", ms=6, color=".75", markerfacecolor=".75", transform=ccrs.PlateCarree(), zorder=4)
-    ax.add_feature(coast, facecolor=coastfacecolor, edgecolor=coastedgecolor)
+    ax.add_feature(coast, facecolor=coastfacecolor, edgecolor=coastedgecolor, zorder=2)
 
     # gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=False)
+
+    if bathy == True:
+            ax.add_wms(wms='http://ows.emodnet-bathymetry.eu/wms',
+               layers=['emodnet:mean_atlas_land', 'coastlines'])
+
     plt.legend(fontsize=14, loc=3)
     plt.title(f"Observations of sea water {varname} concentration")
     if len(figname) > 0:
@@ -571,7 +578,7 @@ def plot_data_locations_domains(m, varname, regiondict, figname=""):
 
         regionkeyold = regionkey
 
-    m.plot(5., 51., "o", ms=6, color=".75", markerfacecolor=".75", latlon=True, zorder=4)
+    # m.plot(5., 51., "o", ms=6, color=".75", markerfacecolor=".75", latlon=True, zorder=4)
     m.fillcontinents(color=".75")
     plt.legend(fontsize=14, loc=3)
     plt.title(f"Observations of sea water {varname} concentration")
@@ -615,13 +622,13 @@ def plot_hexbin_datalocations(theproj, varname, figname=""):
     xxx, yyy = np.meshgrid(xx, yy)
     ax.plot(xxx.flatten(), yyy.flatten(), "wo", ms=.1, transform=ccrs.PlateCarree(), zorder=5)
     hb = ax.hexbin(lonp, latp, bins="log", vmin=1, vmax=100000,
-             mincnt=3, gridsize=30, zorder=3, cmap=plt.cm.Greens_r)
+             mincnt=3, gridsize=30, zorder=3, cmap=plt.cm.Greens)
     cb = plt.colorbar(hb, shrink=.7, extend="both")
     ax.add_feature(coast, facecolor=coastfacecolor, edgecolor=coastedgecolor, zorder=6)
     #cb.set_ticks([1., 2., 3., 4., 5.])
     #cb.set_ticklabels(["10", "100", "1000", "10000", "100000"])
     cb.set_label("Number of\ndata points\nper cell", fontsize=14, rotation=0, ha="left")
-    plt.title("Sea water {varname.replace('_', ' ')}")
+    plt.title(f"Sea water {varname.replace('_', ' ')}")
     if len(figname) > 0:
         plt.savefig(figname)
     plt.close()
@@ -672,7 +679,7 @@ def make_histo_values(obsval, varname, figdir="./", stack=False):
     varname : str
         Name of the variables
     figdir : str, default: "./"
-        Path of the figure directory
+        Directory of the figure 
     strack : bool, default: False
         If true, the histogram use different color for each sub-array of obsval,
         typically one per region
@@ -708,9 +715,10 @@ def make_histo_values(obsval, varname, figdir="./", stack=False):
     plt.xlim(0., vmax)
 
     if stack is True:
-        fname = os.path.join(figdir, f"values_histogram_{varname}_stack")
+        fname = os.path.join(figdir, f"value_histogram_{varname}_stack")
     else:
-        fname = os.path.join(figdir, f"values_histogram_{varname}")
+        fname = os.path.join(figdir, f"value_histogram_{varname}")
+
 
     plt.savefig(fname)
     #plt.show()
@@ -762,7 +770,7 @@ def make_histo_year(years, varname, figdir="./", stack=False):
     plt.savefig(fname)
     plt.close()
 
-def make_histo_month(months, varname, figdir="./"):
+def make_histo_month(months, varname, figdir="./", stack=False):
     """Create an histogram for the month
 
     Parameters
@@ -774,14 +782,30 @@ def make_histo_month(months, varname, figdir="./"):
     figdir : str, default: "./"
         Path of the figure directory
     """
+
+    months_flat = []
+    for months_region in months:
+        for mm in months_region:
+            months_flat.append(mm)
+
+
     monthlist = [calendar.month_name[i] for i in range(1, 13)]
+
     fig = plt.figure(figsize=(12, 12))
     ax = plt.subplot(111)
-    plt.hist(months, bins=12, rwidth=.8, color=".2")
+
+    if stack is True:
+        plt.hist(months, bins=12, rwidth=.8, histtype='bar',
+                 stacked=True, color=colorlist2[0:len(months)],
+                 label=histlabels[0:len(months)])
+        plt.legend(loc=2)
+    else:
+        plt.hist(months_flat, bins=12, rwidth=.8, color=".2")
+
     plt.xticks(np.arange(1.5, 13.5), monthlist)
     plt.ylabel("Number of\nobservations", rotation=0, ha="right")
     fig.autofmt_xdate()
-    plt.title(varname.replace("_", " ").capitalize())
+    plt.title(varnamedict[varname])
     plt.savefig(os.path.join(figdir, f"month_histogram_{varname}"))
     plt.close()
 
@@ -868,7 +892,16 @@ class Region(object):
         latvector = np.append(latvector, np.fliplr([self.lats])[0])
         self.latvector = latvector
 
-    def get_rect_patch(self, m, **kwargs):
+    def get_rect_patch(self, theproj, **kwargs):
+        coords_proj = theproj.transform_points(ccrs.PlateCarree(), self.lonvector, self.latvector)
+        lonp = coords_proj[:,0]
+        latp = coords_proj[:,1]
+        coords = []
+        for xx, yy in zip(lonp, latp):
+            coords.append((xx, yy))
+        self.rect = Polygon(coords, **kwargs)
+
+    def get_rect_patch_basemap(self, m, **kwargs):
         x, y = m(self.lonvector, self.latvector)
         coords = []
         for xx, yy in zip(x, y):
