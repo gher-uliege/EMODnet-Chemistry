@@ -1,6 +1,7 @@
-# edit_mergedfiles_attrib.jl
-# Modify the attributes of the merged files
-# as required by the Central Portal
+"""edit_mergedfiles_attrib.jl
+Modify the attributes of the merged files
+as required by the Central Portal
+"""
 
 include("MergingClim.jl")
 using NCDatasets
