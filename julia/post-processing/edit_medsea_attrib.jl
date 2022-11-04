@@ -1,3 +1,6 @@
+"""Add the missing product IDs to the Med Sea products
+"""
+
 using NCDatasets
 include("emodnetchemistry.jl")
 

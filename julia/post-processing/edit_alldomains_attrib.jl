@@ -1,3 +1,10 @@
+"""Add new attributes to all the files:
+- bathymetry
+- DIVAnd source
+- project
+...
+"""
+
 include("./emodnetchemistry.jl")
 using NCDatasets
 

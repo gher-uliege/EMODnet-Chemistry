@@ -1,18 +1,11 @@
+"""Modify the attributes of the Black Sea merged file
+"""
+
 using NCDatasets
 using Dates
 using Glob
 using DIVAnd
 using Test
-include("MergingClim.jl")
-
-# Merge the 4 seasonal file into a unique, annual file for each variable and each season.
-# The record variable (time) has already been created.
-#
-# 1. Loop on the regions
-# 2. Loop on the variables
-# 3. List the files corresponding to the variable and the region
-# 4. Process the list of files
-
 
 # User inputs
 # ------------
@@ -56,8 +49,4 @@ for datafile in datafilelist
     nccommand = `ncatted -a WEB_visualisation,global,d,, "$(datafile)" "$(datafile)"`
 	run(nckscommand);
 
-    
-
-
 end
-
