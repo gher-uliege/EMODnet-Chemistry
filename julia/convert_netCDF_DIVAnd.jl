@@ -23,21 +23,10 @@ varlist = ["Water body phosphate",
 inputdir = "/data/EMODnet/Eutrophication/"
 outputdir = "/data/EMODnet/Eutrophication/Split"
 
-#inputfile = joinpath(inputdir, "data_from_Black_Sea_Eutrophication_2021_v1_DIVA.nc")
-#inputfile = joinpath(inputdir, "data_from_QF6_Reiner_data_from_NS 2021 Nutrient data required final(1).nc")
-#inputfile = joinpath(inputdir, "Eutrophication_profiles_Arctic/data_from_Eutrophication_Arctic_profiles_all_20210129.nc")
-#inputfile = joinpath(inputdir, "BalticSea_Eutrophication_2021/data_from_BS_eutrophication_profiles_v2_210218.nc")
-#inputfile = joinpath(inputdir, "BalticSea_Eutrophication_2021/data_from_BS_eutrophication_timeseries_210201.nc")
-#inputfile = joinpath(inputdir, "Med_Collections/data_from_Eutrophication_MED_profiles_2.2021.nc")
-#inputfile = joinpath(inputdir, "Eutrophication_MED_unrestricted_2021/data_from_data_from_Eutrophication_MED_profiles_2.2021_unrestricted.nc")
-#inputfile = joinpath(inputdir, "Eutrophication_MED_unrestricted_2021/data_from_data_from_Eutrophication_MED_time_series_2.2021_unrestricted.nc")
-#inputfile = joinpath(inputdir, "Med_Collections/data_from_Eutrophication_MED_profiles_2.2021.nc")
-#inputfile = joinpath(inputdir, "Med_Collections/data_from_Eutrophication_MED_time_series_2.2021.nc")
-inputfile = joinpath(inputdir, "Atlantic_V2/Final_for_DIVA_Eutrophication_Acidification_NAT_all_time_series.nc")
-#inputfile = joinpath(inputdir, "Final_Eutrophication_Acidification_NAT/data_from_Final_Eutrophication_Acidification_NAT_all_time_series.nc")
+inputfile = joinpath(inputdir, "data_from_NS_eutrophication_2021_v2.nc")
 
 # Set region name (in agreeent with the input file!)
-regionname = "Atlantic2_TS"
+regionname = "NorthSea"
 
 
 !isdir(outputdir) ? mkdir(outputdir) : @debug("Already created")
