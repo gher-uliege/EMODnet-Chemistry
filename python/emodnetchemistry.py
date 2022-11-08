@@ -69,7 +69,7 @@ varnamedict = {"phosphate": "Water body phosphate",
                "dissolved_inorganic_nitrogen": "Water body dissolved inorganic nitrogen (DIN)",
                "dissolved_oxygen": "Water body dissolved oxygen concentration"}
 
-datadir = "/data/EMODnet/Eutrophication/Split/"
+# datadir = "/data/EMODnet/Eutrophication/Split/"
 
 def read_coords_time_nc(ncfile):
     """Read the observations positions and the time (year and month)
@@ -434,7 +434,7 @@ def plot_WOA_DIVAnd_comparison(m, lon1, lat1, field1, lon2, lat2, field2, depth,
         plt.savefig(figname, dpi=300, bbox_inches="tight")
     plt.close()
     
-def plot_data_locations(theproj, varname, regiondict, figname="", bathy=False):
+def plot_data_locations(theproj, datadir, varname, regiondict, figname="", bathy=False, bbox=None, isglobal=True):
     """Plot the data location on a map, one color per region
 
     Parameters
@@ -450,6 +450,7 @@ def plot_data_locations(theproj, varname, regiondict, figname="", bathy=False):
     datafilelist = sorted(glob.glob(os.path.join(datadir, f"*{varname}*.nc")))
     nfiles = len(datafilelist)
     logger.info("Working on {} files".format(nfiles))
+    logger.info(datafilelist)
 
     plt.figure(figsize=(12, 12))
     ax = plt.subplot(111, projection=theproj)
@@ -462,7 +463,7 @@ def plot_data_locations(theproj, varname, regiondict, figname="", bathy=False):
         region.get_data_coords(datafile)
 
         col = colorlist[regionkey]
-        pp = ax.plot(region.londata, region.latdata, "o", color=col, ms=.03, 
+        pp = ax.plot(region.londata, region.latdata, "o", color=col, ms=2, 
         transform=ccrs.PlateCarree(), zorder=3)
 
         if regionkey != regionkeyold:
@@ -471,22 +472,32 @@ def plot_data_locations(theproj, varname, regiondict, figname="", bathy=False):
 
         regionkeyold = regionkey
 
-    xx = np.arange(-180, 180, 30)
-    yy = np.arange(-90, 90, 30.)
-    xxx, yyy = np.meshgrid(xx, yy)
-    ax.plot(xxx.flatten(), yyy.flatten(), "wo", ms=.1, transform=ccrs.PlateCarree(), zorder=1)
+
+    if isglobal:
+        # Add fake points to get global grid (dirty)
+        xx = np.arange(-180, 180, 30)
+        yy = np.arange(-90, 90, 30.)
+        xxx, yyy = np.meshgrid(xx, yy)
+        ax.plot(xxx.flatten(), yyy.flatten(), "wo", ms=.1, transform=ccrs.PlateCarree(), zorder=1)
+    else:
+        gl = ax.gridlines(crs=ccrs.PlateCarree(), linewidth=.5, color='.25', linestyle='--', draw_labels=True)
+        gl.top_labels = False
+        gl.right_labels = False
 
     # ax.plot(5., 51., "o", ms=6, color=".75", markerfacecolor=".75", transform=ccrs.PlateCarree(), zorder=4)
     ax.add_feature(coast, facecolor=coastfacecolor, edgecolor=coastedgecolor, zorder=2)
 
-    # gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=False)
+    # 
 
     if bathy == True:
             ax.add_wms(wms='http://ows.emodnet-bathymetry.eu/wms',
                layers=['emodnet:mean_atlas_land', 'coastlines'])
 
-    plt.legend(fontsize=14, loc=3)
-    plt.title(f"Observations of sea water {varname} concentration")
+    if bbox is not None:
+        ax.set_extent(bbox)
+
+    plt.legend(fontsize=14, loc=2)
+    plt.title(f"Observations of sea water {varname.replace('_', ' ')} concentration")
     if len(figname) > 0:
         plt.savefig(figname)
     plt.close()
@@ -528,13 +539,13 @@ def plot_data_locations_basemap(m, varname, regiondict, figname=""):
 
     m.plot(5., 51., "o", ms=6, color=".75", markerfacecolor=".75", latlon=True, zorder=4)
     m.fillcontinents(color=".75")
-    plt.legend(fontsize=14, loc=3)
+    plt.legend(fontsize=14, loc=1)
     plt.title(f"Observations of sea water {varname} concentration")
     if len(figname) > 0:
         plt.savefig(figname)
     plt.close()
 
-def plot_data_locations_domains(m, varname, regiondict, figname=""):
+def plot_data_locations_domains(m, varname, regiondict, datadir, figname=""):
     """Plot the data positions and the domains on the map
 
     Parameters
@@ -580,13 +591,13 @@ def plot_data_locations_domains(m, varname, regiondict, figname=""):
 
     # m.plot(5., 51., "o", ms=6, color=".75", markerfacecolor=".75", latlon=True, zorder=4)
     m.fillcontinents(color=".75")
-    plt.legend(fontsize=14, loc=3)
+    plt.legend(fontsize=14, loc=1)
     plt.title(f"Observations of sea water {varname} concentration")
     if len(figname) > 0:
         plt.savefig(figname)
     plt.close()
     
-def plot_hexbin_datalocations(theproj, varname, figname=""):
+def plot_hexbin_datalocations(theproj, datadir, varname, figname=""):
     """Create hexbin plot using the data positions read from a list of file
 
     Parameters
