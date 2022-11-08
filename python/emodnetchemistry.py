@@ -760,12 +760,12 @@ def make_histo_year(years, varname, figdir="./", stack=False):
     ax = plt.subplot(111)
 
     if stack is True:
-        plt.hist(years, bins=np.arange(1928, 2021), rwidth=.8, histtype='bar',
+        plt.hist(years, bins=np.arange(1928, 2023), rwidth=.8, histtype='bar',
                  stacked=True, color=colorlist2[0:len(years)],
                  label=histlabels[0:len(years)])
         plt.legend(loc=2)
     else:
-        plt.hist(year_flat, bins=np.arange(1928, 2021), rwidth=.8, color=".2")
+        plt.hist(year_flat, bins=np.arange(1928, 2023), rwidth=.8, color=".2")
 
     plt.xticks(np.arange(1950, 2030, 10))
     fig.autofmt_xdate()

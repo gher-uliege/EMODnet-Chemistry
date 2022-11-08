@@ -58,7 +58,8 @@ timerange = [Date(1000,1,1),Date(3000,12,31)]
 # set EMAIL address in ~/.bachrc, for example
 # export EMAIL="..."
 
-email = ENV["EMAIL"]
+#email = ENV["EMAIL"]
+email = "ctroupin@uliege.be"
 
 datadir = first(filter(isdir,["/data",expanduser("~/tmp/EMODnet-Chemistry-data/")]))
 
