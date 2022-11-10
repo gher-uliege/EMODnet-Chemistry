@@ -62,10 +62,11 @@ timerange = [Date(1000,1,1),Date(3000,12,31)]
 email = "ctroupin@uliege.be"
 
 datadir = first(filter(isdir,["/data",expanduser("~/tmp/EMODnet-Chemistry-data/")]))
+datadir = "/data/"
 
 woddir = joinpath(datadir,"WOD")
 
-obsdir = joinpath(datadir,"EMODnet")
+obsdir = joinpath(datadir,"EMODnet/2022")
 excludedir = joinpath(datadir,"EMODnet","blacklist")
 
 # Name of the variables (WOD)

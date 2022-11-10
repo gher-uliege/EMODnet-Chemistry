@@ -175,6 +175,7 @@ obslon = mod.(obslon .+ 180,360) .- 180
 rdiag_len = 0.1
 #rdiag_len = 0.5
 
+mkpath(joinpath(obsdir,"weights"))
 #filename_rdiag = joinpath(obsdir,"weights","$(varname)_len$(rdiag_len)_rdiag.nc")
 filename_rdiag = joinpath(obsdir,"weights","$(varname)_rdiag.nc")
 
@@ -254,7 +255,7 @@ mkpath(casedir)
 
 @info "casedir: $casedir"
 
-gitdiff(casedir)
+#gitdiff(casedir)
 
 # Figures
 figdir = joinpath(casedir,"Figures")
