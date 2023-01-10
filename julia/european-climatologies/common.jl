@@ -2,6 +2,8 @@ using DIVAnd
 using Dates
 using DelimitedFiles
 
+do_exclude = false      # Flag to remove bad data from a list of indices stored in file
+
 # common parameters to various scripts
 
 # Grid and resolutions
@@ -61,12 +63,12 @@ timerange = [Date(1000,1,1),Date(3000,12,31)]
 #email = ENV["EMAIL"]
 email = "ctroupin@uliege.be"
 
-datadir = first(filter(isdir,["/data",expanduser("~/tmp/EMODnet-Chemistry-data/")]))
-datadir = "/data/"
+#datadir = first(filter(isdir,["/data",expanduser("~/tmp/EMODnet-Chemistry-data/")]))
+datadir = expanduser("~/Data/EMODnet")
 
 woddir = joinpath(datadir,"WOD")
 
-obsdir = joinpath(datadir,"EMODnet/2022")
+obsdir = joinpath(datadir,"2022")
 excludedir = joinpath(datadir,"EMODnet","blacklist")
 
 # Name of the variables (WOD)
