@@ -102,7 +102,7 @@ else
     epsilon2 = 2.
     #epsilon2 = 0.5
 
-    filenamebackground = joinpath(datadir,"Case/$(varname_)-res-$(deltalon)-epsilon2-$(epsilon2_background)-$(clversion)-lb$(lb)-maxit-$(maxit)-reltol-$(reltol)-$(suffix)-background/Results/$(varname_)_background.nc")
+    filenamebackground = joinpath(datadir,"2022/Case/$(varname_)-res-$(deltalon)-epsilon2-$(epsilon2_background)-$(clversion)-lb$(lb)-maxit-$(maxit)-reltol-$(reltol)-$(suffix)-background/Results/$(varname_)_background.nc")
     background = DIVAnd.backgroundfile(filenamebackground,varname,TSbackground)
 
     #debug
@@ -250,7 +250,7 @@ if isfile(varname_ * ".jl")
     include(varname_ * ".jl")
 end
 
-casedir = joinpath(datadir,"Case/$(varname_)-res-$(deltalon)-epsilon2-$(epsilon2)-$(clversion)-lb$(lb)-maxit-$(maxit)-reltol-$(reltol)-$(suffix)-$(analysistype)")
+casedir = joinpath(datadir,"2022/Case/$(varname_)-res-$(deltalon)-epsilon2-$(epsilon2)-$(clversion)-lb$(lb)-maxit-$(maxit)-reltol-$(reltol)-$(suffix)-$(analysistype)")
 mkpath(casedir)
 
 @info "casedir: $casedir"
@@ -282,7 +282,6 @@ else
     if isfile(filename)
         rm(filename)
     end
-
 #=
 ioff()
 clf()
