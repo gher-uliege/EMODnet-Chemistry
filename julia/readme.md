@@ -7,7 +7,7 @@ Tools used to
 
 The files and notebooks are now separared in different sub-folders.
 
-### Climatology merging
+### 1. Climatology merging
 
 `MergingClim.jl` is the module where all the functions are defined.       
 `merge_products.jl` is the script that actually performs the merging.
@@ -18,6 +18,10 @@ The files and notebooks are now separared in different sub-folders.
 include("test.jl")
 ```
 
+### 2. All European Seas products
+
+Contains the scripts for the preparation of the new products covering all the European Seas.
+            
 ### Post-processing
 
 Contains scripts to edit the attributes or to add the _deepest depth_ variable.

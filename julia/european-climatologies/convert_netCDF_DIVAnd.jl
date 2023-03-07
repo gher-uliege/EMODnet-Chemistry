@@ -24,10 +24,10 @@ varlist = ["Water body phosphate",
 inputdir = "/data/EMODnet/Eutrophication/"
 outputdir = "/data/EMODnet/Eutrophication/Split"
 
-inputfile = joinpath(inputdir, "data_from_BALTIC_eutrophication_timeseries_20221005.nc")
+inputfile = joinpath(inputdir, "data_from_North Sea_non-nutrient_data_from_profiles.nc")
 
 # Set region name (in agreeent with the input file!)
-regionname = "BalticSea_TS"
+regionname = "NorthSea2"
 
 
 !isdir(outputdir) ? mkdir(outputdir) : @debug("Already created")
