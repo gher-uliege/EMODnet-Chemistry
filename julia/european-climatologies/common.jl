@@ -2,12 +2,14 @@ using DIVAnd
 using Dates
 using DelimitedFiles
 
+do_exclude = false      # Flag to remove bad data from a list of indices stored in file
+
 # common parameters to various scripts
 
 # Grid and resolutions
 
-deltalon = 0.1
-deltalat = 0.1
+#deltalon = 0.1
+#deltalat = 0.1
 
 deltalon = 0.25
 deltalat = 0.25
@@ -61,11 +63,12 @@ timerange = [Date(1000,1,1),Date(3000,12,31)]
 #email = ENV["EMAIL"]
 email = "ctroupin@uliege.be"
 
-datadir = first(filter(isdir,["/data",expanduser("~/tmp/EMODnet-Chemistry-data/")]))
+#datadir = first(filter(isdir,["/data",expanduser("~/tmp/EMODnet-Chemistry-data/")]))
+datadir = expanduser("~/Data/EMODnet")
 
 woddir = joinpath(datadir,"WOD")
 
-obsdir = joinpath(datadir,"EMODnet")
+obsdir = joinpath(datadir,"2022")
 excludedir = joinpath(datadir,"EMODnet","blacklist")
 
 # Name of the variables (WOD)
@@ -73,11 +76,11 @@ varnames = ["Oxygen","Phosphate","Silicate","Nitrate and Nitrate+Nitrite","pH","
 
 # Name of the variables (EMODnet Chemistry)
 varlist = ["Water body phosphate",
-           "Water body dissolved oxygen concentration",
            "Water body chlorophyll-a",
            "Water body dissolved inorganic nitrogen (DIN)",
-#           "Water body ammonium",
+           "Water body ammonium",
            "Water body silicate",
+	   "Water body dissolved oxygen concentration"
            ]
 
 
@@ -141,6 +144,7 @@ varinfo = Dict(
         "netcdf_units" => "umol/l",
         # http://cfconventions.org/Data/cf-standard-names/current/build/cf-standard-name-table.html
         "netcdf_standard_name" => "mole_concentration_of_ammonium_in_sea_water",
+        "doi" => "https://doi.org/10.6092/av67-qz53", # Ammonium
     ),
     "Water body silicate" => Dict(
          # http://vocab.nerc.ac.uk/collection/P02/current/
@@ -219,5 +223,5 @@ end
 
 exclude_sampleid(fname_exclude::AbstractString) = sampleid.(loadexclude(fname_exclude)...)
 
-
-exclude_sampleid(fnames_exclude::AbstractVector) = reduce(vcat,exclude_sampleid.(fnames_exclude))
+exclude_sampleid(fnames_exclude::AbstractVector) = reduce(vcat,exclude_sampleid.(fnames_exclude),init=Tuple{Int,Int,Int,DateTime,String}[])
+#exclude_sampleid(fnames_exclude::AbstractVector) = reduce(vcat,exclude_sampleid.(fnames_exclude))

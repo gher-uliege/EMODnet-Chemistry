@@ -21,13 +21,13 @@ varlist = ["Water body phosphate",
            ]
 
 # Set input and output directories
-inputdir = "/data/EMODnet/Eutrophication/"
-outputdir = "/data/EMODnet/Eutrophication/Split"
+inputdir = "/home/ctroupin/data/EMODnet/Eutrophication/"
+outputdir = "/home/ctroupin/data/EMODnet/Eutrophication/Split"
 
-inputfile = joinpath(inputdir, "data_from_North Sea_non-nutrient_data_from_profiles.nc")
+inputfile = joinpath(inputdir, "data_from_NS_non-nutrient_data_from_time_series.nc")
 
 # Set region name (in agreeent with the input file!)
-regionname = "NorthSea2"
+regionname = "NorthSea_TS2"
 
 
 !isdir(outputdir) ? mkdir(outputdir) : @debug("Already created")
@@ -48,7 +48,7 @@ if isfile(inputfile)
          try
             @info("Reading original netCDF file")
                @time obsval, obslon, obslat, obsdepth, obstime, obsid =
-                   NCODV.load(Float64, inputfile, varname);
+                   NCODV.load(Float64, inputfile, varname, qv_flags = ["no_quality_control", "good_value", "probably_good_value"]);
 
             @info("Writing new netCDF file")
             @time DIVAnd.saveobs(outputfile, varname, obsval,
