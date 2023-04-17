@@ -495,6 +495,7 @@ end
     read_obs(filelist)
 
 Read the observations from a list of netCDF files.
+The observations IDs are automatically merged using the function `merge_obsids`
 
 ## Example
 ```julia-repl
@@ -565,7 +566,7 @@ Ensure uniqueness of observation vectors
 ## Example
 ```julia-repl
 julia> obslon_u, obslat_u, obsdepth_u, obstime_u, obsid_u =
-merge_obsids(obslon, obslat, obsdepth, obstime, obsid)
+    unique_obs(obslon, obslat, obsdepth, obstime, obsid)
 ```
 """
 function unique_obs(obslon::Vector{Float64}, obslat::Vector{Float64},
@@ -583,7 +584,7 @@ function unique_obs(obslon::Vector{Float64}, obslat::Vector{Float64},
 	obsid_u = Matrix{Char}(undef, size(obsid)[1], length(obslon_u))
 
 	for ii = 1:length(obslat_u)
-	    obsid_u[:,ii] = collect(obsid_string_u[ii])[1:size(obsid_u)[1]]
+        obsid_u[:,ii] = collect(obsid_string_u[ii])[1:size(obsid_u)[1]]
 	end;
 
 	return obslon_u, obslat_u, obsdepth_u, obstime_u, obsid_u
