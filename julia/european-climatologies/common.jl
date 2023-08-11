@@ -64,7 +64,7 @@ timerange = [Date(1000,1,1),Date(3000,12,31)]
 email = "ctroupin@uliege.be"
 
 #datadir = first(filter(isdir,["/data",expanduser("~/tmp/EMODnet-Chemistry-data/")]))
-datadir = expanduser("~/Data/EMODnet")
+datadir = expanduser("~/data/EMODnet-Chemistry")
 
 woddir = joinpath(datadir,"WOD")
 
