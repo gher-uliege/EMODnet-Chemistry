@@ -36,22 +36,11 @@ echo "Working on files from directory${domaindir}"
 datafilelist=()
 tmpfile=$(mktemp)
 echo ${tmpfile}
-find ${domaindir} -type f -name "*.nc" -print0) > ${tmpfile}
+find ${domaindir} -type f -name "*.nc" -print0 > ${tmpfile}
 while IFS=  read -r -d $'\0'; do
     datafilelist+=("$REPLY")
 done <${tmpfile}
 rm -f tmpfile
-
-# Function to generate a list of variables based on the main variable
-function getvarlist {
-    echo ${1}","$1"_err",$1"_L1",${1}"_L2",$1"_deepest",$1"_deepest_L1",$1"_deepest_L2"
-    }
-
-divacitation="Barth, A., Beckers, J.-M., Troupin, C., Alvera-Azcárate, A.,\
-and Vandenbulcke, L. (2014): divand-1.0: n-dimensional variational data analysis\
-for ocean observations, Geosci. Model Dev., 7, 225–241,\
-doi:10.5194/gmd-7-225-2014"
-
 
 i=0
 for ncfile in "${datafilelist[@]}" ; do # Whitespace-safe and recursive
@@ -62,33 +51,32 @@ for ncfile in "${datafilelist[@]}" ; do # Whitespace-safe and recursive
   echo "  File: ${ncfile}"
 
 
-    # Editing the attributes
-    # -h: override automatically appending the command to the history global attribute
-    # -a: name of the attribute
-    # o = overwrite (editing mode)
-    # c = character (attribute type)
-    echo "  Modifying global attributes"
+  # Editing the attributes
+  # -h: override automatically appending the command to the history global attribute
+  # -a: name of the attribute
+  # o = overwrite (editing mode)
+  # c = character (attribute type)
+  echo "  Modifying global attributes"
 
-    if [ "$testmode" = true]; then
-      echo "test mode"
-    fi
-
-    # ncatted -h -a project,global,o,c,"EMODnet Chemistry: http://www.emodnet-chemistry.eu/" "${ncfile}"
-    # ncatted -h -a data_access,global,o,c,"OPeNDAP: http://ec.oceanbrowser.net:8081/data/emodnet-domains/" "${ncfile}"
-    # ncatted -h -a WEB_visualisation,global,o,c,"http://ec.oceanbrowser.net/emodnet/" "${ncfile}"
-
-    # Adding new attributes
-    # -h: don't write the command in "history" global attribute
-    echo "  Creating new global attributes"
-
-    if [ "$testmode" = true]; then
-      echo "test mode"
-    fi
-    #ncatted -h -a DIVA_source,global,o,c,"https://github.com/gher-ulg/DIVA" "${ncfile}"
-    #ncatted -h -a DIVA_code_doi,global,o,c,"10.5281/zenodo.592476" "${ncfile}"
-    #ncatted -h -a DIVA_references,global,o,c,"${divacitation}" "${ncfile}"
-
-    echo "  Finished processing file ${i}/${nfiles}"
+  if [ "$testmode" = true]; then
+    echo "test mode"
   fi
+
+  # ncatted -h -a project,global,o,c,"EMODnet Chemistry: http://www.emodnet-chemistry.eu/" "${ncfile}"
+  # ncatted -h -a data_access,global,o,c,"OPeNDAP: http://ec.oceanbrowser.net:8081/data/emodnet-domains/" "${ncfile}"
+  # ncatted -h -a WEB_visualisation,global,o,c,"http://ec.oceanbrowser.net/emodnet/" "${ncfile}"
+
+  # Adding new attributes
+  # -h: don't write the command in "history" global attribute
+  echo "  Creating new global attributes"
+
+  if [ "$testmode" = true]; then
+    echo "test mode"
+  fi
+  #ncatted -h -a DIVA_source,global,o,c,"https://github.com/gher-ulg/DIVA" "${ncfile}"
+  #ncatted -h -a DIVA_code_doi,global,o,c,"10.5281/zenodo.592476" "${ncfile}"
+  #ncatted -h -a DIVA_references,global,o,c,"${divacitation}" "${ncfile}"
+
+  echo "  Finished processing file ${i}/${nfiles}"
 
 done
