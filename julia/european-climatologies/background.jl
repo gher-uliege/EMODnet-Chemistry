@@ -102,7 +102,7 @@ else
     epsilon2 = 2.
     #epsilon2 = 0.5
 
-    filenamebackground = joinpath(datadir,"Case/$(varname_)-res-$(deltalon)-epsilon2-$(epsilon2_background)-$(clversion)-lb$(lb)-maxit-$(maxit)-reltol-$(reltol)-$(suffix)-background/Results/$(varname_)_background.nc")
+    filenamebackground = joinpath(datadir,"2022/Case/$(varname_)-res-$(deltalon)-epsilon2-$(epsilon2_background)-$(clversion)-lb$(lb)-maxit-$(maxit)-reltol-$(reltol)-$(suffix)-background/Results/$(varname_)_background.nc")
     background = DIVAnd.backgroundfile(filenamebackground,varname,TSbackground)
 
     #debug
@@ -175,6 +175,7 @@ obslon = mod.(obslon .+ 180,360) .- 180
 rdiag_len = 0.1
 #rdiag_len = 0.5
 
+mkpath(joinpath(obsdir,"weights"))
 #filename_rdiag = joinpath(obsdir,"weights","$(varname)_len$(rdiag_len)_rdiag.nc")
 filename_rdiag = joinpath(obsdir,"weights","$(varname)_rdiag.nc")
 
@@ -196,15 +197,16 @@ end
 sel = obsvalue .>= 0
 
 # exclude values flagged as unrepresentative
-fnames_exclude = glob("exclude_" * replace(varname," " => "_")  * "*.csv",excludedir)
-exclude_sampleid_set = Set(exclude_sampleid(fnames_exclude))
-@show length(obsvalue)
-obs_sampleid = sampleid.(obslon,obslat,obsdepth,obstime,obsids)
-good = [sid ∉ exclude_sampleid_set for sid in obs_sampleid];
+if do_exclude 
+    fnames_exclude = glob("exclude_" * replace(varname," " => "_")  * "*.csv",excludedir)
+    exclude_sampleid_set = Set(exclude_sampleid(fnames_exclude))
+    @show length(obsvalue)
+    obs_sampleid = sampleid.(obslon,obslat,obsdepth,obstime,obsids)
+    good = [sid ∉ exclude_sampleid_set for sid in obs_sampleid];
 
-@info "remove $(sum(.!good)) unrepresentative value(s)"
-@info "remove $(sum(.!sel)) negative value(s)"
-
+    @info "remove $(sum(.!good)) unrepresentative value(s)"
+    @info "remove $(sum(.!sel)) negative value(s)"
+end
 
 dsc = NCDataset(joinpath(datadir,"dist2coast.nc"))
 distance2coast = dsc["distance2coast"][:,:]
@@ -234,7 +236,7 @@ savefig("/data/Figures/dist2coast_phosphate.png")
 
 # (-18.61436491935485, 46.021723790322554, 29.82312530335926, 72.3762527284168)
 
-sel = sel .& good
+# sel = sel .& good
 
 obslon = obslon[sel]
 obslat = obslat[sel]
@@ -249,12 +251,12 @@ if isfile(varname_ * ".jl")
     include(varname_ * ".jl")
 end
 
-casedir = joinpath(datadir,"Case/$(varname_)-res-$(deltalon)-epsilon2-$(epsilon2)-$(clversion)-lb$(lb)-maxit-$(maxit)-reltol-$(reltol)-$(suffix)-$(analysistype)")
+casedir = joinpath(datadir,"2022/Case/$(varname_)-res-$(deltalon)-epsilon2-$(epsilon2)-$(clversion)-lb$(lb)-maxit-$(maxit)-reltol-$(reltol)-$(suffix)-$(analysistype)")
 mkpath(casedir)
 
 @info "casedir: $casedir"
 
-gitdiff(casedir)
+#gitdiff(casedir)
 
 # Figures
 figdir = joinpath(casedir,"Figures")
@@ -281,7 +283,6 @@ else
     if isfile(filename)
         rm(filename)
     end
-
 #=
 ioff()
 clf()

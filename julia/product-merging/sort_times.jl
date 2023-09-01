@@ -8,8 +8,6 @@ using Glob
 include("MergingClim.jl")
 
 
-#datadir = "/media/ctroupin/My Passport/data/EMODnet/Eutrophication/Products/BlackSea/"
-#datafile = joinpath(datadir, "Water_body_dissolved_oxygen_concentration_year.nc")
 datadir = "/production/apache/data/emodnet-test-charles/test-merg/Baltic Sea/"
 datafile = joinpath(datadir, "Water_body_chlorophyll-a.4Danl_year.nc")
 

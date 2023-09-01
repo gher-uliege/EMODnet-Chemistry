@@ -196,3 +196,26 @@ function remove_attribs(datafile::String, varname::String)
         end
     end
 end
+
+"""
+    count_nans(filename)
+
+Return the number of NaNs in the filename.
+
+```julia-repl
+count_nans(filename)
+```
+"""
+function count_nans(filename::String)
+        Dataset(filename) do ds
+                var0 = varbyattrib(ds, standard_name=var_stdname);
+                d = ds["Water_body_ammonium_L1"].var[:];
+                nnans = sum(isnan.(d));
+                @info("Found $(nnans) NaNs for the variable")
+                return nnans
+                fv = fillvalue(ds["Water_body_ammonium_L1"])
+                # d[isnan.(d)] .= fv;
+                # ds["Water_body_ammonium_L1"].var[:] = d;
+        end
+end
+     
