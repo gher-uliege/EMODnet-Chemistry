@@ -17,7 +17,7 @@ end
 hostname = gethostname()
 if hostname == "ogs04"
 	@info "Working in production server"
-	databasedir = "/production/apache/data/emodnet-domains/By sea regions/Black Sea"
+	databasedir = "/production/apache/data/emodnet-projects/v2023/"
 elseif hostname == "GHER-ULg-Laptop"
 	databasedir = "/data/EMODnet/Chemistry/prod/"
 elseif hostname == "FSC-PHYS-GHER01"
