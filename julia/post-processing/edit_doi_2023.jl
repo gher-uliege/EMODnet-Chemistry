@@ -5,49 +5,26 @@ using DIVAnd
 using Test
 using CSV
 using DataFrames
+include("./emodnetchemistry.jl")
 
 doifile = "../../diva_2023_doi.csv"
 
-# User inputs
-# ------------
-
-hostname = gethostname()
-if hostname == "ogs04"
-	@info "Working in production server"
-	databasedir = "/production/apache/data/emodnet-domains/By sea regions/Black Sea"
-elseif hostname == "GHER-ULg-Laptop"
-	outputbasedir = "/data/EMODnet/Chemistry/merged/"
-	databasedir = "/data/EMODnet/Chemistry/prod/"
-elseif hostname == "gherdivand"
-	outputbasedir = "/home/ctroupin/data/EMODnet/merged"
-	databasedir = "/home/ctroupin/data/EMODnet/By sea regions"
-elseif hostname == "FSC-PHYS-GHER01"
-    outputbasedir = "/home/ctroupin/data/EMODnet-Chemistry/merged"
-	databasedir = "/home/ctroupin/data/EMODnet-Chemistry/emodnet-results-2023"
+if isfile(doifile)
+    # Read the CSV
+    data = CSV.read(doifile, DataFrame, header=["productID", "productTitle", "productDOI"]);
 else
-	@error("Unknown host")
+    @error("The file containing the DOI doesn't exist")
 end
 
-function get_ncfile_list(datadir::String)::Array
-    filelist = []
-	# Varname with spaces instead of underscores
-	for (root, dirs, files) in walkdir(datadir)
-        for file in files
-            if endswith(file, ".nc")
-                push!(filelist, joinpath(root, file))
-            end
-        end
-    end
-    @info("Found $(length(filelist)) files")
-    return filelist
-end
-
-# Read the CSV
-data = CSV.read(doifile, DataFrame, header=["productID", "productTitle", "productDOI"]);
+databasedir, _ = get_dirnames()
 
 # Generate list of netCDF
-resultfilelist = get_ncfile_list(databasedir);
-resultfilelist
+resultfilelist = get_file_list(databasedir);
+@info("Found $(length(resultfilelist)) netCDF files");
+
+thecitation = "Usage is subject to mandatory citation: \"This resource was generated in the framework \
+ of EMODnet Chemistry, under the support of DG MARE Call for Tender EASME/EMFF/2020/3.1.11/European \
+ Marine Observation and Data Network (EMODnet) - Lot 5 - Chemistry\""
 
 for resfile in resultfilelist
     @debug("Working on file $(resfile)")
@@ -66,6 +43,11 @@ for resfile in resultfilelist
             oldDOI = ds.attrib["doi"]
             newDOI = data.productDOI[productIndex]
             @info("$(oldDOI) → $(newDOI)")
+            ds.attrib["doi"] = newDOI
         end
+
+        @info("Changing citation")
+        ds.attrib["citation"] = thecitation
+        # ds.attrib["Conventions"] = "CF-1.10"
     end
 end
