@@ -218,4 +218,35 @@ function count_nans(filename::String)
                 # ds["Water_body_ammonium_L1"].var[:] = d;
         end
 end
-     
+    
+"""
+    get_dirnames()
+
+Return the paths of the data and output directories
+
+# Examples
+```julia-repl
+databasedir, outputbasedir = get(dirnames)
+```
+"""
+function get_dirnames()
+    hostname = gethostname()
+    if hostname == "ogs04"
+        @info "Working in production server"
+        databasedir = "/production/apache/data/emodnet-domains"
+        outputbasedir = nothing
+    elseif hostname == "GHER-ULg-Laptop"
+        outputbasedir = "/data/EMODnet/Chemistry/merged/"
+        databasedir = "/data/EMODnet/Chemistry/prod/"
+    elseif hostname == "gherdivand"
+        outputbasedir = "/home/ctroupin/data/EMODnet/merged"
+        databasedir = "/home/ctroupin/data/EMODnet/By sea regions"
+    elseif hostname == "FSC-PHYS-GHER01"
+        outputbasedir = "/home/ctroupin/data/EMODnet-Chemistry/merged"
+        databasedir = "/home/ctroupin/data/EMODnet-Chemistry/emodnet-results-2023"
+    else
+        @error("Unknown host")
+    end
+
+    return databasedir, outputbasedir
+end
