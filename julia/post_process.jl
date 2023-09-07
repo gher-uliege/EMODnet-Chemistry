@@ -9,7 +9,7 @@ include("common.jl")
 year0 = yearlist[1][1]
 year1 = yearlist[1][end]
 
-cdilist = joinpath(datadir,"export.zip")
+cdilist = joinpath("/home/uniliege01/src/EMODnet-Chemistry","export.zip")
 if !isfile(cdilist)
     download("https://emodnet-chemistry.maris.nl/download/export.zip",cdilist)
 end
@@ -28,11 +28,11 @@ end
 
 resdir = joinpath(databasedir, "All_European_Seas")
 
-for varname in varlist[1:1]
+for varname in varlist[2:end]
 
     varname_ = replace(varname," " => "_")
     filename_src = joinpath(resdir, "$(varname_)_monthly.nc")
-    filename = replace(filename_src, "_monthly"=>"")
+    filename = replace(filename_src, "_monthly"=>"", " "=>"_")
 
     if isfile(filename_src)
         @info("OK")
