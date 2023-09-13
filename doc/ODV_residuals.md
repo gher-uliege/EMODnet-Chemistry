@@ -81,7 +81,7 @@ awk -F "," '$8 == 1 {print $5}' inputfile > excludelist.txt
 * If we need to combine several conditions (`||` = or; `&&` = and):
 ```bash
 awk -F "," '($7 > 150.0) || ($7 < -115.) { print $5}' inputfile > excludelist.txt
-
+```
 
 __Notes:__
 
