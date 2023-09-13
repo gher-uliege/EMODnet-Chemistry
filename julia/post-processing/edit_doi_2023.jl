@@ -42,7 +42,7 @@ for resfile in resultfilelist
             @info("Modify the DOI")
             oldDOI = ds.attrib["doi"]
             newDOI = data.productDOI[productIndex]
-            @info("$(oldDOI) → $(newDOI)")
+            @info("$(oldDOI) -> $(newDOI)")
             ds.attrib["doi"] = newDOI
         end
 
