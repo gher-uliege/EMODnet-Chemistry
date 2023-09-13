@@ -40,7 +40,7 @@ echo "Working on files from directory${domaindir}"
 datafilelist=()
 tmpfile=$(mktemp)
 echo ${tmpfile}
-find ${domaindir} -type f -name "*.nc" -print0) > ${tmpfile}
+find ${domaindir} -type f -name "*.nc" -print0 > ${tmpfile}
 while IFS=  read -r -d $'\0'; do
   datafilelist+=("$REPLY")
 done <${tmpfile}
@@ -93,13 +93,12 @@ for ncfile in "${datafilelist[@]}" ; do # Whitespace-safe and recursive
   echo "  File: ${ncfile}"
 
 
-    # Editing the attributes
-    # -h: override automatically appending the command to the history global attribute
-    # -a: name of the attribute
-    # o = overwrite (editing mode)
-    # c = character (attribute type)
-    echo "  Modifying global attributes"
-
+  # Editing the attributes
+  # -h: override automatically appending the command to the history global attribute
+  # -a: name of the attribute
+  # o = overwrite (editing mode)
+  # c = character (attribute type)
+  echo "  Modifying global attributes"
 
     if [ "${addstandardname}" = true ]; then
       echo "Adding standard name to variables"
@@ -152,7 +151,13 @@ for ncfile in "${datafilelist[@]}" ; do # Whitespace-safe and recursive
       fi
     fi
 
-    echo "  Finished processing file ${i}/${nfiles}"
+  if [ "$testmode" = true]; then
+    echo "test mode"
   fi
+  #ncatted -h -a DIVA_source,global,o,c,"https://github.com/gher-ulg/DIVA" "${ncfile}"
+  #ncatted -h -a DIVA_code_doi,global,o,c,"10.5281/zenodo.592476" "${ncfile}"
+  #ncatted -h -a DIVA_references,global,o,c,"${divacitation}" "${ncfile}"
+
+  echo "  Finished processing file ${i}/${nfiles}"
 
 done

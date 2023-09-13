@@ -37,7 +37,7 @@ function create_date_list(years::Array, months::Array, dateref::Date=Date(1900,1
 end
 
 """
-```julia
+```julia-repl
 create_nc_merged(filename, longrid, latgrid, depthgrid, timegrid,
                  varname, standardname, longname, title, units, valex)
 ```
@@ -135,7 +135,7 @@ end
 
 
 """
-```julia
+```julia-repl
 get_file_list(datadir, varname, season)
 ```
 Return a list of files located in `datadir`, containing the
@@ -144,8 +144,8 @@ variable `varname` for the season `season`.
 `season` can take the values: Summer, Autumn, Winter, Spring
 
 ## Example
-```julia
-get_file("./data/EMODnet/", "chlorophyll-a", "Winter")
+```julia-repl-repl
+get_file_list("./data/EMODnet/", "chlorophyll-a", "Winter")
 ```
 """
 function get_file_list(datadir::String, varname::String="", season::String="")::Array
@@ -165,12 +165,14 @@ function get_file_list(datadir::String, varname::String="", season::String="")::
 end
 
 """
-```julia
-get_file_list_combined(datadir, varname)
-```
+    get_file_list_combined(datadir, varname)
+
 Return a list of files corresponding to the combined products for the variable `varname`.
 
-
+# Example
+```julia-repl
+filelist = get_file_list_combined(datadir, varname)
+```
 """
 function get_file_list_combined(datadir::String, varname::String)::Array
     filelist = []
@@ -184,12 +186,15 @@ function get_file_list_combined(datadir::String, varname::String)::Array
     return filelist
 end
 
-
 """
-```julia
-get_years(filename)
+    get_years(filename)
+
+    Extract the years (from the time variable) out of a netCDF file `filename`
+
+## Example
+```julia-repl
+years = get_years(filename)
 ```
-Extract the years (from the time variable) out of a netCDF file `filename`
 """
 function get_years(filename::String)::Array
     Dataset(filename,"r") do ds
@@ -201,11 +206,15 @@ function get_years(filename::String)::Array
 end
 
 """
-```julia
-get_coords(filename)
-```
+    get_coords(filename)
+
 Extract the years, longitudes, latitudes and depths
 out of a netCDF file `filename`
+
+## Example
+```julia-repl
+years, lonregion, latregion, depthregion = get_coords(datafile)
+````
 """
 function get_coords(filename::String)
     Dataset(filename,"r") do ds
@@ -226,19 +235,18 @@ end
 
 
 """
-```julia
-get_closer_depth(depthgrid, depthlevel)
-```
+    get_closer_depth(depthgrid, depthlevel)
+
 Get the 2 closest depths in vector `depthgrid`, to a select depth level `depthlevel`
 If `depthlevel` is outside the interval defined by `depthgrid`, then nothing is returned.
 
 ## Examples
-```julia
+```julia-repl
 get_closer_depth([-10., -5., 7., 20], 1.);
 (-5., 7.)
 ```
 
-```julia
+```julia-repl
 get_closer_depth([-10., -5., 7., 20], 1.);
 (-5., 7.)
 ```
@@ -260,15 +268,14 @@ function get_closer_depth(depthgrid::Array, depthlevel::Float64)
 end
 
 """
-```julia
-w1, w2 = get_depth_weights(depthlevel, dmin, dmax)
-```
-Compute the weight for the linear interpolation, according to the depths.
+    get_depth_weights(depthlevel, dmin, dmax)
+
+Compute the weights for the linear interpolation at `depthlevel` between the depths `dmin` and `dmax`.
 If `depthlevel` is outside the interval defined by `dmin` and `dmax`,
 then nothing is returned.
 
 ## Example
-```julia
+```julia-repl
 w1, w2 = get_depth_weights(-5., -20., 0.)
 (0.75, 0.25)
 ```
@@ -287,7 +294,7 @@ function get_depth_weights(depthlevel::Float64, dmin::Float64, dmax::Float64)
 end
 
 """
-```julia
+```julia-repl
 get_depth_indices(depth, depthvector)
 ```
 Return the indices of the depth levels from `depthvector` above and below
@@ -309,7 +316,7 @@ end
 Get the field for the specificed variable, depth level, time period
 from the file `filename`
 
-```julia
+```julia-repl
 get_var_level_time("mass_concentration_of_chlorophyll_a_in_sea_water",
  "Water_body_chlorophyll-a.4Danl.nc",
  12, 4)
@@ -327,7 +334,7 @@ end
 Get the masked field (relative error below 0.5) for the specificed variable, depth level, time period
 from the file `filename`
 
-```julia
+```julia-repl
 get_masked_var_level_time("mass_concentration_of_chlorophyll_a_in_sea_water",
  "Water_body_chlorophyll-a.4Danl.nc", 12, 4)
 ```
@@ -342,14 +349,14 @@ end
 
 
 """
-```julia
+```julia-repl
 depth_interp(depth, depthvector, field)
 ```
 Perform linear interpolation of the 4D variable `field` (read from a netCDF) defined on the
 levels `depthvector` (vector) onto the depth level `depth`.
 
 ## Example
-```julia
+```julia-repl
 depth_interp(25., (0., 10., 20., 30.), temperature)
 ```
 """
@@ -364,7 +371,7 @@ function depth_interp(depth::Float64, depthvector::Array{Float64}, field::Array{
 end
 
 """
-```julia
+```julia-repl
 interp_horiz(londata, latdata, data, longrid, latgrid)
 ```
 Perform a bilinear interpolation of a 2D field defined by the coordinates
