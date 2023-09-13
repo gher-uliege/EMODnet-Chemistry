@@ -17,9 +17,10 @@ else
 end
 
 databasedir, _ = get_dirnames()
+databasedir2 = joinpath(databasedir, "All_European_Seas")
 
 # Generate list of netCDF
-resultfilelist = get_file_list(databasedir);
+resultfilelist = get_file_list(databasedir2);
 @info("Found $(length(resultfilelist)) netCDF files");
 
 thecitation = "Usage is subject to mandatory citation: \"This resource was generated in the framework \
@@ -41,13 +42,14 @@ for resfile in resultfilelist
         else
             @info("Modify the DOI")
             oldDOI = ds.attrib["doi"]
-            newDOI = data.productDOI[productIndex]
+            #newDOI = data.productDOI[productIndex]
+            newDOI = "https://doi.org/10.13120/$(productID)"
             @info("$(oldDOI) → $(newDOI)")
-            ds.attrib["doi"] = newDOI
+            #ds.attrib["doi"] = newDOI
         end
 
         @info("Changing citation")
-        ds.attrib["citation"] = thecitation
+        # ds.attrib["citation"] = thecitation
         # ds.attrib["Conventions"] = "CF-1.10"
     end
 end
