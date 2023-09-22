@@ -1,4 +1,7 @@
-"""Modify the attributes of the Black Sea merged file
+"""
+# Add the correct DOI to each file
+
+DOI's were sent by Eugenia 
 """
 
 using NCDatasets
