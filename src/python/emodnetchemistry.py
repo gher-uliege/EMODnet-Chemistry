@@ -32,9 +32,9 @@ coastfacecolor = ".75"
 coastedgecolor = None
 
 colorlist = {"ArcticSea": "#1f77b4",
-             "NorthAtlantic": "#ff7f0e",
+             "NorthAtlantic": "#ff7f0e", "Atlantic": "#ff7f0e",
              "BalticSea": "#2ca02c", "BlackSea": "#d62728",
-             "MediterraneanSea": "#9467bd", "NorthSea": "#8c564b"}
+             "MediterraneanSea": "#9467bd", "Mediterranean": "#9467bd", "NorthSea": "#8c564b"}
 
 colorlist2 = ['#1f77b4',
              '#ff7f0e', #'#ff7f0e',
@@ -393,7 +393,7 @@ def plot_WOA_DIVAnd_comparison(m, lon1, lat1, field1, lon2, lat2, field2, depth,
 
     fig = plt.figure()
     ax1 = plt.subplot(121)
-    pcm = ax.pcolormesh(lon1, lat1, field1, transform=datacrs, vmin=vmin, vmax=vmax)
+    pcm = ax1.pcolormesh(lon1, lat1, field1, transform=datacrs, vmin=vmin, vmax=vmax)
     
     if monthname is not None:
         plt.title("WOA 2018 at {} m, {}".format(int(depth), monthname))
@@ -442,6 +442,7 @@ def plot_data_locations(theproj, datadir, varname, regiondict, figname="", bathy
     regionkeyold = ""
     for datafile in datafilelist:
         regionkey = os.path.basename(datafile).split("_")[0]
+        regionkey = regionkey.replace("TS", "")
         logger.info(regionkey)
 
         region = regiondict[regionkey]

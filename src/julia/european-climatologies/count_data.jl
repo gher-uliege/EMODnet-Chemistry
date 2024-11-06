@@ -19,7 +19,7 @@ varlist = ["Water body phosphate",
 
 # inputdir = "/home/ctroupin/data/EMODnet/Eutrophication/"
 inputdir = "/home/ctroupin/data/EMODnet-Chemistry/Eutrophication2024/ODVnetCDF"
-# inpudir = "/home/ctroupin/data/EMODnet-Chemistry/Eutrophication2024/netCDF/"
+outputdir = "/home/ctroupin/data/EMODnet-Chemistry/Eutrophication2024/netCDF/"
 
 datafilelist = glob("*.nc", inputdir)
 
@@ -30,3 +30,16 @@ for datafile in datafilelist
         @info("$(basename(datafile)) -- $(nobs)")
     end
 end
+
+println(" ")
+println(" ")
+datafilelist2 = glob("*.nc", outputdir)
+
+for datafile in datafilelist2
+    NCDataset(datafile) do ds
+        lonvar = varbyattrib(ds, standard_name="longitude")[1]
+        nobs = length(lonvar[:])
+        @info("$(basename(datafile)) -- $(nobs)")
+    end
+end
+
