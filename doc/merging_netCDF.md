@@ -91,7 +91,7 @@ time = UNLIMITED ; // (184 currently)
 ### Step 4: sort time
 
 If the files were properly prepared, the time variable should already be sorted in
-chronological order. If this is not the case, you can use the tool [`sort_times.jl`](../julia/sort_times.jl) (an detailed example can be found in this [notebook](https://github.com/gher-ulg/SeaDataCloud/blob/master/Julia/sort_climatology_time.ipynb)).
+chronological order. If this is not the case, you can use the tool [`sort_times.jl`](../julia/product-merging/sort_times.jl) (a detailed example can be found in this [notebook](https://github.com/gher-ulg/SeaDataCloud/blob/master/Julia/sort_climatology_time.ipynb)).
 
 1. Edit the file paths in the script
 2. Run the script      
@@ -125,7 +125,7 @@ __Solution:__ delete the variables that depends on the dimension `observations`:
 ncks -x -v obslon,obslat,obsdepth,obstime,obsid Water_body_dissolved_oxygen_concentration_year.nc Water_body_dissolved_oxygen_concentration_year.nc
 ```
 
-Once the variables have been removed, use the script [merge_obs.jl](https://github.com/gher-ulg/EMODnet-Chemistry/blob/master/julia/merge_obs.jl) to merge the observations
+Once the variables have been removed, use the script [merge_obs.jl](https://github.com/gher-ulg/EMODnet-Chemistry/blob/master/julia/product-merging/merge_obs.jl) to merge the observations
 from the 2 input files:
 1. Adapt the paths of the files
 2. Run the script      

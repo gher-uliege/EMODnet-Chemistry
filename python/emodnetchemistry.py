@@ -21,23 +21,11 @@ datacrs = ccrs.PlateCarree()
 
 import logging
 
-import matplotlib as mpl
-
-plt.rcParams.update({
-    'savefig.dpi':  300,
-    'figure.edgecolor': 'w',
-    'figure.facecolor': 'w',
-    'savefig.edgecolor': 'w',
-    'savefig.facecolor': 'w',
-    'font.size': 16,
-    'savefig.bbox': "tight",
-    'savefig.transparent': False,
-    'figure.titlesize': 20
-})
-
 logger = logging.getLogger("EMODnet-Chemistry-Data-positions")
 logger.setLevel(logging.DEBUG)
 logging.info("Starting")
+
+domain = [-45., 70., 24., 83.]
 
 # Setting colors
 coastfacecolor = ".75"
@@ -297,7 +285,8 @@ def plot_oxy_map(llon, llat, field, depth, theproj, figname=""):
     """
     plt.figure(figsize=(10, 10))
     ax = plt.subplot(111, projection=theproj)
-    pcm = ax.pcolormesh(llon, llat, field, latlon=True, vmin=200., vmax=375.)
+    ax.set_extent(domain)
+    pcm = ax.pcolormesh(llon, llat, field, transform=datacrs, vmin=200., vmax=375.)
     cb = plt.colorbar(pcm, shrink=.6, extend="both")
     cb.set_label(r"$\mu$moles/kg", rotation=0, ha="left")
     cb.set_ticks(np.arange(200., 376., 25))
@@ -308,9 +297,10 @@ def plot_oxy_map(llon, llat, field, depth, theproj, figname=""):
     # plt.show()
     plt.close()
 
-def plot_DIVAnd_field_basemap(m, lon, lat, field, depth, figname="",
+def plot_DIVAnd_field(theproj, lon, lat, field, depth, figname="", varname="", 
                       vmin=200., vmax=375., deltavar=25.,
-                      units=r"$\mu$moles/kg", monthname=None):
+                      units=r"$\mu$moles/kg", monthname=None,
+                      cmap=plt.cm.RdYlGn_r):
 
     """Create a plot with the DIVAnd results (alone)
 
@@ -336,28 +326,32 @@ def plot_DIVAnd_field_basemap(m, lon, lat, field, depth, figname="",
         name is not indicated in the figure title.
     """
 
-    fig = plt.figure(figsize=(12, 10))
-    ax1 = plt.subplot(111)
-    pcm = m.pcolormesh(lon, lat, field, latlon=True, vmin=vmin, vmax=vmax)
-    m.drawmeridians(np.arange(-40., 70., 20.), zorder=2, labels=[0, 0, 0, 1], fontsize=14,
-                    linewidth=.25)
-    m.drawparallels(np.arange(20., 81., 10.), zorder=2, labels=[1, 0, 0, 0], fontsize=14,
-                    linewidth=.25)
-    m.fillcontinents(color=".85", zorder=3)
-    m.drawcoastlines(linewidth=0.1, zorder=4)
+    fig = plt.figure()
+    ax = plt.subplot(111, projection=theproj)
+    ax.set_extent(domain)
+    pcm = ax.pcolormesh(lon, lat, field, vmin=vmin, vmax=vmax, transform=datacrs, cmap=cmap)
+
+    ax.add_feature(coast, facecolor=".7", linewidth=0.0001, zorder=4)
+    gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
+                      linewidth=.5, color='gray', alpha=0.5, linestyle='-', zorder=5)
+    gl.top_labels = False
+    gl.right_labels = False
+    
     if monthname is not None:
-        plt.title("DIVAnd field at {} m, {}".format(int(depth), monthname))
+        plt.title(f"DIVAnd field of {varname} concentration at {int(depth)} m in  {monthname}")
     else:
-        plt.title("DIVAnd field at {} m".format(int(depth)))
+        plt.title(f"DIVAnd field of {varname} concentrationat {int(depth)} m")
 
     if vmin==0:
-        cb = plt.colorbar(pcm, extend="max", shrink=0.5, orientation="horizontal")
+        cb = plt.colorbar(pcm, extend="max", shrink=0.9)
     else:
-        cb = plt.colorbar(pcm, extend="both", shrink=0.5, orientation="horizontal")
-    cb.set_label(units)
+        cb = plt.colorbar(pcm, extend="both", shrink=0.9)
+
+    cb.set_label(units, rotation=0, ha="left")
     cb.set_ticks(np.arange(vmin, vmax + 0.0001, deltavar))
+    
     if len(figname) > 0:
-        plt.savefig(figname, dpi=300, bbox_inches="tight")
+        plt.savefig(figname)
     plt.close()
 
 def plot_WOA_DIVAnd_comparison(m, lon1, lat1, field1, lon2, lat2, field2, depth, figname="",
@@ -397,28 +391,18 @@ def plot_WOA_DIVAnd_comparison(m, lon1, lat1, field1, lon2, lat2, field2, depth,
         name is not indicated in the figure title.
     """
 
-    fig = plt.figure(figsize=(12, 10))
+    fig = plt.figure()
     ax1 = plt.subplot(121)
-    pcm = m.pcolormesh(lon1, lat1, field1, latlon=True, vmin=vmin, vmax=vmax)
-    m.drawmeridians(np.arange(-40., 70., 20.), zorder=2, labels=[0, 0, 0, 1], fontsize=14,
-                    linewidth=.25)
-    m.drawparallels(np.arange(20., 81., 10.), zorder=2, labels=[1, 0, 0, 0], fontsize=14,
-                    linewidth=.25)
-    m.fillcontinents(color=".85", zorder=3)
-    m.drawcoastlines(linewidth=0.1, zorder=4)
+    pcm = ax.pcolormesh(lon1, lat1, field1, transform=datacrs, vmin=vmin, vmax=vmax)
+    
     if monthname is not None:
         plt.title("WOA 2018 at {} m, {}".format(int(depth), monthname))
     else:
         plt.title("WOA 2018 at {} m".format(int(depth)))
 
     ax2 = plt.subplot(122)
-    pcm = m.pcolormesh(lon2, lat2, field2, latlon=True, vmin=vmin, vmax=vmax)
-    m.drawmeridians(np.arange(-40., 70., 20.), zorder=2, labels=[0, 0, 0, 1], fontsize=14,
-                    linewidth=.25)
-    m.drawparallels(np.arange(20., 81., 10.), zorder=2, labels=[1, 0, 0, 0], fontsize=14,
-                    linewidth=.25)
-    m.fillcontinents(color=".85", zorder=3)
-    m.drawcoastlines(linewidth=0.1, zorder=4)
+    pcm = m.pcolormesh(lon2, lat2, field2, transform=datacrs, vmin=vmin, vmax=vmax)
+    
     plt.title("DIVAnd")
 
 
@@ -431,7 +415,7 @@ def plot_WOA_DIVAnd_comparison(m, lon1, lat1, field1, lon2, lat2, field2, depth,
     cb.set_label(units, rotation=0, ha="center")
     cb.set_ticks(np.arange(vmin, vmax + 0.0001, deltavar))
     if len(figname) > 0:
-        plt.savefig(figname, dpi=300, bbox_inches="tight")
+        plt.savefig(figname)
     plt.close()
     
 def plot_data_locations(theproj, datadir, varname, regiondict, figname="", bathy=False, bbox=None, isglobal=True):
@@ -454,6 +438,7 @@ def plot_data_locations(theproj, datadir, varname, regiondict, figname="", bathy
 
     plt.figure(figsize=(12, 12))
     ax = plt.subplot(111, projection=theproj)
+    ax.set_extent(domain)
     regionkeyold = ""
     for datafile in datafilelist:
         regionkey = os.path.basename(datafile).split("_")[0]
@@ -502,7 +487,7 @@ def plot_data_locations(theproj, datadir, varname, regiondict, figname="", bathy
         plt.savefig(figname)
     plt.close()
 
-def plot_data_locations_basemap(m, varname, regiondict, figname=""):
+def plot_data_locations_basemap(theproj, varname, regiondict, figname=""):
     """Plot the data location on a map, one color per region
 
     Parameters
@@ -520,7 +505,9 @@ def plot_data_locations_basemap(m, varname, regiondict, figname=""):
     nfiles = len(datafilelist)
     logger.info("Working on {} files".format(nfiles))
 
-    plt.figure(figsize=(12, 12))
+    plt.figure()
+    ax = plt.subfigure(111, projection=theproj)
+    ax.set_extent(domain)
     regionkeyold = ""
     for datafile in datafilelist:
         regionkey = os.path.basename(datafile).split("_")[0]
@@ -530,22 +517,22 @@ def plot_data_locations_basemap(m, varname, regiondict, figname=""):
         region.get_data_coords(datafile)
 
         col = colorlist[regionkey]
-        pp = m.plot(region.londata, region.latdata, "o", color=col, ms=.03, latlon=True)
+        pp = ax.plot(region.londata, region.latdata, "o", color=col, ms=.03, transform=datacrs)
 
         if regionkey != regionkeyold:
-            m.plot(5., 51., "o", ms=5, color=col, markerfacecolor=col, latlon=True, label=region.name)
+            ax(5., 51., "o", ms=5, color=col, markerfacecolor=col, transform=datacrs, label=region.name)
 
         regionkeyold = regionkey
 
-    m.plot(5., 51., "o", ms=6, color=".75", markerfacecolor=".75", latlon=True, zorder=4)
-    m.fillcontinents(color=".75")
+    ax.plot(5., 51., "o", ms=6, color=".75", markerfacecolor=".75", transform=datacrs, zorder=4)
+
     plt.legend(fontsize=14, loc=1)
     plt.title(f"Observations of sea water {varname} concentration")
     if len(figname) > 0:
         plt.savefig(figname)
     plt.close()
 
-def plot_data_locations_domains(m, varname, regiondict, datadir, figname=""):
+def plot_data_locations_domains(theproj, varname, regiondict, datadir, figname=""):
     """Plot the data positions and the domains on the map
 
     Parameters
@@ -565,8 +552,9 @@ def plot_data_locations_domains(m, varname, regiondict, datadir, figname=""):
     nfiles = len(datafilelist)
     logger.info("Working on {} files".format(nfiles))
 
-    fig = plt.figure(figsize=(12, 12))
-    ax = plt.subplot(111)
+    fig = plt.figure()
+    ax = plt.subplot(111, projection=theproj)
+    ax.set_extent(domain)
 
     regionkeyold = ""
     for datafile in datafilelist:
@@ -575,7 +563,7 @@ def plot_data_locations_domains(m, varname, regiondict, datadir, figname=""):
         region.get_data_coords(datafile)
 
         col = colorlist[regionkey]
-        pp = m.plot(region.londata, region.latdata, "o", color=col, ms=.03, latlon=True)
+        pp = ax.plot(region.londata, region.latdata, "o", color=col, ms=.03, transform=datacrs)
 
         if regionkey != regionkeyold:
 
@@ -583,14 +571,14 @@ def plot_data_locations_domains(m, varname, regiondict, datadir, figname=""):
             region.get_rect_coords()
             region.get_rect_patch(m, facecolor=col, alpha=0.4)
 
-            m.plot(region.lonvector, region.latvector, color=col,
-                   latlon=True, label=region.name, linewidth=2)
+            ax.plot(region.lonvector, region.latvector, color=col,
+                   transform=datacrs, label=region.name, linewidth=2)
             ax.add_patch(region.rect)
 
         regionkeyold = regionkey
 
-    # m.plot(5., 51., "o", ms=6, color=".75", markerfacecolor=".75", latlon=True, zorder=4)
-    m.fillcontinents(color=".75")
+    # m.plot(5., 51., "o", ms=6, color=".75", markerfacecolor=".75", transform=datacrs, zorder=4)
+
     plt.legend(fontsize=14, loc=1)
     plt.title(f"Observations of sea water {varname} concentration")
     if len(figname) > 0:
@@ -626,8 +614,10 @@ def plot_hexbin_datalocations(theproj, datadir, varname, figname=""):
     lonp = coords_proj[:,0]
     latp = coords_proj[:,1]
 
-    plt.figure(figsize=(10, 10))
+    plt.figure()
     ax = plt.subplot(111, projection=theproj)
+    ax.set_extent(domain)
+
     xx = np.arange(-180, 180, 30)
     yy = np.arange(-90, 90, 30.)
     xxx, yyy = np.meshgrid(xx, yy)
@@ -640,42 +630,6 @@ def plot_hexbin_datalocations(theproj, datadir, varname, figname=""):
     #cb.set_ticklabels(["10", "100", "1000", "10000", "100000"])
     cb.set_label("Number of\ndata points\nper cell", fontsize=14, rotation=0, ha="left")
     plt.title(f"Sea water {varname.replace('_', ' ')}")
-    if len(figname) > 0:
-        plt.savefig(figname)
-    plt.close()
-
-def plot_hexbin_datalocations_basemap(m, varname, figname=""):
-    """Create hexbin plot using the data positions read from a list of file
-
-    Parameters
-    ----------
-
-    m : Basemap
-        Basemap projection obtained `m = Basemap(projection=...)`
-    varname : str
-        Name of the variable; should be one of those:
-        "phosphate", "silicate", "ammonium", "chlorophyll-a",
-        "dissolved_inorganic_nitrogen", "dissolved_oxygen"
-    figname : str default: None
-        Path of the figure to be saved; if "", no figure is saved
-    """
-
-    # Generate list of files corresponding to the data directory
-    datafilelist = sorted(glob.glob(os.path.join(datadir, f"*{varname}*.nc")))
-    nfiles = len(datafilelist)
-    logger.info("Working on {} files".format(nfiles))
-
-    lonall, latall, dates_all = all_positions(m, datafilelist)
-    fig = plt.figure(figsize=(10, 10))
-
-    m.hexbin(lonall, latall, bins="log", vmin=1, vmax=100000,
-             mincnt=3, gridsize=30, zorder=3, cmap=plt.cm.hot_r)
-    m.fillcontinents(color=".75", zorder=5, alpha=.9)
-    cb = plt.colorbar(shrink=.7, extend="both")
-    #cb.set_ticks([1., 2., 3., 4., 5.])
-    #cb.set_ticklabels(["10", "100", "1000", "10000", "100000"])
-    cb.set_label("Number of\ndata points\nper cell", fontsize=14, rotation=0, ha="left")
-    plt.title(varname.replace("_", " ").capitalize())
     if len(figname) > 0:
         plt.savefig(figname)
     plt.close()
@@ -710,8 +664,9 @@ def make_histo_values(obsval, varname, figdir="./", stack=False):
     else:
         units = r"$\mu$moles/l"
 
-    fig = plt.figure(figsize=(12, 12))
+    fig = plt.figure()
     ax = plt.subplot(111)
+    ax.set_extent(domain)
 
     if stack is True:
         plt.hist(obsval, bins=np.linspace(vmin, vmax, 20), rwidth=.8, histtype='bar',
@@ -758,7 +713,7 @@ def make_histo_year(years, varname, figdir="./", stack=False):
 
     fig = plt.figure(figsize=(12, 12))
     ax = plt.subplot(111)
-
+    
     if stack is True:
         plt.hist(years, bins=np.arange(1928, 2023), rwidth=.8, histtype='bar',
                  stacked=True, color=colorlist2[0:len(years)],
@@ -802,7 +757,7 @@ def make_histo_month(months, varname, figdir="./", stack=False):
 
     monthlist = [calendar.month_name[i] for i in range(1, 13)]
 
-    fig = plt.figure(figsize=(12, 12))
+    fig = plt.figure()
     ax = plt.subplot(111)
 
     if stack is True:

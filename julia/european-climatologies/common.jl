@@ -63,15 +63,9 @@ timerange = [Date(1000,1,1),Date(3000,12,31)]
 #email = ENV["EMAIL"]
 email = "ctroupin@uliege.be"
 
-#datadir = first(filter(isdir,["/data",expanduser("~/tmp/EMODnet-Chemistry-data/")]))
-#datadir = expanduser("~/Data/EMODnet")
-
-datadir = "/home/ulg/gher/ctroupin/data/EMODnet-Chemistry"
+datadir = "/home/ulg/gher/ctroupin/data/EMODnet-Chemistry/"
 woddir = joinpath(datadir,"WOD")
-
-#obsdir = joinpath(datadir,"2022")
 obsdir = datadir
-
 excludedir = joinpath(datadir,"EMODnet","blacklist")
 
 # Name of the variables (WOD)
@@ -85,8 +79,6 @@ varlist = ["Water body phosphate",
            "Water body silicate",
 	   "Water body dissolved oxygen concentration"
            ]
-
-
 
 area_keywords = [
         "Arctic Ocean",
@@ -121,7 +113,7 @@ varinfo = Dict(
         # http://cfconventions.org/Data/cf-standard-names/current/build/cf-standard-name-table.html
         "netcdf_standard_name" => "mole_concentration_of_dissolved_molecular_oxygen_in_sea_water",
         "woa_depthr" => [0.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0, 55.0, 60.0, 65.0, 70.0, 75.0, 80.0, 85.0, 90.0, 95.0, 100.0, 125.0, 150.0, 175.0, 200.0, 225.0, 250.0, 275.0, 300.0, 325.0, 350.0, 375.0, 400.0, 425.0, 450.0, 475.0, 500.0, 550.0, 600.0, 650.0, 700.0, 750.0, 800.0, 850.0, 900.0, 950.0, 1000.0, 1050.0, 1100.0, 1150.0, 1200.0, 1250.0, 1300.0, 1350.0, 1400.0, 1450.0, 1500.0],
-        "doi" => "https://doi.org/10.6092/yepr-1a13", # Water body dissolved oxygen concentration
+        "doi" => "https://doi.org/", # Water body dissolved oxygen concentration
     ),
     "Water body phosphate" => Dict(
          # http://vocab.nerc.ac.uk/collection/P02/current/
@@ -130,7 +122,7 @@ varinfo = Dict(
         # http://cfconventions.org/Data/cf-standard-names/current/build/cf-standard-name-table.html
         "netcdf_standard_name" => "moles_of_phosphate_per_unit_mass_in_sea_water",
         "woa_depthr" => [0.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0, 55.0, 60.0, 65.0, 70.0, 75.0, 80.0, 85.0, 90.0, 95.0, 100.0, 125.0, 150.0, 175.0, 200.0, 225.0, 250.0, 275.0, 300.0, 325.0, 350.0, 375.0, 400.0, 425.0, 450.0, 475.0, 500.0, 550.0, 600.0, 650.0, 700.0, 750.0, 800.0],
-        "doi" => "https://doi.org/10.6092/njj3-hk55", # Water body phosphate
+        "doi" => "https://doi.org/", # Water body phosphate
     ),
     "Water body chlorophyll-a" => Dict(
          # http://vocab.nerc.ac.uk/collection/P02/current/
@@ -138,7 +130,7 @@ varinfo = Dict(
         "netcdf_units" => "mg/m3",
         # http://cfconventions.org/Data/cf-standard-names/current/build/cf-standard-name-table.html
         "netcdf_standard_name" => "mass_concentration_of_chlorophyll_in_sea_water",
-        "doi" => "https://doi.org/10.6092/av67-qz53", # Water body chlorophyll-a
+        "doi" => "https://doi.org/", # Water body chlorophyll-a
     ),
     "Water body ammonium" => Dict(
          # http://vocab.nerc.ac.uk/collection/P02/current/
@@ -146,7 +138,7 @@ varinfo = Dict(
         "netcdf_units" => "umol/l",
         # http://cfconventions.org/Data/cf-standard-names/current/build/cf-standard-name-table.html
         "netcdf_standard_name" => "mole_concentration_of_ammonium_in_sea_water",
-        "doi" => "https://doi.org/10.6092/av67-qz53", # Ammonium
+        "doi" => "https://doi.org/", # Ammonium
     ),
     "Water body silicate" => Dict(
          # http://vocab.nerc.ac.uk/collection/P02/current/
@@ -155,7 +147,7 @@ varinfo = Dict(
         # http://cfconventions.org/Data/cf-standard-names/current/build/cf-standard-name-table.html
         "netcdf_standard_name" => "mole_concentration_of_silicate_in_sea_water",
         "woa_depthr" => [0.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0, 55.0, 60.0, 65.0, 70.0, 75.0, 80.0, 85.0, 90.0, 95.0, 100.0, 125.0, 150.0, 175.0, 200.0, 225.0, 250.0, 275.0, 300.0, 325.0, 350.0, 375.0, 400.0, 425.0, 450.0, 475.0, 500.0, 550.0, 600.0, 650.0, 700.0, 750.0, 800.0],
-        "doi" => "https://doi.org/10.6092/cyd3-ew67", # Water body silicate
+        "doi" => "https://doi.org/", # Water body silicate
     ),
     "Water body dissolved inorganic nitrogen (DIN)" => Dict(
          # http://vocab.nerc.ac.uk/collection/P02/current/
@@ -166,8 +158,6 @@ varinfo = Dict(
         "doi" => "https://doi.org/10.6092/xjj3-7d14", # Water body dissolved inorganic nitrogen (DIN)
     )
 )
-
-
 
 bathname = joinpath(datadir, "gebco_30sec_4.nc")
 bathisglobal = true
