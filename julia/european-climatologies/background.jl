@@ -17,7 +17,7 @@ using JLD2
 using DataStructures
 using Interpolations
 
-ENV["JULIA_DEBUG"] = "DIVAnd"
+#ENV["JULIA_DEBUG"] = "DIVAnd"
 
 include("common.jl")
 clversion = "varlen1"
@@ -102,7 +102,7 @@ else
     epsilon2 = 2.
     #epsilon2 = 0.5
 
-    filenamebackground = joinpath(datadir,"2022/Case/$(varname_)-res-$(deltalon)-epsilon2-$(epsilon2_background)-$(clversion)-lb$(lb)-maxit-$(maxit)-reltol-$(reltol)-$(suffix)-background/Results/$(varname_)_background.nc")
+    filenamebackground = joinpath(datadir,"Case/$(varname_)-res-$(deltalon)-epsilon2-$(epsilon2_background)-$(clversion)-lb$(lb)-maxit-$(maxit)-reltol-$(reltol)-$(suffix)-background/Results/$(varname_)_background.nc")
     background = DIVAnd.backgroundfile(filenamebackground,varname,TSbackground)
 
     #debug
@@ -251,7 +251,7 @@ if isfile(varname_ * ".jl")
     include(varname_ * ".jl")
 end
 
-casedir = joinpath(datadir,"2022/Case/$(varname_)-res-$(deltalon)-epsilon2-$(epsilon2)-$(clversion)-lb$(lb)-maxit-$(maxit)-reltol-$(reltol)-$(suffix)-$(analysistype)")
+casedir = joinpath(datadir,"Case/$(varname_)-res-$(deltalon)-epsilon2-$(epsilon2)-$(clversion)-lb$(lb)-maxit-$(maxit)-reltol-$(reltol)-$(suffix)-$(analysistype)")
 mkpath(casedir)
 
 @info "casedir: $casedir"
@@ -336,61 +336,36 @@ mean_value = mean(obsvalue[sel])
 @show mean_value
     size(mask)
 
-    P35 = Vocab.SDNCollection("P35")
-    c = Vocab.findbylabel(P35,[varname])[1]
-    parameter_keyword_urn = Vocab.notation(c)
 
-metadata = OrderedDict(
-    # Name of the project (SeaDataCloud, SeaDataNet, EMODNET-chemistry, ...)
-    "project" => "EMODNET-chemistry",
-
-    # URN code for the institution EDMO registry,
-    # e.g. SDN:EDMO::1579
-    "institution_urn" => "SDN:EDMO::1579", # GHER
-    # Name and emails from authors
-    #"Author_e-mail" => ["Your Name1 <name1@example.com>", "Other Name <name2@example.com>"],
-
-    # Source of the observation
-    "source" => "Observations from EMODnet-Chemistry",
-
-    # SeaDataNet Vocabulary P35 URN
-    # http://seadatanet.maris2.nl/v_bodc_vocab_v2/search.asp?lib=p35
-    # example: SDN:P35::WATERTEMP
-    "parameter_keyword_urn" => parameter_keyword_urn,
-
-    # List of SeaDataNet Parameter Discovery Vocabulary P02 URNs
-    # http://seadatanet.maris2.nl/v_bodc_vocab_v2/search.asp?lib=p02
-    # example: ["SDN:P02::TEMP"]
-    "search_keywords_urn" => varinfo[varname]["search_keywords_urn"],
-
-    # List of SeaDataNet Vocabulary C19 area URNs
-    # SeaVoX salt and fresh water body gazetteer (C19)
-    # http://seadatanet.maris2.nl/v_bodc_vocab_v2/search.asp?lib=C19
-    # example: ["SDN:C19::3_1"]
-    "area_keywords_urn" => area_keywords_urn,
-    "bathymetry_source" => "The GEBCO Digital Atlas published by the British Oceanographic Data Centre on behalf of IOC and IHO, 2003",
-    # # NetCDF CF standard name
-    # # http://cfconventions.org/Data/cf-standard-names/current/build/cf-standard-name-table.html
-    # # example "standard_name" = "sea_water_temperature",
-    "netcdf_standard_name" => varinfo[varname]["netcdf_standard_name"],
-    "netcdf_long_name" => varname,
-    "netcdf_units" => varinfo[varname]["netcdf_units"],
-    "product_version" => "1.0",
-    # # Abstract for the product
-    # "abstract" => "...",
-
-    # # This option provides a place to acknowledge various types of support for the
-    # # project that produced the data
-    # "acknowledgement" => "...",
-
-    # "documentation" => "https://doi.org/doi_of_doc",
-
-    # # Digital Object Identifier of the data product
-    "doi" => varinfo[varname]["doi"],
-);
+"""
+Read the attributes from the text file storing the 
+different key-value pairs.
+"""
+function read_attrib_file(filename::String, colsep::String="|")::OrderedDict
+    ncattrib = OrderedDict{String,String}()
+    open(filename, "r") do fr
+        while !eof(fr)
+            line = readline(fr)
+            linesplit = split(line,colsep)
+            global key
+            if length(linesplit) == 2
+                key = String(linesplit[1]);
+                value = String(linesplit[2])
+                ncattrib[key] = value
+            elseif length(linesplit) == 1
+                ncattrib[key] = ncattrib[key] * linesplit[1]
+            else
+                @warn("There is a problem with the number of column in the text file")
+                @show linesplit
+            end
+        end
+    end
+    return ncattrib
+end
 
 
-ncglobalattrib, ncvarattrib = SDNMetadata(metadata, filename, varname, lonr, latr)
+ncglobalattrib = read_attrib_file(joinpath(datadir, "ncglobalattrib_$(varname_index).txt"))
+ncvarattrib = read_attrib_file(joinpath(datadir, "ncvarattrib_$(varname_index).txt"))
 
 
 dbinfo = @time DIVAnd.diva3d(
@@ -414,7 +389,7 @@ dbinfo = @time DIVAnd.diva3d(
 #    maxfield = maximum(obsvalue),
 
     solver = :direct,
-    MEMTOFIT = 100,
+    MEMTOFIT = 500,
 
     #surfextend = true,
     coeff_derivative2 = [0.,0.,1e-8],

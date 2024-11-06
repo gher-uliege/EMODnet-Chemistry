@@ -64,11 +64,14 @@ timerange = [Date(1000,1,1),Date(3000,12,31)]
 email = "ctroupin@uliege.be"
 
 #datadir = first(filter(isdir,["/data",expanduser("~/tmp/EMODnet-Chemistry-data/")]))
-datadir = expanduser("~/Data/EMODnet")
+#datadir = expanduser("~/Data/EMODnet")
 
+datadir = "/home/ulg/gher/ctroupin/data/EMODnet-Chemistry"
 woddir = joinpath(datadir,"WOD")
 
-obsdir = joinpath(datadir,"2022")
+#obsdir = joinpath(datadir,"2022")
+obsdir = datadir
+
 excludedir = joinpath(datadir,"EMODnet","blacklist")
 
 # Name of the variables (WOD)
@@ -84,21 +87,20 @@ varlist = ["Water body phosphate",
            ]
 
 
-#=
-using DIVAnd
-    area_keywords = [
+
+area_keywords = [
         "Arctic Ocean",
         #"Barents Sea","Greenland Sea","Iceland Sea",
         "North Atlantic Ocean",
         #"Norwegian Sea",
-		"Black Sea",
+	"Black Sea",
         #"Sea of Azov","Sea of Marmara",
         "Baltic Sea",
         "North Sea",
         "Mediterranean Sea"]
-area_collection = Vocab.SDNCollection("C19")
-@show Vocab.notation.(Vocab.findbylabel(area_collection,area_keywords))
-=#
+#area_collection = Vocab.SDNCollection("C19")
+#@show Vocab.notation.(Vocab.findbylabel(area_collection,area_keywords))
+
 
 area_keywords_urn = [
     "SDN:C19::9",
@@ -168,12 +170,7 @@ varinfo = Dict(
 
 
 bathname = joinpath(datadir, "gebco_30sec_4.nc")
-if !isfile(bathname)
-    download("https://dox.ulg.ac.be/index.php/s/RSwm4HPHImdZoQP/download",bathname)
-end
 bathisglobal = true
-
-
 
 function gitdiff(casedir)
     cd(joinpath(dirname(pathof(DIVAnd)),"..")) do

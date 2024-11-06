@@ -36,7 +36,7 @@ for i = 1:length(varlist)
 
 
     filename_src = joinpath(datadir,"Case/$(varname_)-res-0.25-epsilon2-2.0-varlen1-lb5-maxit-5000-reltol-1.0e-9-bathcl-go-exclude-mL-1960-exNS2-monthly/Results/$(varname_)_monthly.nc")
-
+                                                    #-res-0.25-epsilon2-2.0-varlen1-lb5-maxit-5000-reltol-1.0e-9-bathcl-go-exclude-mL-1960-exNS2-monthly
     resdir = dirname(filename_src)
     xmlname = joinpath(resdir,"$(varname_).xml")
 
@@ -44,7 +44,7 @@ for i = 1:length(varlist)
 
     DIVAnd.derived(filename_src,varname,filename)
 
-    titlestr = "European seas - DIVAnd 4D monthly analysis of $varname $year0/$year1 v2021"
+    titlestr = "European seas - DIVAnd 4D monthly analysis of $varname $year0/$year1 v2023"
     NCDataset(filename,"a") do ds
         ds.attrib["title"] = titlestr
     end
@@ -58,7 +58,7 @@ for i = 1:length(varlist)
     absstr = """
 $varname - Monthly Climatology for the European Seas for the period $(TSbackground.yearlists[1][1])-$(TSbackground.yearlists[1][end]) on the domain from longitude $(lonr[1]) to $(lonr[end]) degrees East and latitude $(latr[1]) to $(latr[end]) degrees North.
 Data Sources: observational data from SeaDataNet/EMODnet Chemistry Data Network.
-Description of DIVA analysis: The computation was done with the DIVAnd (Data-Interpolating Variational Analysis in n dimensions), version 2.7.2, using GEBCO 30sec topography for the spatial connectivity of water masses. Horizontal correlation length and vertical correlation length vary spatially depending on the topography and domain.
+Description of DIVAnd analysis: The computation was done with the DIVAnd (Data-Interpolating Variational Analysis in n dimensions), version 2.7.2, using GEBCO 30sec topography for the spatial connectivity of water masses. Horizontal correlation length and vertical correlation length vary spatially depending on the topography and domain.
 Depth range: $(join(string.(depthr),", ")) m.
 Units: $(varinfo[varname]["netcdf_units"]).
 The horizontal resolution of the produced DIVAnd analysis is $(step(lonr)) degrees."""

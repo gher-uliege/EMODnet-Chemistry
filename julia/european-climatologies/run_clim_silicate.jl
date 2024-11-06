@@ -18,7 +18,7 @@ pmap(varname -> begin;
 
 @info(length(varlist));
 #@sync @distributed for varname_index in 1:1# length(varlist)
-for varname_index in 4:4#length(varlist):length(varlist)
+for varname_index in 5:5#length(varlist):length(varlist)
     @info varlist[varname_index]
     ENV["VARNAME_INDEX"] = "$varname_index"
     @info("Computing background field")
