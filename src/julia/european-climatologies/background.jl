@@ -39,7 +39,7 @@ varname_index = parse(Int,get(ENV,"VARNAME_INDEX","1"))
 
 @show varname_index
 varname = varlist[varname_index]
-varname_ = replace(varname," " => "_")
+varname_ = replace(varname, " (DIN)"=>"", " "=>"_", )
 @show varname
 
 #maxit = 100
@@ -363,9 +363,8 @@ function read_attrib_file(filename::String, colsep::String="|")::OrderedDict
     return ncattrib
 end
 
-
-ncglobalattrib = read_attrib_file(joinpath(datadir, "ncglobalattrib_$(varname_index).txt"))
-ncvarattrib = read_attrib_file(joinpath(datadir, "ncvarattrib_$(varname_index).txt"))
+ncglobalattrib = read_attrib_file(joinpath(datadir, "Attributes/ncglobalattrib_$(varname_).txt"))
+ncvarattrib = read_attrib_file(joinpath(datadir, "Attributes/ncvarattrib_$(varname_).txt"))
 
 
 dbinfo = @time DIVAnd.diva3d(
