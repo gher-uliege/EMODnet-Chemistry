@@ -7,8 +7,9 @@
 
 using DIVAnd
 using DataStructures
-include("../config.jl")
 theyear = 2024
+
+outputdir = "/home/ctroupin/data/EMODnet-Chemistry/Eutrophication2024/Attributes"
 
 # Name of the variables (EMODnet Chemistry)
 varlist = ["Water body phosphate",
@@ -83,7 +84,8 @@ for iii in 1:nvar
     c = Vocab.findbylabel(P35,[varlist[iii]])[1]
     parameter_keyword_urn = Vocab.notation(c)
 
-    varname_nospace = replace(varlist[iii], " "=>"_")
+    varname_nospace = replace(varlist[iii], " (DIN)"=>"", " "=>"_", )
+    @info(varname_nospace);
     
     metadata = OrderedDict(
         "title" => "European seas - DIVAnd 4D monthly analysis of $(varlist[iii]) 1960/2023 v$(theyear)",
@@ -110,7 +112,7 @@ for iii in 1:nvar
         "doi" => varinfo2[varlist[iii]]["doi"]
     );
     
-    fname = varname_nospace * "_monthly.nc"
+    fname = "$(varname_nospace)_monthly.nc"
     varname = varlist[iii]
     deltalon = 0.25
     deltalat = 0.25
