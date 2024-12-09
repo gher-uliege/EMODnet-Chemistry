@@ -11,17 +11,14 @@ do_exclude = false      # Flag to remove bad data from a list of indices stored 
 #deltalon = 0.1
 #deltalat = 0.1
 
-deltalon = 0.25
-deltalat = 0.25
+#deltalon = 0.25
+#deltalat = 0.25
 
 #deltalon = 0.5
 #deltalat = 0.5
 
-#deltalon = 1
-#deltalat = 1
-
-#lonr = -40.:deltalon:55.
-#latr = 24.:deltalat:67.
+deltalon = 1
+deltalat = 1
 
 # include the Artic
 lonr = -45.:deltalon:70.
@@ -31,15 +28,7 @@ timeorigin = DateTime(1900,1,1,0,0,0)
 
 # List of depths: selected as the union of the different products
 
-depthr = Float64[
-  0, 10, 20, 30, 50, 75, 100, 125, 150, 200, 250, 300, 400, 500, 600, 700, 800, 900, 1000,
-  1100, 1200, 1300, 1400, 1500, 1750, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500]
-
 depthr = Float64[0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 125, 150, 175, 200, 225, 250, 275, 300, 325, 350, 375, 400, 425, 450, 475, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000, 1050, 1100, 1150, 1200, 1250, 1300, 1350, 1400, 1450, 1500, 1550, 1600, 1650, 1700, 1750, 1800, 1850, 1900, 1950, 2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000, 3100, 3200, 3300, 3400, 3500, 3600, 3700, 3800, 3900, 4000, 4100, 4200, 4300, 4400, 4500, 4600, 4700, 4800, 4900, 5000, 5100, 5200, 5300, 5400, 5500]
-
-#debug
-#depthr = depthr[15:25]
-#depthr = depthr[1:4]
 
 yearlist = [1970:2020]
 yearlist = [1960:2020]
@@ -56,11 +45,6 @@ TSmonthly = DIVAnd.TimeSelectorYearListMonthList(
 # time range of the in-situ data
 timerange = [Date(1000,1,1),Date(3000,12,31)]
 
-
-# set EMAIL address in ~/.bachrc, for example
-# export EMAIL="..."
-
-#email = ENV["EMAIL"]
 email = "ctroupin@uliege.be"
 
 datadir = "/home/ulg/gher/ctroupin/data/EMODnet-Chemistry/"
@@ -69,15 +53,15 @@ obsdir = datadir
 excludedir = joinpath(datadir,"EMODnet","blacklist")
 
 # Name of the variables (WOD)
-varnames = ["Oxygen","Phosphate","Silicate","Nitrate and Nitrate+Nitrite","pH","Chlorophyll"]
+varnames = ["Oxygen","Phosphate","Silicate","Nitrate and Nitrate+Nitrite","Chlorophyll"]
 
 # Name of the variables (EMODnet Chemistry)
-varlist = ["Water body phosphate",
-           "Water body chlorophyll-a",
-           "Water body dissolved inorganic nitrogen (DIN)",
-           "Water body ammonium",
-           "Water body silicate",
-	   "Water body dissolved oxygen concentration"
+varlist = ["Water_body_phosphate",
+           "Water_body_chlorophyll-a",
+           "Water_body_dissolved_inorganic_nitrogen",
+           "Water_body_ammonium",
+           "Water_body_silicate",
+	   "Water_body_dissolved_oxygen_concentration"
            ]
 
 area_keywords = [
