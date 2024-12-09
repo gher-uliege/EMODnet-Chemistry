@@ -1,6 +1,7 @@
 #!/usr/bin/env julia
+# Creation of the climatologies
+# -----------------------------
 
-#ENV["DISPLAY"] = ""
 using Distributed
 using Dates
 using Printf
@@ -11,7 +12,6 @@ using PhysOcean
 @everywhere using DIVAnd
 using StatsBase
 using FileIO
-#using PyPlot
 using Glob
 using JLD2
 using DataStructures
@@ -19,43 +19,49 @@ using Interpolations
 
 #ENV["JULIA_DEBUG"] = "DIVAnd"
 
-include("common.jl")
-clversion = "varlen1"
+# Include the configuration file
+# ------------------------------
 
+include("common.jl")
+
+# Information about correlation length
+# ------------------------------------
+
+clversion = "varlen1"
 sz = (length(lonr),length(latr),length(depthr))
 @show sz
-mkpath(datadir)
 
-#analysistype = "background"
-#analysistype = "monthly"
+# Get the type of analysis from the main script
 analysistype = get(ENV,"ANALYSIS_TYPE","background")
+@info("Analysis type: $(analysistype)")
 
-@show analysistype
-
-
-#varname_index = parse(Int,get(ENV,"VARNAME_INDEX","2"))
-varname_index = parse(Int,get(ENV,"VARNAME_INDEX","3"))
-varname_index = parse(Int,get(ENV,"VARNAME_INDEX","1"))
-
-@show varname_index
+# Get the variable name from the main script
+varname_index = parse(Int,get(ENV,"VARNAME_INDEX", "1"))
+@info("Working on variable number $(varname_index)")
 varname = varlist[varname_index]
-varname_ = replace(varname, " (DIN)"=>"", " "=>"_", )
+varname_ = replace(varname," " => "_")
 @show varname
 
 #maxit = 100
-maxit = 1000
+# maxit = 1000
+maxit = 5000
 #maxit = 10000
+
 reltol = 1e-6;
 reltol = 1e-9;
-maxit = 5000
+
 #len_background = 1000_000
 epsilon2_background = 10
+
 suffix = "bathcl"
 suffix = "bathcl-go"
 suffix = "bathcl-go-exclude"
 suffix = "bathcl-go-exclude-rdiag"
 suffix = "bathcl-go-exclude-mL"
 suffix = "bathcl-go-exclude-mL-1960-exNS2"
+
+# Prepare correlation length field
+# --------------------------------
 
 filename_corrlen = joinpath(datadir,"correlation_len_$(clversion)_$(deltalon).nc")
 
@@ -68,7 +74,6 @@ close(ds)
 
 #lenz = [min(max(25.,1 + depthr[k]/10),500.) for i = 1:sz[1], j = 1:sz[2], k = 1:sz[3]]
 lenz = [min(max(minlenz[i,j],depthr[k]/10),500.) for i = 1:sz[1], j = 1:sz[2], k = 1:sz[3]]
-
 
 lb = 6
 lb = 5
@@ -160,21 +165,22 @@ lenx .= bath_RL .* lenx
 
 #--
 
-# load data
+# Load data
+# ---------
 
+# Bathymetry
 bx,by,b = DIVAnd.extract_bath(bathname,bathisglobal,lonr,latr);
 
+# Observations (netCDF files)
 filenames_obs = glob("*" * replace(varname," " => "_") * "*.nc",obsdir)
-
-obsvalue,obslon,obslat,obsdepth,obstime,obsids = DIVAnd.loadobs(
-    Float64,filenames_obs,varname)
-
+obsvalue,obslon,obslat,obsdepth,obstime,obsids = DIVAnd.loadobs(Float64,filenames_obs,varname)
+# Edit longitude to lie between -180. and 180.
 obslon = mod.(obslon .+ 180,360) .- 180
 
+# Create data weights
+# -------------------
 
 rdiag_len = 0.1
-#rdiag_len = 0.5
-
 mkpath(joinpath(obsdir,"weights"))
 #filename_rdiag = joinpath(obsdir,"weights","$(varname)_len$(rdiag_len)_rdiag.nc")
 filename_rdiag = joinpath(obsdir,"weights","$(varname)_rdiag.nc")
@@ -196,7 +202,10 @@ end
 
 sel = obsvalue .>= 0
 
-# exclude values flagged as unrepresentative
+# Exclude values flagged as unrepresentative
+# ------------------------------------------
+
+# Need to set the flag `do_exclude` to `true` in file `common.jl`  
 if do_exclude 
     fnames_exclude = glob("exclude_" * replace(varname," " => "_")  * "*.csv",excludedir)
     exclude_sampleid_set = Set(exclude_sampleid(fnames_exclude))
@@ -208,6 +217,10 @@ if do_exclude
     @info "remove $(sum(.!sel)) negative value(s)"
 end
 
+# Prepare distance to coast
+# -------------------------
+
+# Read from data file
 dsc = NCDataset(joinpath(datadir,"dist2coast.nc"))
 distance2coast = dsc["distance2coast"][:,:]
 distance2coast_lon = dsc["lon"][:]
@@ -217,6 +230,7 @@ distance2coast_lat = distance2coast_lat[end:-1:1]
 distance2coast = distance2coast[:,end:-1:1]
 close(dsc)
 
+# Interpolate on the grid
 itp = interpolate((distance2coast_lon,distance2coast_lat),
             distance2coast,Gridded(Linear()))
 obsdistance2coast = itp.(obslon,obslat)

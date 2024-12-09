@@ -1,3 +1,4 @@
+doc/*pdf
 src/python/__pycache__/
 *.log
 data

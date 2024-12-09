@@ -1,12 +1,28 @@
+#!/usr/bin/env julia
+
+# Definition of the common parameters to various scripts:
+# domain, grid, depth levels, background field, variable names
+# ------------------------------------------------------------
+
 using DIVAnd
 using Dates
 using DelimitedFiles
 
 do_exclude = false      # Flag to remove bad data from a list of indices stored in file
 
-# common parameters to various scripts
+# Directories
+# -----------
+
+email = "ctroupin@uliege.be"
+datadir = "/home/ulg/gher/ctroupin/data/EMODnet-Chemistry/"
+woddir = joinpath(datadir,"WOD")
+obsdir = datadir
+excludedir = joinpath(datadir,"EMODnet","blacklist")
+
+isdir(datadir) ? @debug("Already exists") : mkpath(datadir)
 
 # Grid and resolutions
+# --------------------
 
 #deltalon = 0.1
 #deltalat = 0.1
@@ -20,18 +36,29 @@ do_exclude = false      # Flag to remove bad data from a list of indices stored 
 deltalon = 1
 deltalat = 1
 
-# include the Artic
+# Domain extent
+# -------------
+
 lonr = -45.:deltalon:70.
 latr = 24.:deltalat:83.
 
 timeorigin = DateTime(1900,1,1,0,0,0)
 
-# List of depths: selected as the union of the different products
+# List of depths
+# --------------
+# selected as the union of the different products
 
 depthr = Float64[0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 125, 150, 175, 200, 225, 250, 275, 300, 325, 350, 375, 400, 425, 450, 475, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000, 1050, 1100, 1150, 1200, 1250, 1300, 1350, 1400, 1450, 1500, 1550, 1600, 1650, 1700, 1750, 1800, 1850, 1900, 1950, 2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000, 3100, 3200, 3300, 3400, 3500, 3600, 3700, 3800, 3900, 4000, 4100, 4200, 4300, 4400, 4500, 4600, 4700, 4800, 4900, 5000, 5100, 5200, 5300, 5400, 5500]
 
-yearlist = [1970:2020]
-yearlist = [1960:2020]
+# Period of interest
+# ------------------
+# Note: changed 2020 to 2023 since new observations have been made available
+yearlist = [1960:2023]
+
+# Time periods
+# ----------------
+
+# Main background takes all the months together
 
 TSbackground = DIVAnd.TimeSelectorYearListMonthList(
     yearlist,
@@ -45,24 +72,25 @@ TSmonthly = DIVAnd.TimeSelectorYearListMonthList(
 # time range of the in-situ data
 timerange = [Date(1000,1,1),Date(3000,12,31)]
 
-email = "ctroupin@uliege.be"
+# Variable names
+# --------------
 
-datadir = "/home/ulg/gher/ctroupin/data/EMODnet-Chemistry/"
-woddir = joinpath(datadir,"WOD")
-obsdir = datadir
-excludedir = joinpath(datadir,"EMODnet","blacklist")
-
-# Name of the variables (WOD)
+# World Ocean Database
 varnames = ["Oxygen","Phosphate","Silicate","Nitrate and Nitrate+Nitrite","Chlorophyll"]
 
-# Name of the variables (EMODnet Chemistry)
+# EMODnet Chemistry
+# Note: we removed the white spaces and the `(DIN)` to avoid possible issues with ERDDAP extract_bath
+
 varlist = ["Water_body_phosphate",
            "Water_body_chlorophyll-a",
            "Water_body_dissolved_inorganic_nitrogen",
            "Water_body_ammonium",
            "Water_body_silicate",
-	   "Water_body_dissolved_oxygen_concentration"
-           ]
+	       "Water_body_dissolved_oxygen_concentration"
+]
+
+# Metadata and vocab
+# ------------------
 
 area_keywords = [
         "Arctic Ocean",
@@ -74,9 +102,9 @@ area_keywords = [
         "Baltic Sea",
         "North Sea",
         "Mediterranean Sea"]
+
 #area_collection = Vocab.SDNCollection("C19")
 #@show Vocab.notation.(Vocab.findbylabel(area_collection,area_keywords))
-
 
 area_keywords_urn = [
     "SDN:C19::9",
@@ -87,7 +115,8 @@ area_keywords_urn = [
     "SDN:C19::3_1",
 ]
 
-
+# Attributes for the variables
+# ----------------------------
 
 varinfo = Dict(
     "Water body dissolved oxygen concentration" => Dict(
@@ -158,10 +187,6 @@ function gitdiff(casedir)
     end;
 end
 
-
-
-
-
 function loadexclude(fname_exclude::AbstractString)
     #data, headers = readdlm(fname_exclude, header = true)
     #headers = vec(headers)
@@ -193,6 +218,5 @@ function sampleid(obslon,obslat,obsdepth,obstime,obsids)
 end
 
 exclude_sampleid(fname_exclude::AbstractString) = sampleid.(loadexclude(fname_exclude)...)
-
 exclude_sampleid(fnames_exclude::AbstractVector) = reduce(vcat,exclude_sampleid.(fnames_exclude),init=Tuple{Int,Int,Int,DateTime,String}[])
 #exclude_sampleid(fnames_exclude::AbstractVector) = reduce(vcat,exclude_sampleid.(fnames_exclude))
