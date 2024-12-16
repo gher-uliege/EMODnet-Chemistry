@@ -32,16 +32,22 @@ coastfacecolor = ".75"
 coastedgecolor = None
 
 colorlist = {"ArcticSea": "#1f77b4",
-             "NorthAtlantic": "#ff7f0e", "Atlantic": "#ff7f0e",
-             "BalticSea": "#2ca02c", "BlackSea": "#d62728",
-             "MediterraneanSea": "#9467bd", "Mediterranean": "#9467bd", "NorthSea": "#8c564b"}
+             "NorthAtlantic": "#ff7f0e", 
+             "Atlantic": "#ff7f0e",
+             "BalticSea": "#2ca02c", 
+             "BlackSea": "#d62728",
+             "MediterraneanSea": "#9467bd", 
+             "Mediterranean": "#9467bd", 
+             "NorthSea": "#8c564b",
+             "Caribbean": "#e5c494"}
 
 colorlist2 = ['#1f77b4',
              '#ff7f0e', #'#ff7f0e',
              '#2ca02c', #'#2ca02c',
              '#d62728',
              '#9467bd', #'#9467bd',
-             '#8c564b']
+             '#8c564b',
+             "#e5c494"]
 
 histlabels = ['Arctic Sea',
               'Baltic Sea', 
@@ -438,7 +444,7 @@ def plot_data_locations(theproj, datadir, varname, regiondict, figname="", bathy
 
     plt.figure(figsize=(12, 12))
     ax = plt.subplot(111, projection=theproj)
-    ax.set_extent(domain)
+    # ax.set_extent(domain)
     regionkeyold = ""
     for datafile in datafilelist:
         regionkey = os.path.basename(datafile).split("_")[0]
@@ -617,7 +623,7 @@ def plot_hexbin_datalocations(theproj, datadir, varname, figname=""):
 
     plt.figure()
     ax = plt.subplot(111, projection=theproj)
-    ax.set_extent(domain)
+    # ax.set_extent(domain)
 
     xx = np.arange(-180, 180, 30)
     yy = np.arange(-90, 90, 30.)
@@ -712,16 +718,16 @@ def make_histo_year(years, varname, figdir="./", stack=False):
         for yyyy in years_region:
             year_flat.append(yyyy)
 
-    fig = plt.figure(figsize=(12, 12))
+    fig = plt.figure()
     ax = plt.subplot(111)
     
     if stack is True:
-        plt.hist(years, bins=np.arange(1928, 2023), rwidth=.8, histtype='bar',
+        ax.hist(years, bins=np.arange(1928, 2023), rwidth=.8, histtype='bar',
                  stacked=True, color=colorlist2[0:len(years)],
                  label=histlabels[0:len(years)])
         plt.legend(loc=2)
     else:
-        plt.hist(year_flat, bins=np.arange(1928, 2023), rwidth=.8, color=".2")
+        ax.hist(year_flat, bins=np.arange(1928, 2023), rwidth=.8, color=".2")
 
     plt.xticks(np.arange(1950, 2030, 10))
     fig.autofmt_xdate()
@@ -762,12 +768,12 @@ def make_histo_month(months, varname, figdir="./", stack=False):
     ax = plt.subplot(111)
 
     if stack is True:
-        plt.hist(months, bins=12, rwidth=.8, histtype='bar',
+        ax.hist(months, bins=12, rwidth=.8, histtype='bar',
                  stacked=True, color=colorlist2[0:len(months)],
                  label=histlabels[0:len(months)])
         plt.legend(loc=2)
     else:
-        plt.hist(months_flat, bins=12, rwidth=.8, color=".2")
+        ax.hist(months_flat, bins=12, rwidth=.8, color=".2")
 
     plt.xticks(np.arange(1.5, 13.5), monthlist)
     plt.ylabel("Number of\nobservations", rotation=0, ha="right")
