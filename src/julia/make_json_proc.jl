@@ -6,8 +6,9 @@ using Glob
 #datadir = "/production/apache/data/emodnet-domains/By sea regions/Northeast Atlantic Ocean"
 #datadir = "/production/apache/data/emodnet-domains/By sea regions/Black Sea/"
 #datadir = "/production/apache/data/emodnet-domains/By sea regions/Arctic Ocean/"
+#datadir = "/production/apache/data/emodnet-domains/Coastal areas/Northeast Atlantic Ocean - Loire River"
+datadir = "/home/ctroupin/data/EMODnet-Chemistry/Eutrophication2024/Results/Monthly/"
 
-datadir = "/production/apache/data/emodnet-domains/Coastal areas/Northeast Atlantic Ocean - Loire River"
 filelist = Glob.glob("*.nc", datadir)
 
 # Get variable name

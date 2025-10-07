@@ -343,10 +343,10 @@ def plot_DIVAnd_field(theproj, lon, lat, field, depth, figname="", varname="",
     gl.top_labels = False
     gl.right_labels = False
     
-    if monthname is not None:
-        plt.title(f"DIVAnd field of {varname} concentration at {int(depth)} m in  {monthname}")
+    if monthname == "background":
+        plt.title(f"DIVAnd background field of {varname} concentration at {int(depth)} m")
     else:
-        plt.title(f"DIVAnd field of {varname} concentrationat {int(depth)} m")
+        plt.title(f"DIVAnd field of {varname} concentration at {int(depth)} m in {monthname}")   
 
     if vmin==0:
         cb = plt.colorbar(pcm, extend="max", shrink=0.9)
