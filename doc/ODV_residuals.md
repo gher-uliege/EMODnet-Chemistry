@@ -53,13 +53,14 @@ Set the ranges for the residuals, for instance between -5. and 5.
 ![Display residuals](../figures/ODV-residuals/odv_res13.png "Display residuals")
 
 ### 6. Select your region of interest using the _Set ranges_ tool
-s
 In this case we can see the measurements in the _Black Sea_ for which the residuals exceed a concentration of 5 µmol/l.
 
 ![Black Sea residuals](../figures/ODV-residuals/odv_res14.png "Black Sea")
 
 
 ## Post-processing
+
+### Starting with a CSV file
 
 The goal is to obtain a list of identifier (`obsid`) that will be black-listed
 for the next round of analysis. We can either store the identifiers (only), or
@@ -90,6 +91,10 @@ __Notes:__
 ```bash
 awk -F  ";" '$8 == 1 {print $1, $2, $3, $4, $5}' inputfile > excludelist.txt
 ```
+
+### Starting with a netCDF file
+
+One can directly use the output file produced by `DIVAnd` and storing the residuals (ex: `)
 
 
 ### User notes

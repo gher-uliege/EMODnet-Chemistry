@@ -14,12 +14,12 @@ do_exclude = false      # Flag to remove bad data from a list of indices stored 
 # -----------
 
 email = "ctroupin@uliege.be"
-datadir = "/home/ulg/gher/ctroupin/data/EMODnet-Chemistry/"
+datadir = "/home/ctroupin/data/EMODnet-Chemistry/Eutrophication2024/"
 woddir = joinpath(datadir,"WOD")
 obsdir = datadir
 excludedir = joinpath(datadir,"EMODnet","blacklist")
 
-isdir(datadir) ? @debug("Already exists") : mkpath(datadir)
+# isdir(datadir) ? @debug("Already exists") : mkpath(datadir)
 
 # Grid and resolutions
 # --------------------
@@ -27,14 +27,14 @@ isdir(datadir) ? @debug("Already exists") : mkpath(datadir)
 #deltalon = 0.1
 #deltalat = 0.1
 
-#deltalon = 0.25
-#deltalat = 0.25
+deltalon = 0.25
+deltalat = 0.25
 
 #deltalon = 0.5
 #deltalat = 0.5
 
-deltalon = 1
-deltalat = 1
+#deltalon = 1
+#deltalat = 1
 
 # Domain extent
 # -------------
@@ -119,7 +119,7 @@ area_keywords_urn = [
 # ----------------------------
 
 varinfo = Dict(
-    "Water body dissolved oxygen concentration" => Dict(
+    "Water_body_dissolved_oxygen_concentration" => Dict(
          # http://vocab.nerc.ac.uk/collection/P02/current/
         "search_keywords_urn" => ["SDN:P02::DOXY"],
         "netcdf_units" => "umol/l",
@@ -128,7 +128,7 @@ varinfo = Dict(
         "woa_depthr" => [0.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0, 55.0, 60.0, 65.0, 70.0, 75.0, 80.0, 85.0, 90.0, 95.0, 100.0, 125.0, 150.0, 175.0, 200.0, 225.0, 250.0, 275.0, 300.0, 325.0, 350.0, 375.0, 400.0, 425.0, 450.0, 475.0, 500.0, 550.0, 600.0, 650.0, 700.0, 750.0, 800.0, 850.0, 900.0, 950.0, 1000.0, 1050.0, 1100.0, 1150.0, 1200.0, 1250.0, 1300.0, 1350.0, 1400.0, 1450.0, 1500.0],
         "doi" => "https://doi.org/", # Water body dissolved oxygen concentration
     ),
-    "Water body phosphate" => Dict(
+    "Water_body_phosphate" => Dict(
          # http://vocab.nerc.ac.uk/collection/P02/current/
         "search_keywords_urn" => ["SDN:P02::PHOS"],
         "netcdf_units" => "umol/l",
@@ -137,7 +137,7 @@ varinfo = Dict(
         "woa_depthr" => [0.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0, 55.0, 60.0, 65.0, 70.0, 75.0, 80.0, 85.0, 90.0, 95.0, 100.0, 125.0, 150.0, 175.0, 200.0, 225.0, 250.0, 275.0, 300.0, 325.0, 350.0, 375.0, 400.0, 425.0, 450.0, 475.0, 500.0, 550.0, 600.0, 650.0, 700.0, 750.0, 800.0],
         "doi" => "https://doi.org/", # Water body phosphate
     ),
-    "Water body chlorophyll-a" => Dict(
+    "Water_body_chlorophyll-a" => Dict(
          # http://vocab.nerc.ac.uk/collection/P02/current/
         "search_keywords_urn" => ["SDN:P02::CPWC"],
         "netcdf_units" => "mg/m3",
@@ -145,7 +145,7 @@ varinfo = Dict(
         "netcdf_standard_name" => "mass_concentration_of_chlorophyll_in_sea_water",
         "doi" => "https://doi.org/", # Water body chlorophyll-a
     ),
-    "Water body ammonium" => Dict(
+    "Water_body_ammonium" => Dict(
          # http://vocab.nerc.ac.uk/collection/P02/current/
         "search_keywords_urn" => ["SDN:P02::AMON"],
         "netcdf_units" => "umol/l",
@@ -153,7 +153,7 @@ varinfo = Dict(
         "netcdf_standard_name" => "mole_concentration_of_ammonium_in_sea_water",
         "doi" => "https://doi.org/", # Ammonium
     ),
-    "Water body silicate" => Dict(
+    "Water_body_silicate" => Dict(
          # http://vocab.nerc.ac.uk/collection/P02/current/
         "search_keywords_urn" => ["SDN:P02::SLCA"],
         "netcdf_units" => "umol/l",
@@ -162,7 +162,7 @@ varinfo = Dict(
         "woa_depthr" => [0.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0, 55.0, 60.0, 65.0, 70.0, 75.0, 80.0, 85.0, 90.0, 95.0, 100.0, 125.0, 150.0, 175.0, 200.0, 225.0, 250.0, 275.0, 300.0, 325.0, 350.0, 375.0, 400.0, 425.0, 450.0, 475.0, 500.0, 550.0, 600.0, 650.0, 700.0, 750.0, 800.0],
         "doi" => "https://doi.org/", # Water body silicate
     ),
-    "Water body dissolved inorganic nitrogen (DIN)" => Dict(
+    "Water_body_dissolved_inorganic_nitrogen" => Dict(
          # http://vocab.nerc.ac.uk/collection/P02/current/
         "search_keywords_urn" => ["SDN:P02::TDIN"],
         "netcdf_units" => "umol/l",

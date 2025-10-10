@@ -380,7 +380,6 @@ end
 ncglobalattrib = read_attrib_file(joinpath(datadir, "Attributes/ncglobalattrib_$(varname_).txt"))
 ncvarattrib = read_attrib_file(joinpath(datadir, "Attributes/ncvarattrib_$(varname_).txt"))
 
-
 dbinfo = @time DIVAnd.diva3d(
     (lonr,latr,depthr,TS),
     (obslon[sel],obslat[sel],obsdepth[sel],obstime[sel]),
