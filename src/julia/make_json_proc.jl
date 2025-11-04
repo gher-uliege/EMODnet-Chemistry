@@ -7,7 +7,11 @@ using Glob
 #datadir = "/production/apache/data/emodnet-domains/By sea regions/Black Sea/"
 #datadir = "/production/apache/data/emodnet-domains/By sea regions/Arctic Ocean/"
 #datadir = "/production/apache/data/emodnet-domains/Coastal areas/Northeast Atlantic Ocean - Loire River"
-datadir = "/home/ctroupin/data/EMODnet-Chemistry/Eutrophication2024/Results/Monthly/"
+#datadir = "/home/ctroupin/data/EMODnet-Chemistry/Eutrophication2024/Results/Monthly/"
+#datadir = "/home/ctroupin/data/EMODnet-Chemistry/Eutrophication2024/Results/Coastal_areas-water_body/Baltic_Sea_-_Gulf_of_Riga/"
+#datadir = "/home/ctroupin/data/EMODnet-Chemistry/Eutrophication2024/Results/Coastal_areas-water_body/Black_Sea-_Danube_Delta"
+#datadir = "/home/ctroupin/data/EMODnet-Chemistry/Eutrophication2024/Results/By_sea_regions-water_body/Baltic_Sea"
+datadir = "/home/ctroupin/data/EMODnet-Chemistry/Eutrophication2024/Results/By_sea_regions-water_body/Black_Sea"
 
 filelist = Glob.glob("*.nc", datadir)
 

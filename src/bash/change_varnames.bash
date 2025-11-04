@@ -1,8 +1,8 @@
 #!/bin/bash
 shopt -s nullglob
 
-#datadir = ${1}
-datadir="/home/ctroupin/data/EMODnet-Chemistry/Eutrophication2024/Results/By_sea_regions-water_body/Baltic_Sea"
+datadir=${1}
+
 
 if [ -d ${datadir} ]; then
     echo "directory exists"
