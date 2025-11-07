@@ -1,6 +1,8 @@
 module EMODnetChemistry
 using Glob
 using NCDatasets
+using HTTP
+using EzXML
 
 const standard_names_dict =  Dict(
     "Water_body_ammonium" => "mole_concentration_of_ammonium_in_sea_water",
@@ -22,10 +24,57 @@ const standard_names_dict =  Dict(
 )
 
 """
+    check_uuid(uuid)
+
+Check the Sextant catalog entry specified with `uuid`
+"""
+function check_uuid(uuid)
+    r = HTTP.get("https://sextant.ifremer.fr/geonetwork/srv/eng/qi", query = Dict("_uuid" => uuid));
+    body = String(r.body)
+    doc = parsexml(body)
+    summary = EzXML.findfirst("/response/summary",doc)
+    count = parse(Int,summary["count"])
+    if count == 1
+        return true
+    else
+        @show uuid
+        return false
+    end
+end
+
+"""
+    rlist(rootpath,pattern)
+
+Create a list of files located in directory `rootpath` and following the pattern `pattern`
+
+# Example
+```julia-repl
+julia> allfiles = collect(rlist(rootpath, r".nc"))
+```
+"""
+function rlist(rootpath,pattern)
+    Channel() do ch
+        for (root, dirs, files) in walkdir(rootpath)
+            for file in files
+                if occursin(pattern, file) 
+                    put!(ch,joinpath(root,file))
+                end
+            end
+        end
+    end
+end
+
+
+"""
     write_json(jsonfile::String, varname)
 
 Create a JSON file based on the variable name `varname`.     
 The JSON file is used to organise how the variables are displayed in OceanBrowser.
+
+# Example
+```julia-repl
+julia>  write_json("Water_body_chlorophyll-a.nc.json", "Water_body_chlorophyll-a")
+```
 """
 function write_json(jsonfile::String, varname::String)
     jsontpl = """
@@ -55,6 +104,7 @@ function write_json(jsonfile::String, varname::String)
     open(jsonfile, "w") do io
         write(io, jsontpl)
     end
+    return nothing
 end
 
 """
