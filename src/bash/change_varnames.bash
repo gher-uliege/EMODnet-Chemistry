@@ -1,4 +1,21 @@
 #!/bin/bash
+#===============================================================================
+#
+# FILE: change_varnames.bash
+#
+# USAGE: change_varnames.bash directory_path
+#
+# DESCRIPTION: Modify the netCDF variable names in order to remove
+# white spaces and special chatacters
+#
+# REQUIREMENTS: netCDF Operator toolkit (http://nco.sourceforge.net/)
+#
+# AUTHOR: C. Troupin (GHER, ULiege),
+#
+# VERSION: 1.1
+#===================================================================================
+
+# Modify shell behavior and enable "shell globbing"
 shopt -s nullglob
 
 datadir=${1}
@@ -89,6 +106,6 @@ find "${datadir}" -maxdepth 1 -type f -name "*.nc" -print0 | while IFS= read -r 
         echo "Unknown variable"
     fi
 
-    ncks -7 -O -L 5 --baa=4 --ppc default=3 "${datafile}" "${datafile}" 
+    # ncks -7 -O -L 5 --baa=4 --ppc default=3 "${datafile}" "${datafile}" 
 
 done
