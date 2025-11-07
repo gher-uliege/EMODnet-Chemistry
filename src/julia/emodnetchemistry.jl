@@ -1,5 +1,61 @@
+module EMODnetChemistry
 using Glob
 using NCDatasets
+
+const standard_names_dict =  Dict(
+    "Water_body_ammonium" => "mole_concentration_of_ammonium_in_sea_water",
+    "Water_body_chlorophyll-a" => "mass_concentration_of_chlorophyll_a_in_sea_water",
+    "Water_body_phosphate" => "mole_concentration_of_phosphate_in_sea_water",
+    "Water_body_dissolved_oxygen_concentration" => "mole_concentration_of_dissolved_molecular_oxygen_in_sea_water",
+    "Water_body_silicate" => "mole_concentration_of_silicate_in_sea_water",
+    "Water_body_dissolved_inorganic_nitrogen_(DIN)" => "mole_concentration_of_dissolved_inorganic_nitrogen_in_sea_water",
+    "Water_body_dissolved_inorganic_nitrogen" => "mole_concentration_of_dissolved_inorganic_nitrogen_in_sea_water",
+    "Water_body_dissolved_oxygen_saturation" => "fractional_saturation_of_oxygen_in_sea_water",
+    "Water body_ammonium" => "mole_concentration_of_ammonium_in_sea_water",
+    "Water body chlorophyll-a" => "mass_concentration_of_chlorophyll_a_in_sea_water",
+    "Water body phosphate" => "mole_concentration_of_phosphate_in_sea_water",
+    "Water body dissolved oxygen concentration" => "mole_concentration_of_dissolved_molecular_oxygen_in_sea_water",
+    "Water body silicate" => "mole_concentration_of_silicate_in_sea_water",
+    "Water body dissolved inorganic nitrogen (DIN)" => "mole_concentration_of_dissolved_inorganic_nitrogen_in_sea_water",
+    "Water body dissolved inorganic nitrogen" => "mole_concentration_of_dissolved_inorganic_nitrogen_in_sea_water",
+    "Water body dissolved oxygen saturation" => "fractional_saturation_of_oxygen_in_sea_water"
+)
+
+"""
+    write_json(jsonfile::String, varname)
+
+Create a JSON file based on the variable name `varname`.     
+The JSON file is used to organise how the variables are displayed in OceanBrowser.
+"""
+function write_json(jsonfile::String, varname::String)
+    jsontpl = """
+    {
+        \"default_time\": \"2000\",
+        \"subfolders\": [
+            {
+                \"name\": \"Additional fields\",
+                \"variables\": [
+                    \"$(varname)\",
+                    \"$(varname)_L1\",
+                    \"$(varname)_err\",
+                    \"$(varname)_relerr\",
+                    \"databins\",
+                    \"outlbins\",
+                    \"CLfield\",
+                    \"$(varname)_deepest\",
+                    \"$(varname)_deepest_L1\",
+                    \"$(varname)_deepest_L2\",
+                    \"$(varname)_deepest_depth\"
+                ]
+            }
+        ]
+    }
+    """
+
+    open(jsonfile, "w") do io
+        write(io, jsontpl)
+    end
+end
 
 """
     get_file_list(datadir, varname, season)
@@ -183,4 +239,6 @@ function get_dirnames()
     end
 
     return databasedir, outputbasedir
+end
+
 end
