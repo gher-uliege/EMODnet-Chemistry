@@ -67,10 +67,8 @@ end
 
 """
     write_url_file(urlfile, theme, subtheme, filename, layername, uuid, comments)
-    )
 
-Create the table requied by Central Portal
-
+Create the table required by Central Portal
 """
 function write_url_file(urlfile::String, theme::Array, subtheme::Array, filename::Array, layername::Array, uuid, comments="")
   open(urlfile, "w") do df
