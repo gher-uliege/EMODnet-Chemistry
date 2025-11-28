@@ -132,13 +132,52 @@ function get_subtheme(datafile::AbstractString)
   return subtheme::String
 end
 
+function write_url_file_download(databasedir::AbstractString, urlfile::AbstractString)
+
+  datafilelist = get_netcdf_list(databasedir)
+    
+  open(urlfile, "w") do df
+    # write(df, "Product type,	Region, Variable,	Direct download, Thredds, Product ID\n")
+
+    for datafile in datafilelist
+      regionname = last(split(dirname(datafile), "/"))
+      producttype = split(dirname(datafile), "/")[end-1]
+      filename = basename(datafile)
+      varname = replace(filename, "Water_body_" => "", ".nc" => "", ".4Danl" => "")
+
+      if producttype == "ogs04"
+        producttype = "All_European_Seas-water_body"
+        regionname = ""
+      end
+
+      downloadURL = replace(datafile, databasedir => baseURL)
+      threddsURL = replace(datafile, databasedir => threddsbaseURL) * ".html"
+      productID = get_id(datafile)
+
+      check_url(threddsURL)
+
+      # write(df, "$(producttype), $(regionname), $(varname), $(downloadURL), $(threddsURL), $(productID)\n")
+    end
+  end
+  return nothing
+
+end
+  
+
+
+
 # Set the directory and the name of the file which will store the lists
 # -----------------
 
+const baseURL = "https://ec.oceanbrowser.net/data/emodnet-domains"
+const threddsbaseURL = "http://opendap.oceanbrowser.net/thredds/dodsC/data/emodnet-domains"
+
 #databasedir = "/production/apache/data/emodnet-projects/Phase-3"
 #databasedir = "/production/apache/data/emodnet-projects/v2023"
-databasedir = "/home/ctroupin/data/EMODnet-Chemistry/emodnet-results-2023"
-outputfile = "./listurl_v2023.csv"
+#databasedir = "/home/ctroupin/data/EMODnet-Chemistry/emodnet-results-2023"
+databasedir = "/media/ctroupin/T7 Shield/data/EMODnet-Chemistry/Eutrophication2024/Results/ogs04"
+
+outputfile = "./listurl_v2025.csv"
 
 datafilelist = get_netcdf_list(databasedir)
 idlist = get_id.(datafilelist)
@@ -147,6 +186,9 @@ theme = get_theme.(datafilelist)
 subtheme = get_subtheme.(datafilelist)
 layername = get_layer_name.(datafilelist)
 
-write_url_file(outputfile, theme, subtheme, urllist, layername, idlist)
-
+# write_url_file(outputfile, theme, subtheme, urllist, layername, idlist)
+write_url_file_download(databasedir, outputfile)
 @info("Info written in file $(outputfile)")
+
+
+
