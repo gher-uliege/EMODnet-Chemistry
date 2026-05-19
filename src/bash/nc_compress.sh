@@ -27,11 +27,11 @@ else
     exit 0
 fi
 
-find "${datadir}" -maxdepth 1 -type f -name "*.nc" -print0 | while IFS= read -r -d '' datafile; do
+find "${datadir}" -maxdepth 3 -type f -name "*.nc" -print0 | while IFS= read -r -d '' datafile; do
     ((i++))
     echo " "
     echo "working on file $(basename "${datafile}")"
 
-    ncks -7 -O -L 5 --baa=4 --ppc default=3 "${datafile}" "${datafile}" 
+    ncks -7 -O -L 5 --baa=4 --ppc default=.4 "${datafile}" "${datafile}.cmp" 
 
 done

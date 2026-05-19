@@ -1,8 +1,12 @@
 using NCDatasets
 
-datadir1 = "/production/apache/data/emodnet-domains/All_European_Seas-water_body"
-datadir2 = "/production/apache/data/emodnet-domains/By_sea_regions-water_body"
-datadir3 = "/production/apache/data/emodnet-domains/Coastal_areas-water_body"
+datamaindir = "/media/ctroupin/T7Shield/data/EMODnet-Chemistry/Eutrophication2024/Results/ogs04"
+datamaindir = "/media/ctroupin/T7Shield/data/EMODnet-Chemistry/Eutrophication2024/Results/Archives2PROCESS"
+datamaindir = "/media/ctroupin/T7Shield/data/EMODnet-Chemistry/Eutrophication2024/Results/ogs04_20260518"
+
+datadir1 = joinpath(datamaindir, "All_European_Seas-water_body")
+datadir2 = joinpath(datamaindir, "By_sea_regions-water_body")
+datadir3 = joinpath(datamaindir, "Coastal_areas-water_body")
 
 """
     get_netcdf_list(datadir)
@@ -36,7 +40,7 @@ datafilelist3 = get_netcdf_list(datadir3);
 datafilelist = vcat(datafilelist1, datafilelist2, datafilelist3)
 
 
-urlfile = "/home/uniliege01/product_list.csv"
+urlfile = joinpath(expanduser("~/"), "product_list_ref.csv")
 
 open(urlfile, "w") do df
     write(df, "File name,   DOI\n")

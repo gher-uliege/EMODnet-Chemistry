@@ -27,7 +27,7 @@ else
     exit 0
 fi
 
-find "${datadir}" -maxdepth 1 -type f -name "*.nc" -print0 | while IFS= read -r -d '' datafile; do
+find "${datadir}" -maxdepth 3 -type f -name "*.proc" -print0 | while IFS= read -r -d '' datafile; do
     ((i++))
     echo " "
     echo "working on file $(basename "${datafile}")"
@@ -105,7 +105,5 @@ find "${datadir}" -maxdepth 1 -type f -name "*.nc" -print0 | while IFS= read -r 
     else
         echo "Unknown variable"
     fi
-
-    # ncks -7 -O -L 5 --baa=4 --ppc default=3 "${datafile}" "${datafile}" 
 
 done

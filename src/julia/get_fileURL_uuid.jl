@@ -107,6 +107,7 @@ function get_layer_name(datafile::AbstractString)
     return layername::String
   end
 end
+
 """
     get_theme(datafile)
 
@@ -118,6 +119,7 @@ Get the theme and sub-theme according to Central Portal requirements
 julia> datafile = "/production/apache/data/emodnet-projects/v2023/Coastal_areas/Northeast_Atlantic_Ocean_-_Loire_River/Water_body_phosphate.nc"
 julia> julia> get_theme(datafile)
 ("Coastal areas", "Northeast Atlantic Ocean - Loire River")
+```
 """
 function get_theme(datafile::AbstractString)
   pathsplit = split(datafile, "/")
@@ -154,9 +156,9 @@ function write_url_file_download(databasedir::AbstractString, urlfile::AbstractS
       threddsURL = replace(datafile, databasedir => threddsbaseURL) * ".html"
       productID = get_id(datafile)
 
-      check_url(threddsURL)
+      # check_url(threddsURL)
 
-      # write(df, "$(producttype), $(regionname), $(varname), $(downloadURL), $(threddsURL), $(productID)\n")
+      write(df, "$(producttype), $(regionname), $(varname), $(downloadURL), $(threddsURL), $(productID)\n")
     end
   end
   return nothing
