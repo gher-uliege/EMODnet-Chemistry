@@ -2,7 +2,10 @@
 shopt -s nullglob
 
 #datadir = ${1}
-datadir="/home/ctroupin/data/EMODnet-Chemistry/Eutrophication2024/Results/By_sea_regions-water_body/Baltic_Sea"
+# datadir="/home/ctroupin/data/EMODnet-Chemistry/Eutrophication2024/Results/By_sea_regions-water_body/Baltic_Sea"
+# datadir="/home/ctroupin/data/EMODnet/EMODnet-Chemistry/Eutrophication2024/Results/By_sea_regions-water_body/Mediterranean_Sea"
+datadir="/home/ctroupin/data/EMODnet/EMODnet-Chemistry/Eutrophication2024/Results/Coastal_areas-water_body/Mediterranean_Sea_-_Po_River"
+
 
 if [ -d ${datadir} ]; then
     echo "directory exists"
@@ -37,6 +40,15 @@ for datafile in $(ls ${datadir}/*.nc); do
         ncrename -h -O -v ".Water body dissolved inorganic nitrogen_deepest_L1","Water_body_dissolved_inorganic_nitrogen_deepest_L1" ${datafile}
         ncrename -h -O -v ".Water body dissolved inorganic nitrogen_deepest_L2","Water_body_dissolved_inorganic_nitrogen_deepest_L2" ${datafile}
         ncrename -h -O -v ".Water body dissolved inorganic nitrogen_deepest_depth","Water_body_dissolved_inorganic_nitrogen_deepest_depth" ${datafile}
+
+        ncrename -h -O -v ".Water body dissolved inorganic nitrogen (DIN)","Water_body_dissolved_inorganic_nitrogen" ${datafile}
+        ncrename -h -O -v ".Water body dissolved inorganic nitrogen (DIN)_L1","Water_body_dissolved_inorganic_nitrogen_L1" ${datafile}
+        ncrename -h -O -v ".Water body dissolved inorganic nitrogen (DIN)_L2","Water_body_dissolved_inorganic_nitrogen_L2" ${datafile}
+        ncrename -h -O -v ".Water body dissolved inorganic nitrogen (DIN)_relerr","Water_body_dissolved_inorganic_nitrogen_relerr" ${datafile}
+        ncrename -h -O -v ".Water body dissolved inorganic nitrogen (DIN)_deepest","Water_body_dissolved_inorganic_nitrogen_deepest" ${datafile}
+        ncrename -h -O -v ".Water body dissolved inorganic nitrogen (DIN)_deepest_L1","Water_body_dissolved_inorganic_nitrogen_deepest_L1" ${datafile}
+        ncrename -h -O -v ".Water body dissolved inorganic nitrogen (DIN)_deepest_L2","Water_body_dissolved_inorganic_nitrogen_deepest_L2" ${datafile}
+        ncrename -h -O -v ".Water body dissolved inorganic nitrogen (DIN)_deepest_depth","Water_body_dissolved_inorganic_nitrogen_deepest_depth" ${datafile}
 
         ncks -7 -O -L 5 --baa=4 --ppc default=3 ${datafile} ${datafile}
     elif  [[ "$(basename ${datafile})" =~ "oxygen" ]]; then
