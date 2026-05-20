@@ -1,7 +1,5 @@
 using Glob
-using Pkg
-Pkg.add(PackageSpec(name="DIVAnd", rev="Alex"))
-using DIVAnd#Alex
+using DIVAnd
 
 datadir = "/production/apache/data/emodnet-domains"
 @info("Download CDI list")
