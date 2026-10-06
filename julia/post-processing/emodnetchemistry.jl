@@ -233,7 +233,7 @@ function get_dirnames()
     hostname = gethostname()
     if hostname == "ogs04"
         @info "Working in production server"
-        databasedir = "/production/apache/data/emodnet-domains"
+        databasedir = "/production/apache/data/emodnet-projects/v2023/"
         outputbasedir = nothing
     elseif hostname == "GHER-ULg-Laptop"
         outputbasedir = "/data/EMODnet/Chemistry/merged/"

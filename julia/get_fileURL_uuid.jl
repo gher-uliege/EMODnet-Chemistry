@@ -137,10 +137,8 @@ end
 # Set the directory and the name of the file which will store the lists
 # -----------------
 
-#databasedir = "/production/apache/data/emodnet-projects/Phase-3"
-#databasedir = "/production/apache/data/emodnet-projects/v2023"
-databasedir = "/home/ctroupin/data/EMODnet-Chemistry/emodnet-results-2023"
-outputfile = "./listurl_v2023.csv"
+databasedir = "/production/apache/data/emodnet-domains/"
+outputfile = "./eutrophication_file_layers_uuids_v2025.csv"
 
 datafilelist = get_netcdf_list(databasedir)
 idlist = get_id.(datafilelist)

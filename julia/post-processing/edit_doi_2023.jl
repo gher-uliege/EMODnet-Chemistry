@@ -32,24 +32,24 @@ for resfile in resultfilelist
     
     NCDataset(resfile, "a") do ds
         productID = ds.attrib["product_id"]
-        #@info(productID);
+        @info(productID);
         
         productIndex = findfirst(data.productID .== productID)
-        @info(productIndex);
+        #@info(productIndex);
+	oldDOI = ds.attrib["doi"]
         
         if productIndex == nothing
             @info(resfile);
+	    newDOI = "https://doi.org/10.13120/$(productID)"
         else
-            @info("Modify the DOI")
-            oldDOI = ds.attrib["doi"]
-            #newDOI = data.productDOI[productIndex]
-            newDOI = "https://doi.org/10.13120/$(productID)"
-            @info("$(oldDOI) → $(newDOI)")
-            #ds.attrib["doi"] = newDOI
+            newDOI = data.productDOI[productIndex]
         end
 
+        @info("$(oldDOI) -> $(newDOI)")
+        ds.attrib["doi"] = newDOI
+
         @info("Changing citation")
-        # ds.attrib["citation"] = thecitation
-        # ds.attrib["Conventions"] = "CF-1.10"
+        ds.attrib["citation"] = thecitation
+        ds.attrib["Conventions"] = "CF-1.10"
     end
 end
